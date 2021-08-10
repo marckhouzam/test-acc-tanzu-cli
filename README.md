@@ -1,8 +1,12 @@
 # App Accelerator tanzu CLI plugin
 
 To check the plugin documentation go to `cmd/plugin/accelerator/README.md`
+# Setup
 
-# Build the plugin1
+Before installing the plugin in your tanzu instance, you need to follow the steps described here https://github.com/vmware-tanzu/tanzu-framework/blob/main/docs/cli/getting-started.md
+for running plugins locally
+
+# Build the plugin
 
 to build the plugin you need to:
 

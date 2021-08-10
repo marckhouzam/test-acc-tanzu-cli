@@ -26,10 +26,17 @@ tanzu accelerator delete existing-accelerator-name
 
 ```
 tanzu accelerator get existing-accelerator-name
+
+Name            GitRepoURL              Branch
+podinfo         https://github.com/simple-starters/podinfo              main
 ```
 
 ## List
 
 ```
 tanzu accelerator list
+
+new-accelerator
+podinfo
+spring-petclinic
 ```
