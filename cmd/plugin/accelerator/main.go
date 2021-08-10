@@ -33,12 +33,12 @@ func main() {
 	kubeconfig := homedir.HomeDir() + "/.kube/config"
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
 	clientset, err := acceleratorClientSet.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 	p.AddCommands(
 		commands.CreateCmd(clientset),
@@ -49,7 +49,7 @@ func main() {
 	)
 
 	if err := p.Execute(); err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
 }
