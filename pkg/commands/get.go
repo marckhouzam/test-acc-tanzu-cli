@@ -25,8 +25,8 @@ func GetCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client, w *tabwri
 			if err != nil {
 				panic(err.Error())
 			}
-			fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH")
-			fmt.Fprintf(w, "%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch)
+			fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Git.Reference.Tag)
 			w.Flush()
 		},
 	}
