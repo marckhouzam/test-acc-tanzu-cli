@@ -17,10 +17,14 @@ import (
 func CreateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
 	opts := CreateOptions{}
 	cmd := &cobra.Command{
-		Use:   "create",
-		Short: "Create accelerator",
-		Long:  `Create will add the accelerator resource using the given parameters`,
+		Use:     "create",
+		Short:   "Create accelerator",
+		Example: "tanzu accelerator create <accelerator-name> -git-repository <git-repo-URL>",
+		Long:    `Create will add the accelerator resource using the given parameters`,
 		Run: func(cmd *cobra.Command, args []string) {
+			if args[0] == "" {
+				panic("you need to pass the name of the accelerator")
+			}
 			if opts.DisplayName == "" {
 				opts.DisplayName = args[0]
 			}

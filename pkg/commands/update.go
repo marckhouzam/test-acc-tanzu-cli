@@ -5,6 +5,7 @@ package commands
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/imdario/mergo"
 	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
@@ -17,9 +18,10 @@ import (
 func UpdateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
 	opts := UpdateOptions{}
 	var updateCmd = &cobra.Command{
-		Use:   "update",
-		Short: "Update accelerator",
-		Long:  `Update accelerator`,
+		Use:     "update",
+		Short:   "Update accelerator",
+		Long:    `Update accelerator`,
+		Example: "tanzu accelerator update <accelerator-name> --description \"Lorem Ipsum\"",
 		Run: func(cmd *cobra.Command, args []string) {
 			accelerator, err := clientset.Accelerators(opts.Namespace).Get(context.Background(), args[0], v1.GetOptions{})
 			if err != nil {
@@ -52,6 +54,7 @@ func UpdateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra
 				panic(err.Error())
 			}
 			clientset.Accelerators(opts.Namespace).Update(context.Background(), &updatedAcceleratorStruct, v1.UpdateOptions{})
+			fmt.Printf("updated accelerator %s in namespace %s\n", args[0], opts.Namespace)
 		},
 	}
 	opts.DefineFlags(updateCmd)

@@ -4,7 +4,8 @@ Copyright 2021 VMware, Inc. All Rights Reserved.
 package main
 
 import (
-	"log"
+	"os"
+	"text/tabwriter"
 
 	"github/vmware-tanzu-private/tanzu-cli-app-accelerator/pkg/commands"
 
@@ -25,31 +26,34 @@ func main() {
 		Aliases:        []string{"acc"},
 	})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	p.Cmd.CompletionOptions.DisableDefaultCmd = true
 
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
+
 	kubeconfig := homedir.HomeDir() + "/.kube/config"
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	clientset, err := acceleratorClientSet.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	p.AddCommands(
 		commands.CreateCmd(clientset),
 		commands.DeleteCmd(clientset),
-		commands.ListCmd(clientset),
-		commands.GetCmd(clientset),
+		commands.ListCmd(clientset, w),
+		commands.GetCmd(clientset, w),
 		commands.UpdateCmd(clientset),
 	)
 
 	if err := p.Execute(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 }

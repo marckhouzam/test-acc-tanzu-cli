@@ -18,16 +18,15 @@ type CreateOptions struct {
 }
 
 func (co *CreateOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&co.Namespace, "namespace", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 	cmd.Flags().StringVar(&co.Description, "description", "", "Accelerator description")
-	cmd.Flags().StringVar(&co.DisplayName, "displayName", "", "Accelerator display name")
-	cmd.Flags().StringVar(&co.IconUrl, "iconUrl", "", "Accelerator icon location")
+	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "Accelerator display name")
+	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "Accelerator icon location")
 	cmd.Flags().StringSliceVar(&co.Tags, "tags", []string{}, "Accelerator Tags")
-	cmd.Flags().StringVar(&co.GitRepoUrl, "gitRepoUrl", "", "Accelerator repo URL")
-	cmd.Flags().StringVar(&co.GitBranch, "gitBranch", "", "Accelerator repo branch")
+	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
+	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "main", "Accelerator repo branch")
 
-	cmd.MarkFlagRequired("gitRepoUrl")
-	cmd.MarkFlagRequired("gitBranch")
+	cmd.MarkFlagRequired("git-repository")
 }
 
 type UpdateOptions struct {
@@ -41,7 +40,7 @@ type UpdateOptions struct {
 }
 
 func (uo *UpdateOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&uo.Namespace, "namespace", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 	cmd.Flags().StringVar(&uo.Description, "description", "", "Accelerator description")
 	cmd.Flags().StringVar(&uo.DisplayName, "displayName", "", "Accelerator display name")
 	cmd.Flags().StringVar(&uo.IconUrl, "iconUrl", "", "Accelerator icon location")
@@ -55,7 +54,7 @@ type DeleteOptions struct {
 }
 
 func (do *DeleteOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&do.Namespace, "namespace", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&do.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 }
 
 type ListOptions struct {
@@ -63,7 +62,7 @@ type ListOptions struct {
 }
 
 func (lo *ListOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&lo.Namespace, "namespace", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 }
 
 type GetOptions struct {
@@ -71,5 +70,5 @@ type GetOptions struct {
 }
 
 func (gopts *GetOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&gopts.Namespace, "namespace", "default", "Kubernetes namespace")
+	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 }

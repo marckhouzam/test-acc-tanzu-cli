@@ -7,19 +7,25 @@ This plugin lets you manage your accelerator resources using the tanzu CLI
 ## Create
 
 ```
-tanzu accelerator create my-accelerator-name --gitRepoUrl http://www.repourl.com --gitBranch main
+tanzu accelerator create my-accelerator-name --git-repository http://www.repourl.com --git-branch main
+
+created accelerator my-accelerator-name in namespace default
 ```
 
 ### Update
 
 ```
 tanzu accelerator update existing-accelerator-name --description "Lorem Ipsum"
+
+updated accelerator existing-accelerator-name in namespace default
 ```
 
 ## Delete
 
 ```
 tanzu accelerator delete existing-accelerator-name
+
+deleted accelerator existing-accelerator-name in namespace default
 ```
 
 ## Get
@@ -27,8 +33,8 @@ tanzu accelerator delete existing-accelerator-name
 ```
 tanzu accelerator get existing-accelerator-name
 
-Name            GitRepoURL              Branch
-podinfo         https://github.com/simple-starters/podinfo              main
+NAME                        GIT REPOSITORY                                    BRANCH
+existing-accelerator-name   https://github.com/example/existing-accelerator   main
 ```
 
 ## List
@@ -36,7 +42,9 @@ podinfo         https://github.com/simple-starters/podinfo              main
 ```
 tanzu accelerator list
 
-new-accelerator
-podinfo
-spring-petclinic
+NAME               GIT REPOSITORY                                            BRANCH
+engine-features    https://github.com/simple-starters/e2e-engine-features    main
+new-accelerator    https://github.com/simple-starters/e2e-new-accelerator    main
+podinfo            https://github.com/simple-starters/e2e-podinfo            main
+spring-petclinic   https://github.com/simple-starters/e2e-spring-petclinic   main
 ```

@@ -15,9 +15,10 @@ import (
 func DeleteCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
 	opts := DeleteOptions{}
 	var deleteCmd = &cobra.Command{
-		Use:   "delete",
-		Short: "Delete accelerator",
-		Long:  `Delete will delete an accelerator from the given name`,
+		Use:     "delete",
+		Short:   "Delete accelerator",
+		Example: "tanzu accelerator delete <accelerator-name>",
+		Long:    `Delete will delete an accelerator from the given name`,
 		Run: func(cmd *cobra.Command, args []string) {
 			err := clientset.Accelerators(opts.Namespace).Delete(context.Background(), args[0], v1.DeleteOptions{})
 			if err != nil {
