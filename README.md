@@ -14,3 +14,10 @@ to build the plugin you need to:
  - Run the `make build` task
  - The build task will create the `artifacts/` directory
  - To install the plugin to tanzu, you need to run `tanzu plugin install accelerator --local ./artifacts`
+
+# Troubleshooting
+If you get the error `fatal: could not read Username for 'https://github.com': terminal prompts disabled` while downloading the go dependencies
+run the following command
+```
+git config --global url."git@github.com:".insteadOf https://github.com/
+```
