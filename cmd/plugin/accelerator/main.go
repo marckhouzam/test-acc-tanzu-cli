@@ -41,6 +41,7 @@ func main() {
 	}
 
 	clientset, err := acceleratorClientSet.NewForConfig(config)
+
 	if err != nil {
 		panic(err)
 	}
@@ -50,6 +51,7 @@ func main() {
 		commands.ListCmd(clientset, w),
 		commands.GetCmd(clientset, w),
 		commands.UpdateCmd(clientset),
+		commands.RunCmd(clientset),
 	)
 
 	if err := p.Execute(); err != nil {
