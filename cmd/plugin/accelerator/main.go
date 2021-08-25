@@ -4,9 +4,6 @@ Copyright 2021 VMware, Inc. All Rights Reserved.
 package main
 
 import (
-	"os"
-	"text/tabwriter"
-
 	"github/vmware-tanzu-private/tanzu-cli-app-accelerator/pkg/commands"
 
 	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
@@ -31,14 +28,12 @@ func main() {
 
 	p.Cmd.CompletionOptions.DisableDefaultCmd = true
 
-	w := new(tabwriter.Writer)
-	w.Init(os.Stdout, 0, 8, 3, ' ', 0)
-
 	kubeconfig := homedir.HomeDir() + "/.kube/config"
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err)
 	}
+	defaultUiServerUrl := commands.EnvVar("ACC_UI_SERVER_URL", "http://acc-ui-server.accelerator-system")
 
 	clientset, err := acceleratorClientSet.NewForConfig(config)
 
@@ -48,10 +43,10 @@ func main() {
 	p.AddCommands(
 		commands.CreateCmd(clientset),
 		commands.DeleteCmd(clientset),
-		commands.ListCmd(clientset, w),
-		commands.GetCmd(clientset, w),
+		commands.ListCmd(clientset),
+		commands.GetCmd(clientset),
 		commands.UpdateCmd(clientset),
-		commands.RunCmd(clientset),
+		commands.RunCmd(defaultUiServerUrl),
 	)
 
 	if err := p.Execute(); err != nil {

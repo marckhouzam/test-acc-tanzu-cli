@@ -42,11 +42,11 @@ type UpdateOptions struct {
 func (uo *UpdateOptions) DefineFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "default", "Kubernetes namespace")
 	cmd.Flags().StringVar(&uo.Description, "description", "", "Accelerator description")
-	cmd.Flags().StringVar(&uo.DisplayName, "displayName", "", "Accelerator display name")
-	cmd.Flags().StringVar(&uo.IconUrl, "iconUrl", "", "Accelerator icon location")
+	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "Accelerator display name")
+	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "Accelerator icon location")
 	cmd.Flags().StringSliceVar(&uo.Tags, "tags", []string{}, "Accelerator Tags")
-	cmd.Flags().StringVar(&uo.GitRepoUrl, "gitRepoUrl", "", "Accelerator repo URL")
-	cmd.Flags().StringVar(&uo.GitBranch, "gitBranch", "", "Accelerator repo branch")
+	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
+	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Accelerator repo branch")
 }
 
 type DeleteOptions struct {

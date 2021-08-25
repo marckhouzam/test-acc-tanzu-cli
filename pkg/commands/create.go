@@ -14,14 +14,14 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
+func CreateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra.Command {
 	opts := CreateOptions{}
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create accelerator",
 		Example: "tanzu accelerator create <accelerator-name> -git-repository <git-repo-URL>",
 		Long:    `Create will add the accelerator resource using the given parameters`,
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if args[0] == "" {
 				panic("you need to pass the name of the accelerator")
 			}
@@ -53,10 +53,12 @@ func CreateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra
 			}
 			result, err := clientset.Accelerators(opts.Namespace).Create(context.Background(), acc, v1.CreateOptions{})
 			if err != nil {
-				panic(err.Error())
+				fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s", args[0])
+				return err
 			}
 
-			fmt.Printf("created accelerator %s in namespace %s\n", result.Name, result.Namespace)
+			fmt.Fprintf(cmd.OutOrStdout(), "created accelerator %s in namespace %s\n", result.Name, result.Namespace)
+			return nil
 
 		},
 	}

@@ -10,19 +10,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
-	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
 	"github.com/spf13/cobra"
 )
-
-func envVar(key string, defVal string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
-	}
-	return defVal
-}
 
 type UiServerBody struct {
 	Accelerator string                 `json:"accelerator"`
@@ -33,7 +24,7 @@ type OptionsProjectName struct {
 	ProjectName string `json:"projectName"`
 }
 
-func RunCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
+func RunCmd(defaultUiServerUrl string) *cobra.Command {
 	var uiServer string
 	var optionsString string
 	var filepath string
@@ -88,16 +79,17 @@ func RunCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Co
 				return
 			}
 			body, _ := ioutil.ReadAll(resp.Body)
-			err = ioutil.WriteFile(outputDir+projectName.ProjectName+".zip", body, 0644)
+			zipfile := outputDir + projectName.ProjectName + ".zip"
+			err = ioutil.WriteFile(zipfile, body, 0644)
 			if err != nil {
 				log.Fatal(err)
 			}
+			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created", zipfile)
 		},
 	}
-	defaultUiServer := envVar("ACC_UI_SERVER_URL", "http://acc-ui-server.accelerator-system")
 	runCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
 	runCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
 	runCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory to place the zip file")
-	runCmd.Flags().StringVar(&uiServer, "ui-server-url", defaultUiServer, "Add accelerator UI server URL, this will overwrite UI_SERVER_URL env variable")
+	runCmd.Flags().StringVar(&uiServer, "ui-server-url", defaultUiServerUrl, "Add accelerator UI server URL, this will overwrite UI_SERVER_URL env variable")
 	return runCmd
 }

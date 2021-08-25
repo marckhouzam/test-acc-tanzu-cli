@@ -15,17 +15,18 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func UpdateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra.Command {
+func UpdateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra.Command {
 	opts := UpdateOptions{}
 	var updateCmd = &cobra.Command{
 		Use:     "update",
 		Short:   "Update accelerator",
 		Long:    `Update accelerator`,
 		Example: "tanzu accelerator update <accelerator-name> --description \"Lorem Ipsum\"",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			accelerator, err := clientset.Accelerators(opts.Namespace).Get(context.Background(), args[0], v1.GetOptions{})
 			if err != nil {
-				panic(err.Error())
+				fmt.Fprintf(cmd.OutOrStderr(), "accelerator %s not found", args[0])
+				return err
 			}
 			updatedAccelerator := &acceleratorv1alpha1.Accelerator{
 				TypeMeta: v1.TypeMeta{
@@ -51,10 +52,12 @@ func UpdateCmd(clientset *acceleratorClientSet.AcceleratorV1Alpha1Client) *cobra
 			updatedAcceleratorStruct := *updatedAccelerator
 			err = mergo.Merge(&updatedAcceleratorStruct, *accelerator)
 			if err != nil {
-				panic(err.Error())
+				fmt.Fprintf(cmd.OutOrStderr(), "there was an error updating accelerator %s", args[0])
+				return err
 			}
 			clientset.Accelerators(opts.Namespace).Update(context.Background(), &updatedAcceleratorStruct, v1.UpdateOptions{})
-			fmt.Printf("updated accelerator %s in namespace %s\n", args[0], opts.Namespace)
+			fmt.Fprintf(cmd.OutOrStdout(), "accelerator %s updated successfully", args[0])
+			return nil
 		},
 	}
 	opts.DefineFlags(updateCmd)
