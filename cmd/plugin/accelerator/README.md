@@ -48,3 +48,19 @@ new-accelerator    https://github.com/simple-starters/e2e-new-accelerator    mai
 podinfo            https://github.com/simple-starters/e2e-podinfo            main
 spring-petclinic   https://github.com/simple-starters/e2e-spring-petclinic   main
 ```
+
+## Run
+
+It will download a zip file with the given options from the accelerator, if you
+wish to download in different directory from the current one you can use
+the `--output-dir` flag
+
+Run command depends on the accelerator ui server to works, you need to set the
+environment variable `ACC_UI_SERVER_URL` pointing to the ui server or use the flag
+`--ui-server-url`
+
+```
+tanzu accelerator run accelerator-name --options "{\"projectName\": \"project\"}" --ui-server-url http://localhost:8877
+
+zip file project.zip created
+```
