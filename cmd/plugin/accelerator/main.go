@@ -11,12 +11,17 @@ import (
 	"github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli/command/plugin"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
+
+	// load credential helpers
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
 
 func main() {
 	p, err := plugin.NewPlugin(&tanzucliv1alpha1.PluginDescriptor{
 		Name:           "accelerator",
-		Version:        "v0.2.0",
+		Version:        "v0.3.0-dev",
 		Description:    "Manage accelerators in your kubernetes cluster",
 		Group:          tanzucliv1alpha1.BuildCmdGroup,
 		CompletionType: tanzucliv1alpha1.NativePluginCompletion,
