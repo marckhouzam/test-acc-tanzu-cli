@@ -919,8 +919,8 @@ github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR
 github.com/phayes/checkstyle v0.0.0-20170904204023-bfd46e6a821d/go.mod h1:3OzsM7FXDQlpCiw2j81fOmAwQLnZnLGXVKUzeKQXIAw=
 github.com/pierrec/lz4 v1.0.2-0.20190131084431-473cd7ce01a1/go.mod h1:3/3N9NVKO0jef7pBehbT1qWhCMrIgbYNnFAZCqQ5LRc=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pivotal/acc-controller v0.1.0-alpha1.0.20210820194545-820265ff6dc9 h1:k3fXS5mDi1oiXSYtYsk0Miwll8ELftsUjVSgtDisDN0=
-github.com/pivotal/acc-controller v0.1.0-alpha1.0.20210820194545-820265ff6dc9/go.mod h1:A4ne14lWSNLLKSJZN87q/lQ0g17w8dhMy1Lx2f6SHnI=
+github.com/pivotal/acc-controller v0.2.1-0.20210827173958-f590e970c336 h1:PKD9giuovk23ad0+FrnYil3ZHzdqLTf+W8IhE43l0hs=
+github.com/pivotal/acc-controller v0.2.1-0.20210827173958-f590e970c336/go.mod h1:A4ne14lWSNLLKSJZN87q/lQ0g17w8dhMy1Lx2f6SHnI=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
