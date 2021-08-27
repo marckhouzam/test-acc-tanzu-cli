@@ -48,7 +48,7 @@ func (uo *UpdateOptions) DefineFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVar(&uo.Tags, "tags", []string{}, "Accelerator Tags")
 	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
 	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Accelerator repo branch")
-	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "Use this flag to trigger a reconcilation with the git repository")
+	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "Trigger a reconciliation including the associated GitRepository resource")
 }
 
 type DeleteOptions struct {
