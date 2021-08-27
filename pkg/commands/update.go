@@ -6,6 +6,7 @@ package commands
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/imdario/mergo"
 	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
@@ -17,6 +18,7 @@ import (
 
 func UpdateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra.Command {
 	opts := UpdateOptions{}
+	requestedAtAnnotation := "reconcile.accelerator.apps.tanzu.vmware.com/requestedAt"
 	var updateCmd = &cobra.Command{
 		Use:     "update",
 		Short:   "Update accelerator",
@@ -48,6 +50,12 @@ func UpdateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 						},
 					},
 				},
+			}
+			if opts.Reconcile {
+				if accelerator.ObjectMeta.Annotations == nil {
+					accelerator.ObjectMeta.Annotations = make(map[string]string)
+				}
+				accelerator.ObjectMeta.Annotations[requestedAtAnnotation] = time.Now().UTC().Format(time.RFC3339)
 			}
 			updatedAcceleratorStruct := *updatedAccelerator
 			err = mergo.Merge(&updatedAcceleratorStruct, *accelerator)

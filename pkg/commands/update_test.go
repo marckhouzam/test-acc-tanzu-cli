@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -57,6 +58,17 @@ var _ = Describe("command update", func() {
 				updateCmd.Execute()
 				out, _ := ioutil.ReadAll(b)
 				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s not found", invalidAcceleratorName))).Should(BeTrue())
+			})
+		})
+
+		When("adds reconcile flag", func() {
+			It("Should add the requestedAt annotation", func() {
+				updateCmd.SetArgs([]string{acceleratorName, "--reconcile"})
+				updateCmd.Execute()
+				reconciledAcc, _ := clientset.FakeAcceleratorV1Alpha1().Accelerators("default").Get(context.Background(), "test", v1.GetOptions{})
+				out, _ := ioutil.ReadAll(b)
+				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s updated successfully", acceleratorName))).Should(BeTrue())
+				Expect(reconciledAcc.ObjectMeta.Annotations["requestedAt"]).ShouldNot(BeNil())
 			})
 		})
 	})
