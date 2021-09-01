@@ -30,7 +30,7 @@ var _ = Describe("command run", func() {
 					Fail("Error testing GET command")
 				}
 
-				Expect(string(out)).Should(Equal("zip file test-acc.zip created"))
+				Expect(string(out)).Should(Equal("zip file test-acc.zip created\n"))
 				os.Remove("test-acc.zip")
 			})
 		})

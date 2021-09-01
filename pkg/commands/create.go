@@ -25,10 +25,6 @@ func CreateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 			if args[0] == "" {
 				panic("you need to pass the name of the accelerator")
 			}
-			if opts.DisplayName == "" {
-				opts.DisplayName = args[0]
-			}
-
 			acc := &acceleratorv1alpha1.Accelerator{
 				TypeMeta: v1.TypeMeta{
 					APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",

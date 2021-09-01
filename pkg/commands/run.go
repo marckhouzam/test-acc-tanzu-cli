@@ -84,7 +84,7 @@ func RunCmd(defaultUiServerUrl string) *cobra.Command {
 			if err != nil {
 				log.Fatal(err)
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created", zipfile)
+			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
 		},
 	}
 	runCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
