@@ -22,7 +22,7 @@ func DeleteCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 		RunE: func(cmd *cobra.Command, args []string) error {
 			err := clientset.Accelerators(opts.Namespace).Delete(context.Background(), args[0], v1.DeleteOptions{})
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "There was a problem trying to delete accelerator %s", args[0])
+				fmt.Fprintf(cmd.OutOrStderr(), "There was a problem trying to delete accelerator %s\n", args[0])
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "deleted accelerator %s in namespace %s\n", args[0], opts.Namespace)

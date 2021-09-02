@@ -54,7 +54,7 @@ var _ = Describe("command delete", func() {
 				err := DeleteCmd.Execute()
 				Expect(err).ShouldNot(BeNil())
 				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), fmt.Sprintf("There was a problem trying to delete accelerator %s", invalidAcceleratorName))).Should(BeTrue())
+				Expect(strings.HasPrefix(string(out), fmt.Sprintf("There was a problem trying to delete accelerator %s\n", invalidAcceleratorName))).Should(BeTrue())
 			})
 		})
 

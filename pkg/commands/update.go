@@ -27,7 +27,7 @@ func UpdateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 		RunE: func(cmd *cobra.Command, args []string) error {
 			accelerator, err := clientset.Accelerators(opts.Namespace).Get(context.Background(), args[0], v1.GetOptions{})
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "accelerator %s not found", args[0])
+				fmt.Fprintf(cmd.OutOrStderr(), "accelerator %s not found\n", args[0])
 				return err
 			}
 			updatedAccelerator := &acceleratorv1alpha1.Accelerator{
@@ -60,11 +60,11 @@ func UpdateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 			updatedAcceleratorStruct := *updatedAccelerator
 			err = mergo.Merge(&updatedAcceleratorStruct, *accelerator)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "there was an error updating accelerator %s", args[0])
+				fmt.Fprintf(cmd.OutOrStderr(), "there was an error updating accelerator %s\n", args[0])
 				return err
 			}
 			clientset.Accelerators(opts.Namespace).Update(context.Background(), &updatedAcceleratorStruct, v1.UpdateOptions{})
-			fmt.Fprintf(cmd.OutOrStdout(), "accelerator %s updated successfully", args[0])
+			fmt.Fprintf(cmd.OutOrStdout(), "accelerator %s updated successfully\n", args[0])
 			return nil
 		},
 	}

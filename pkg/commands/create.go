@@ -49,7 +49,7 @@ func CreateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 			}
 			result, err := clientset.Accelerators(opts.Namespace).Create(context.Background(), acc, v1.CreateOptions{})
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s", args[0])
+				fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", args[0])
 				return err
 			}
 

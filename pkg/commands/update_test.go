@@ -48,7 +48,7 @@ var _ = Describe("command update", func() {
 				updateCmd.SetArgs([]string{acceleratorName, "--git-branch", updatedBranch})
 				updateCmd.Execute()
 				out, _ := ioutil.ReadAll(b)
-				Expect(string(out)).Should(Equal(fmt.Sprintf("accelerator %s updated successfully", acceleratorName)))
+				Expect(string(out)).Should(Equal(fmt.Sprintf("accelerator %s updated successfully\n", acceleratorName)))
 			})
 		})
 
@@ -57,7 +57,7 @@ var _ = Describe("command update", func() {
 				updateCmd.SetArgs([]string{invalidAcceleratorName, "--git-branch", updatedBranch})
 				updateCmd.Execute()
 				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s not found", invalidAcceleratorName))).Should(BeTrue())
+				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s not found\n", invalidAcceleratorName))).Should(BeTrue())
 			})
 		})
 
@@ -67,7 +67,7 @@ var _ = Describe("command update", func() {
 				updateCmd.Execute()
 				reconciledAcc, _ := clientset.FakeAcceleratorV1Alpha1().Accelerators("default").Get(context.Background(), "test", v1.GetOptions{})
 				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s updated successfully", acceleratorName))).Should(BeTrue())
+				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s updated successfully\n", acceleratorName))).Should(BeTrue())
 				Expect(reconciledAcc.ObjectMeta.Annotations["requestedAt"]).ShouldNot(BeNil())
 			})
 		})

@@ -25,7 +25,7 @@ func ListCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "There was an error listing accelerators")
+				fmt.Fprintf(cmd.OutOrStderr(), "There was an error listing accelerators\n")
 				return err
 			}
 			fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
