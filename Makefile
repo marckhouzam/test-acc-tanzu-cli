@@ -15,4 +15,7 @@ build:
 	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin
 
 test:
-	go test ./...
+	go test -coverprofile cover.out ./...
+
+create-artifact: build
+	tar -zcvf tanzu-accelerator-plugin.tar.gz artifacts

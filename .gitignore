@@ -1,3 +1,4 @@
 /artifacts
 .vscode
 vendor/
+cover.out
