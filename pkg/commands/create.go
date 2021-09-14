@@ -5,26 +5,30 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/spf13/cobra"
+	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func CreateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra.Command {
+func CreateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := CreateOptions{}
 	cmd := &cobra.Command{
 		Use:     "create",
 		Short:   "Create accelerator",
 		Example: "tanzu accelerator create <accelerator-name> -git-repository <git-repo-URL>",
-		Long:    `Create will add the accelerator resource using the given parameters`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if args[0] == "" {
-				panic("you need to pass the name of the accelerator")
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("you must pass the name of the accelerator")
 			}
+			return nil
+		},
+		Long: `Create will add the accelerator resource using the given parameters`,
+		RunE: func(cmd *cobra.Command, args []string) error {
 			acc := &acceleratorv1alpha1.Accelerator{
 				TypeMeta: v1.TypeMeta{
 					APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",
@@ -47,17 +51,17 @@ func CreateCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 					},
 				},
 			}
-			result, err := clientset.Accelerators(opts.Namespace).Create(context.Background(), acc, v1.CreateOptions{})
+			err := c.Create(ctx, acc)
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", args[0])
 				return err
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "created accelerator %s in namespace %s\n", result.Name, result.Namespace)
+			fmt.Fprintf(cmd.OutOrStdout(), "created accelerator %s in namespace %s\n", acc.Name, acc.Namespace)
 			return nil
 
 		},
 	}
-	opts.DefineFlags(cmd)
+	opts.DefineFlags(ctx, cmd, c)
 	return cmd
 }

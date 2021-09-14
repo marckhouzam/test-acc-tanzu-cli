@@ -5,22 +5,36 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	acceleratorClientSet "github.com/pivotal/acc-controller/api/clientset"
+	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func DeleteCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cobra.Command {
+func DeleteCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := DeleteOptions{}
 	var deleteCmd = &cobra.Command{
-		Use:     "delete",
-		Short:   "Delete accelerator",
+		Use:   "delete",
+		Short: "Delete accelerator",
+		Args: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("you must pass the name of the accelerator")
+			}
+			return nil
+		},
 		Example: "tanzu accelerator delete <accelerator-name>",
 		Long:    `Delete will delete an accelerator from the given name`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := clientset.Accelerators(opts.Namespace).Delete(context.Background(), args[0], v1.DeleteOptions{})
+			accelerator := &acceleratorv1alpha1.Accelerator{}
+			err := c.Get(ctx, client.ObjectKey{Namespace: opts.Namespace, Name: args[0]}, accelerator)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "accelerator %s not found\n", args[0])
+				return err
+			}
+			err = c.Delete(ctx, accelerator)
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "There was a problem trying to delete accelerator %s\n", args[0])
 				return err
@@ -29,6 +43,6 @@ func DeleteCmd(clientset acceleratorClientSet.AcceleratorV1Alpha1Interface) *cob
 			return nil
 		},
 	}
-	opts.DefineFlags(deleteCmd)
+	opts.DefineFlags(ctx, deleteCmd, c)
 	return deleteCmd
 }

@@ -4,7 +4,10 @@ Copyright 2021 VMware, Inc. All Rights Reserved.
 package commands
 
 import (
+	"context"
+
 	"github.com/spf13/cobra"
+	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 )
 
 type CreateOptions struct {
@@ -17,8 +20,8 @@ type CreateOptions struct {
 	Tags        []string
 }
 
-func (co *CreateOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "default", "Kubernetes namespace")
+func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cli.NamespaceFlag(ctx, cmd, c, &co.Namespace)
 	cmd.Flags().StringVar(&co.Description, "description", "", "Accelerator description")
 	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "Accelerator display name")
 	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "Accelerator icon location")
@@ -40,8 +43,8 @@ type UpdateOptions struct {
 	Reconcile   bool
 }
 
-func (uo *UpdateOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "default", "Kubernetes namespace")
+func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cli.NamespaceFlag(ctx, cmd, c, &uo.Namespace)
 	cmd.Flags().StringVar(&uo.Description, "description", "", "Accelerator description")
 	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "Accelerator display name")
 	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "Accelerator icon location")
@@ -55,22 +58,22 @@ type DeleteOptions struct {
 	Namespace string
 }
 
-func (do *DeleteOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&do.Namespace, "namespace", "n", "default", "Kubernetes namespace")
+func (do *DeleteOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cli.NamespaceFlag(ctx, cmd, c, &do.Namespace)
 }
 
 type ListOptions struct {
 	Namespace string
 }
 
-func (lo *ListOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "default", "Kubernetes namespace")
+func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
 }
 
 type GetOptions struct {
 	Namespace string
 }
 
-func (gopts *GetOptions) DefineFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "default", "Kubernetes namespace")
+func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
 }

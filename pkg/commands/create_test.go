@@ -1,37 +1,76 @@
 package commands
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-	"io/ioutil"
+	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/pivotal/acc-controller/api/clientset/fake"
+	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-var _ = Describe("command get", func() {
-	acceleratorName := "test"
+func TestCreateCommand(t *testing.T) {
+	scheme := runtime.NewScheme()
+	_ = acceleratorv1alpha1.AddToScheme(scheme)
+
+	acceleratorName := "test-accelerator"
+	gitRepoUrl := "https://www.test.com"
+	gitBranch := "main"
 	namespace := "default"
-	clientset := fake.NewSimpleClientset()
-	createCmd := CreateCmd(clientset.FakeAcceleratorV1Alpha1())
-	b := new(bytes.Buffer)
-	createCmd.SetOut(b)
-	createCmd.SetErr(b)
-	Context("create()", func() {
-		When("calling create command", func() {
-			It("Should create the accelerator", func() {
-				createCmd.SetArgs([]string{acceleratorName, "--git-repository", "https://www.test.com", "--git-branch", "main"})
-				createCmd.ExecuteContext(context.Background())
-				out, err := ioutil.ReadAll(b)
-				if err != nil {
-					Fail("Error testing GET command")
-				}
-				Expect(string(out)).Should(Equal(fmt.Sprintf("created accelerator %s in namespace %s\n", acceleratorName, namespace)))
-			})
-		})
 
-	})
-
-})
+	table := clitesting.CommandTestSuite{
+		{
+			Name:        "Missing args",
+			Args:        []string{"--git-repository", gitRepoUrl},
+			ShouldError: true,
+		},
+		{
+			Name: "Error creating accelerator",
+			Args: []string{acceleratorName, "--git-repository", gitRepoUrl},
+			WithReactors: []clitesting.ReactionFunc{
+				clitesting.InduceFailure("create", "Accelerator"),
+			},
+			ExpectCreates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: v1.ObjectMeta{
+						Namespace: namespace,
+						Name:      acceleratorName,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: gitBranch,
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: "Error creating accelerator test-accelerator\n",
+			ShouldError:  true,
+		},
+		{
+			Name: "Create Accelerator",
+			Args: []string{acceleratorName, "--git-repository", gitRepoUrl},
+			ExpectCreates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: v1.ObjectMeta{
+						Namespace: namespace,
+						Name:      acceleratorName,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: gitBranch,
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+		},
+	}
+	table.Run(t, scheme, CreateCmd)
+}

@@ -1,77 +1,77 @@
 package commands
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-	"io/ioutil"
-	"strings"
-	"text/tabwriter"
+	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/pivotal/acc-controller/api/clientset/fake"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-var _ = Describe("command get", func() {
-	acceleratorName := "test"
+func TestGetCommand(t *testing.T) {
+	scheme := runtime.NewScheme()
+	_ = acceleratorv1alpha1.AddToScheme(scheme)
+	acceleratorName := "test-accelerator"
 	namespace := "default"
-	invalidAcceleratorName := "non-existent"
-	acc := &acceleratorv1alpha1.Accelerator{
-		TypeMeta: v1.TypeMeta{
-			APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",
-			Kind:       "Accelerator",
+
+	table := clitesting.CommandTestSuite{
+		{
+			Name:        "Missing args",
+			Args:        []string{},
+			ShouldError: true,
 		},
-		ObjectMeta: v1.ObjectMeta{
-			Namespace: namespace,
-			Name:      acceleratorName,
-		},
-		Spec: acceleratorv1alpha1.AcceleratorSpec{
-			Git: acceleratorv1alpha1.Git{
-				URL: "http://www.test.com",
-				Reference: &fluxcdv1beta1.GitRepositoryRef{
-					Branch: "main",
-				},
+		{
+			Name: "Error getting accelerator",
+			Args: []string{acceleratorName},
+			WithReactors: []clitesting.ReactionFunc{
+				clitesting.InduceFailure("get", "Accelerator"),
 			},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ShouldError:  true,
+			ExpectOutput: "Error getting accelerator test-accelerator\n",
+		},
+		{
+			Name: "Get an accelerator",
+			Args: []string{acceleratorName},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: `
+NAME               GIT REPOSITORY         BRANCH   TAG
+test-accelerator   https://www.test.com   main     
+`,
 		},
 	}
-	clientset := fake.NewSimpleClientset(acc)
-	getCmd := GetCmd(clientset.FakeAcceleratorV1Alpha1())
-	b := new(bytes.Buffer)
-	getCmd.SetOut(b)
-	getCmd.SetErr(b)
-	Context("get()", func() {
-		When("looks for existing accelerator", func() {
-			It("Should return the accelerator", func() {
-				tempBuf := bytes.NewBufferString("")
-				w := new(tabwriter.Writer)
-				w.Init(tempBuf, 0, 8, 3, ' ', 0)
-				fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
-				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", acc.Name, acc.Spec.Git.URL, acc.Spec.Git.Reference.Branch, acc.Spec.Reference.Tag)
-				w.Flush()
-				getCmd.SetArgs([]string{acceleratorName})
-				getCmd.ExecuteContext(context.Background())
-				out, err := ioutil.ReadAll(b)
-				if err != nil {
-					Fail("Error testing GET command")
-				}
-				expected, _ := ioutil.ReadAll(tempBuf)
-				Expect(string(out)).Should(Equal(string(expected)))
-			})
 
-			It("Should throw error for non existent accelerator", func() {
-				expectErrorMsg := fmt.Sprintf("Error getting accelerator %s", invalidAcceleratorName)
-				getCmd.SetArgs([]string{invalidAcceleratorName})
-				err := getCmd.ExecuteContext(context.Background())
-				Expect(err).ShouldNot(BeNil())
-				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), expectErrorMsg)).Should(BeTrue())
-			})
-		})
-
-	})
-
-})
+	table.Run(t, scheme, GetCmd)
+}

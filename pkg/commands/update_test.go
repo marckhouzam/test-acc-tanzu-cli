@@ -1,76 +1,117 @@
 package commands
 
 import (
-	"bytes"
-	"context"
-	"fmt"
-	"io/ioutil"
-	"strings"
+	"testing"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/pivotal/acc-controller/api/clientset/fake"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-var _ = Describe("command update", func() {
-	acceleratorName := "test"
-	invalidAcceleratorName := "non-existent"
-	updatedBranch := "another"
-	acc := &acceleratorv1alpha1.Accelerator{
-		TypeMeta: v1.TypeMeta{
-			APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",
-			Kind:       "Accelerator",
+func TestUpdateCmd(t *testing.T) {
+	acceleratorName := "test-accelerator"
+	testDescription := "another description"
+	namespace := "default"
+	scheme := runtime.NewScheme()
+	_ = acceleratorv1alpha1.AddToScheme(scheme)
+
+	table := clitesting.CommandTestSuite{
+		{
+			Name:        "Missing args",
+			Args:        []string{},
+			ShouldError: true,
 		},
-		ObjectMeta: v1.ObjectMeta{
-			Namespace: "default",
-			Name:      acceleratorName,
+		{
+			Name:         "Invalid accelerator",
+			Args:         []string{"non-existent"},
+			ShouldError:  true,
+			ExpectOutput: "accelerator non-existent not found\n",
 		},
-		Spec: acceleratorv1alpha1.AcceleratorSpec{
-			Git: acceleratorv1alpha1.Git{
-				URL: "http://www.test.com",
-				Reference: &fluxcdv1beta1.GitRepositoryRef{
-					Branch: "main",
-				},
+		{
+			Name: "Error updating accelerator",
+			Args: []string{acceleratorName, "--description", testDescription},
+			WithReactors: []clitesting.ReactionFunc{
+				clitesting.InduceFailure("update", "Accelerator"),
 			},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Description: "first description",
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectUpdates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Description: testDescription,
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ShouldError:  true,
+			ExpectOutput: "there was an error updating accelerator test-accelerator\n",
+		},
+		{
+			Name: "Updates accelerator",
+			Args: []string{acceleratorName, "--description", testDescription},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Description: "first description",
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectUpdates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Description: testDescription,
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: "accelerator test-accelerator updated successfully\n",
 		},
 	}
-	clientset := fake.NewSimpleClientset(acc)
-	b := bytes.NewBufferString("")
-	updateCmd := UpdateCmd(clientset.FakeAcceleratorV1Alpha1())
-	updateCmd.SetOut(b)
-	updateCmd.SetErr(b)
-	Context("update()", func() {
-		When("updates existing accelerator", func() {
-			It("Should update the accelerator", func() {
-				updateCmd.SetArgs([]string{acceleratorName, "--git-branch", updatedBranch})
-				updateCmd.Execute()
-				out, _ := ioutil.ReadAll(b)
-				Expect(string(out)).Should(Equal(fmt.Sprintf("accelerator %s updated successfully\n", acceleratorName)))
-			})
-		})
 
-		When("updates non-existing accelerator", func() {
-			It("Should throw error", func() {
-				updateCmd.SetArgs([]string{invalidAcceleratorName, "--git-branch", updatedBranch})
-				updateCmd.Execute()
-				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s not found\n", invalidAcceleratorName))).Should(BeTrue())
-			})
-		})
-
-		When("adds reconcile flag", func() {
-			It("Should add the requestedAt annotation", func() {
-				updateCmd.SetArgs([]string{acceleratorName, "--reconcile"})
-				updateCmd.Execute()
-				reconciledAcc, _ := clientset.FakeAcceleratorV1Alpha1().Accelerators("default").Get(context.Background(), "test", v1.GetOptions{})
-				out, _ := ioutil.ReadAll(b)
-				Expect(strings.HasPrefix(string(out), fmt.Sprintf("accelerator %s updated successfully\n", acceleratorName))).Should(BeTrue())
-				Expect(reconciledAcc.ObjectMeta.Annotations["requestedAt"]).ShouldNot(BeNil())
-			})
-		})
-	})
-
-})
+	table.Run(t, scheme, UpdateCmd)
+}
