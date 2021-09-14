@@ -24,15 +24,15 @@ type OptionsProjectName struct {
 	ProjectName string `json:"projectName"`
 }
 
-func RunCmd(defaultUiServerUrl string) *cobra.Command {
+func GenerateCmd(defaultUiServerUrl string) *cobra.Command {
 	var uiServer string
 	var optionsString string
 	var filepath string
 	var outputDir string
-	var runCmd = &cobra.Command{
-		Use:   "run",
-		Short: "Run accelerator",
-		Long:  `Executes accelerator from repository and downloads project artifacts`,
+	var generateCmd = &cobra.Command{
+		Use:   "generate",
+		Short: "Generate project from accelerator",
+		Long:  `Generate project from accelerator and download project artifacts as ZIP file`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if optionsString == "" {
 				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
@@ -87,9 +87,9 @@ func RunCmd(defaultUiServerUrl string) *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
 		},
 	}
-	runCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
-	runCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
-	runCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory to place the zip file")
-	runCmd.Flags().StringVar(&uiServer, "ui-server-url", defaultUiServerUrl, "Add accelerator UI server URL, this will overwrite UI_SERVER_URL env variable")
-	return runCmd
+	generateCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
+	generateCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
+	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory to place the zip file")
+	generateCmd.Flags().StringVar(&uiServer, "server-url", defaultUiServerUrl, "The App Accelerator server URL, this will override ACC_SERVER_URL env variable")
+	return generateCmd
 }

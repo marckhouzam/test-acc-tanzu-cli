@@ -49,18 +49,18 @@ podinfo            https://github.com/simple-starters/e2e-podinfo            mai
 spring-petclinic   https://github.com/simple-starters/e2e-spring-petclinic   main
 ```
 
-## Run
+## Generate
 
 It will download a zip file with the given options from the accelerator, if you
 wish to download in different directory from the current one you can use
 the `--output-dir` flag
 
-Run command depends on the accelerator ui server to works, you need to set the
-environment variable `ACC_UI_SERVER_URL` pointing to the ui server or use the flag
-`--ui-server-url`
+Generate command depends on the accelerator ui server to work, you need to set the
+environment variable `ACC_SERVER_URL` pointing to the ui server or use the flag
+`--server-url`
 
 ```
-tanzu accelerator run accelerator-name --options "{\"projectName\": \"project\"}" --ui-server-url http://localhost:8877
+tanzu accelerator run accelerator-name --options "{\"projectName\": \"project\"}" --server-url http://localhost:8877
 
 zip file project.zip created
 ```

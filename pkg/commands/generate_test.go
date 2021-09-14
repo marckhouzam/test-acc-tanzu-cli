@@ -16,18 +16,18 @@ var _ = Describe("command run", func() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Test String")
 	}))
-	runCmd := RunCmd(ts.URL)
+	generateCmd := GenerateCmd(ts.URL)
 	b := new(bytes.Buffer)
-	runCmd.SetOut(b)
-	runCmd.SetErr(b)
-	Context("Run()", func() {
-		When("Executes run command", func() {
+	generateCmd.SetOut(b)
+	generateCmd.SetErr(b)
+	Context("Generate()", func() {
+		When("Executes generate command", func() {
 			It("Should return zip file", func() {
-				runCmd.SetArgs([]string{"test-acc"})
-				runCmd.Execute()
+				generateCmd.SetArgs([]string{"test-acc"})
+				generateCmd.Execute()
 				out, err := ioutil.ReadAll(b)
 				if err != nil {
-					Fail("Error testing GET command")
+					Fail("Error testing generate command")
 				}
 
 				Expect(string(out)).Should(Equal("zip file test-acc.zip created\n"))
