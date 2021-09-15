@@ -45,7 +45,6 @@ func main() {
 
 	c := cli.Initialize(fmt.Sprintf("tanzu %s", p.Cmd.Use), scheme)
 	p.Cmd.CompletionOptions.DisableDefaultCmd = true
-	defaultUiServerUrl := commands.EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 
 	if err != nil {
 		panic(err)
@@ -56,7 +55,7 @@ func main() {
 		commands.ListCmd(ctx, c),
 		commands.GetCmd(ctx, c),
 		commands.UpdateCmd(ctx, c),
-		commands.GenerateCmd(defaultUiServerUrl),
+		commands.GenerateCmd(),
 	)
 
 	p.Cmd.PersistentFlags().StringVar(&c.KubeConfigFile, "kubeconfig", "", "kubeconfig `file` (default is $HOME/.kube/config)")

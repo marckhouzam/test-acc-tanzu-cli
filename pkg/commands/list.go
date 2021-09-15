@@ -5,6 +5,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"text/tabwriter"
 
@@ -15,6 +16,7 @@ import (
 )
 
 func ListCmd(ctx context.Context, c *cli.Config) *cobra.Command {
+	var accServerUrl string
 	opts := ListOptions{}
 	var listCmd = &cobra.Command{
 		Use:     "list",
@@ -22,26 +24,63 @@ func ListCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 		Long:    `List the accelerators, you can choose with namespace to use passing the flag -namespace`,
 		Example: "tanzu accelerator list",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			accelerators := &acceleratorv1alpha1.AcceleratorList{}
-			err := c.List(ctx, accelerators, client.InNamespace(opts.Namespace))
-			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "There was an error listing accelerators\n")
-				return err
+			var context, kubeconfig bool
+			if cmd.Parent() != nil {
+				context = cmd.Parent().PersistentFlags().Changed("context")
+				kubeconfig = cmd.Parent().PersistentFlags().Changed("kubeconfig")
 			}
-			if len(accelerators.Items) == 0 {
-				fmt.Fprintf(cmd.OutOrStderr(), "No accelerators found.\n")
-				return nil
+			serverUrl := accServerUrl
+			if opts.ServerUrl != "" {
+				serverUrl = opts.ServerUrl
 			}
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
-			fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
-			for _, accelerator := range accelerators.Items {
-				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Git.Reference.Tag)
+			if !opts.FromContext && !context && !kubeconfig {
+				return printListFromUiServer(serverUrl, w, cmd)
+			} else {
+				return printListFromClient(ctx, c, opts, cmd, w)
 			}
-			w.Flush()
-			return nil
 		},
 	}
+	accServerUrl = EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	opts.DefineFlags(ctx, listCmd, c)
 	return listCmd
+}
+
+func printListFromUiServer(url string, w *tabwriter.Writer, cmd *cobra.Command) error {
+	Accelerators, err := GetAcceleratorsFromUiServer(url, cmd)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
+	for _, accelerator := range Accelerators {
+		gitRepoUrl := accelerator.SpecGitRepositoryUrl
+		if gitRepoUrl == "" {
+			gitRepoUrl = accelerator.SourceUrl
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, gitRepoUrl, accelerator.SourceBranch, accelerator.SourceTag)
+	}
+	w.Flush()
+
+	return nil
+}
+
+func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, cmd *cobra.Command, w *tabwriter.Writer) error {
+	accelerators := &acceleratorv1alpha1.AcceleratorList{}
+	err := c.List(ctx, accelerators, client.InNamespace(opts.Namespace))
+	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "There was an error listing accelerators\n")
+		return err
+	}
+	if len(accelerators.Items) == 0 {
+		errorMsg := "no accelerators found"
+		fmt.Fprintf(cmd.OutOrStderr(), errorMsg+".\n")
+		return errors.New(errorMsg)
+	}
+	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
+	for _, accelerator := range accelerators.Items {
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Git.Reference.Tag)
+	}
+	w.Flush()
+	return nil
 }

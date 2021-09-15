@@ -63,17 +63,25 @@ func (do *DeleteOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 }
 
 type ListOptions struct {
-	Namespace string
+	Namespace   string
+	ServerUrl   string
+	FromContext bool
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
+	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "Accelerator UI server URL to use for retriving accelerators")
+	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "Retrieve Accelerators from current context defined in kubeconfig")
 }
 
 type GetOptions struct {
-	Namespace string
+	Namespace   string
+	ServerUrl   string
+	FromContext bool
 }
 
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
+	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "Accelerator UI server URL to use for retriving accelerators")
+	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "Retrieve Accelerator from current context defined in kubeconfig")
 }

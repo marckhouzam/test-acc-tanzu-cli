@@ -24,7 +24,7 @@ type OptionsProjectName struct {
 	ProjectName string `json:"projectName"`
 }
 
-func GenerateCmd(defaultUiServerUrl string) *cobra.Command {
+func GenerateCmd() *cobra.Command {
 	var uiServer string
 	var optionsString string
 	var filepath string
@@ -87,6 +87,7 @@ func GenerateCmd(defaultUiServerUrl string) *cobra.Command {
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
 		},
 	}
+	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	generateCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
 	generateCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory to place the zip file")

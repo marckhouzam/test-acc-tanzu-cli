@@ -16,7 +16,8 @@ var _ = Describe("command run", func() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Test String")
 	}))
-	generateCmd := GenerateCmd(ts.URL)
+	os.Setenv("ACC_SERVER_URL", ts.URL)
+	generateCmd := GenerateCmd()
 	b := new(bytes.Buffer)
 	generateCmd.SetOut(b)
 	generateCmd.SetErr(b)
