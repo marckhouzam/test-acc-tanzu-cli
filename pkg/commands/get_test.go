@@ -157,7 +157,7 @@ func TestGetCommand(t *testing.T) {
 			Name:         "Error getting accelerator",
 			Args:         []string{"non-existent"},
 			ShouldError:  true,
-			ExpectOutput: "accelertor non-existent not found.\n",
+			ExpectOutput: "accelerator non-existent not found.\n",
 		},
 		{
 			Name: "Error getting accelerator from context",

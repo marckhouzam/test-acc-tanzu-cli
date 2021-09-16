@@ -32,7 +32,7 @@ func GenerateCmd() *cobra.Command {
 	var generateCmd = &cobra.Command{
 		Use:   "generate",
 		Short: "Generate project from accelerator",
-		Long:  `Generate project from accelerator and download project artifacts as ZIP file`,
+		Long:  `Generate a project from an accelerator and download project artifacts as a ZIP file`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if optionsString == "" {
 				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
@@ -90,7 +90,7 @@ func GenerateCmd() *cobra.Command {
 	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	generateCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
 	generateCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
-	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory to place the zip file")
+	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory where the zip file should be written")
 	generateCmd.Flags().StringVar(&uiServer, "server-url", defaultUiServerUrl, "The App Accelerator server URL, this will override ACC_SERVER_URL env variable")
 	return generateCmd
 }

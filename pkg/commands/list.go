@@ -19,9 +19,12 @@ func ListCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	var accServerUrl string
 	opts := ListOptions{}
 	var listCmd = &cobra.Command{
-		Use:     "list",
-		Short:   "List accelerators",
-		Long:    `List the accelerators, you can choose with namespace to use passing the flag -namespace`,
+		Use:   "list",
+		Short: "List accelerators",
+		Long: `List all accelerators.
+
+You can choose to list accelerators from a server using --server-url flag 
+or from a Kubernetes context using --from-context flag.`,
 		Example: "tanzu accelerator list",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var context, kubeconfig bool

@@ -19,15 +19,15 @@ func CreateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := CreateOptions{}
 	cmd := &cobra.Command{
 		Use:     "create",
-		Short:   "Create accelerator",
+		Short:   "Create a new accelerator",
+		Long:    `Create a new accelerator resource using the provided options`,
 		Example: "tanzu accelerator create <accelerator-name> -git-repository <git-repo-URL>",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.New("you must pass the name of the accelerator")
+				return errors.New("you must specify the name of the accelerator")
 			}
 			return nil
 		},
-		Long: `Create will add the accelerator resource using the given parameters`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			acc := &acceleratorv1alpha1.Accelerator{
 				TypeMeta: v1.TypeMeta{

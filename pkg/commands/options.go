@@ -70,8 +70,8 @@ type ListOptions struct {
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
-	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "Accelerator UI server URL to use for retriving accelerators")
-	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "Retrieve Accelerators from current context defined in kubeconfig")
+	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "Accelerator server URL to use for retrieving resources")
+	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "Retrieve resources from current context defined in kubeconfig")
 }
 
 type GetOptions struct {
@@ -82,6 +82,6 @@ type GetOptions struct {
 
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
-	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "Accelerator UI server URL to use for retriving accelerators")
-	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "Retrieve Accelerator from current context defined in kubeconfig")
+	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "Accelerator server URL to use for retrieving resources")
+	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "Retrieve resources from current context defined in kubeconfig")
 }

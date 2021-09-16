@@ -18,15 +18,15 @@ func DeleteCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := DeleteOptions{}
 	var deleteCmd = &cobra.Command{
 		Use:   "delete",
-		Short: "Delete accelerator",
+		Short: "Delete an accelerator",
+		Long:  `Delete the accelerator resource with the specified name`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.New("you must pass the name of the accelerator")
+				return errors.New("you must specify the name of the accelerator")
 			}
 			return nil
 		},
 		Example: "tanzu accelerator delete <accelerator-name>",
-		Long:    `Delete will delete an accelerator from the given name`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			accelerator := &acceleratorv1alpha1.Accelerator{}
 			err := c.Get(ctx, client.ObjectKey{Namespace: opts.Namespace, Name: args[0]}, accelerator)

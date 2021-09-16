@@ -54,11 +54,14 @@ func GetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := GetOptions{}
 	var getCmd = &cobra.Command{
 		Use:   "get",
-		Short: "Get accelerator",
-		Long:  `Get accelerator`,
+		Short: "Get accelerator info",
+		Long: `Get accelerator info.
+
+You can choose to get the accelerator from a server using --server-url flag 
+or from a Kubernetes context using --from-context flag.`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.New("you must pass the name of the accelerator")
+				return errors.New("you must specify the name of the accelerator")
 			}
 			return nil
 		},
@@ -88,7 +91,7 @@ func GetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 }
 
 func printAcceleratorFromUiServer(url string, name string, w *tabwriter.Writer, cmd *cobra.Command) error {
-	errorMsg := "accelertor %s not found"
+	errorMsg := "accelerator %s not found"
 	Accelerators, err := GetAcceleratorsFromUiServer(url, cmd)
 	if err != nil {
 		return err
