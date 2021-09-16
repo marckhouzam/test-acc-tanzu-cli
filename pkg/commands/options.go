@@ -17,6 +17,7 @@ type CreateOptions struct {
 	IconUrl     string
 	GitRepoUrl  string
 	GitBranch   string
+	GitTag      string
 	Tags        []string
 }
 
@@ -27,7 +28,8 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "Accelerator icon location")
 	cmd.Flags().StringSliceVar(&co.Tags, "tags", []string{}, "Accelerator Tags")
 	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
-	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "main", "Accelerator repo branch")
+	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Accelerator repo branch")
+	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Accelerator repo tag")
 
 	cmd.MarkFlagRequired("git-repository")
 }

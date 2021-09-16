@@ -16,7 +16,10 @@ func TestCreateCommand(t *testing.T) {
 
 	acceleratorName := "test-accelerator"
 	gitRepoUrl := "https://www.test.com"
+	noGitBranch := ""
+	noGitTag := ""
 	gitBranch := "main"
+	gitTag := "v0.0.1"
 	namespace := "default"
 
 	table := clitesting.CommandTestSuite{
@@ -41,7 +44,8 @@ func TestCreateCommand(t *testing.T) {
 						Git: acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
-								Branch: gitBranch,
+								Branch: noGitBranch,
+								Tag:    noGitTag,
 							},
 						},
 					},
@@ -51,7 +55,7 @@ func TestCreateCommand(t *testing.T) {
 			ShouldError:  true,
 		},
 		{
-			Name: "Create Accelerator",
+			Name: "Create Accelerator just GitRepository",
 			Args: []string{acceleratorName, "--git-repository", gitRepoUrl},
 			ExpectCreates: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
@@ -63,7 +67,30 @@ func TestCreateCommand(t *testing.T) {
 						Git: acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
+								Branch: noGitBranch,
+								Tag:    noGitTag,
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+		},
+		{
+			Name: "Create Accelerator with Branch and Tag",
+			Args: []string{acceleratorName, "--git-repository", gitRepoUrl, "--git-branch", gitBranch, "--git-tag", gitTag},
+			ExpectCreates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: v1.ObjectMeta{
+						Namespace: namespace,
+						Name:      acceleratorName,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
+								Tag:    gitTag,
 							},
 						},
 					},

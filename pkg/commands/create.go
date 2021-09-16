@@ -47,6 +47,7 @@ func CreateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 						URL: opts.GitRepoUrl,
 						Reference: &fluxcdv1beta1.GitRepositoryRef{
 							Branch: opts.GitBranch,
+							Tag:    opts.GitTag,
 						},
 					},
 				},
