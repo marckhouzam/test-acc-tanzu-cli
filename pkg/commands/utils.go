@@ -41,6 +41,22 @@ type Embedded struct {
 type UiAcceleratorsApiResponse struct {
 	Emdedded Embedded `json:"_embedded"`
 }
+type Choice struct {
+	Text  string `json:"text"`
+	Value string `json:"value"`
+}
+
+type Option struct {
+	Name         string      `json:"name"`
+	DefaultValue interface{} `json:"defaultValue" yaml:"defaultValue"`
+	Display      bool        `json:"display"`
+	DataType     string      `json:"dataType" yaml:"dataType"`
+	Choices      []Choice    `json:"choices,omitempty"`
+}
+
+type OptionsResponse struct {
+	Options []Option `json:"options"`
+}
 
 func GetAcceleratorsFromUiServer(url string, cmd *cobra.Command) ([]Accelerator, error) {
 	client := &http.Client{}
@@ -59,4 +75,23 @@ func GetAcceleratorsFromUiServer(url string, cmd *cobra.Command) ([]Accelerator,
 		return nil, err
 	}
 	return uiResponse.Emdedded.Accelerators, nil
+}
+
+func GetAcceleratorOptionsFromUiServer(url string, acceleratorName string, cmd *cobra.Command) ([]Option, error) {
+	client := &http.Client{}
+	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators/options?name=%s", url, acceleratorName))
+	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s options from %s\n", acceleratorName, url)
+		return nil, err
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	var optionsResponse OptionsResponse
+	defer resp.Body.Close()
+	err = json.Unmarshal(body, &optionsResponse)
+	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "Error unmarshalling response\n")
+		log.Fatal(err)
+		return nil, err
+	}
+	return optionsResponse.Options, nil
 }

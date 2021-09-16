@@ -13,6 +13,7 @@ require (
 	github.com/vmware-tanzu/tanzu-framework v1.4.0-pre-alpha-2
 	golang.org/x/sys v0.0.0-20210819135213-f52c844e1c1c // indirect
 	golang.org/x/tools v0.1.5 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.22.0
 	k8s.io/client-go v0.22.0
 	sigs.k8s.io/controller-runtime v0.9.5

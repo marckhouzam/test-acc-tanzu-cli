@@ -12,8 +12,42 @@ import (
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"gopkg.in/yaml.v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+type GitData struct {
+	URL    string
+	Branch string
+	Tag    string
+}
+type GetOutput struct {
+	Name        string
+	Namespace   string
+	Description string
+	DisplayName string
+	Options     string
+	Tags        []string
+	Ready       bool
+	Git         GitData
+}
+
+func CastAcceleratorSpecToGetOutput(acc acceleratorv1alpha1.Accelerator) GetOutput {
+	return GetOutput{
+		Name:        acc.Name,
+		Namespace:   acc.Namespace,
+		Description: acc.Spec.Description,
+		DisplayName: acc.Spec.DisplayName,
+		Options:     acc.Status.Options,
+		Tags:        acc.Spec.Tags,
+		Ready:       acc.Status.ArtifactInfo.Ready,
+		Git: GitData{
+			URL:    acc.Spec.Git.URL,
+			Branch: acc.Spec.Git.Reference.Branch,
+			Tag:    acc.Spec.Git.Reference.Tag,
+		},
+	}
+}
 
 func GetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	var accServerUrl string
@@ -61,13 +95,34 @@ func printAcceleratorFromUiServer(url string, name string, w *tabwriter.Writer, 
 	}
 	for _, accelerator := range Accelerators {
 		if accelerator.Name == name {
-			gitRepoUrl := accelerator.SpecGitRepositoryUrl
-			if gitRepoUrl == "" {
-				gitRepoUrl = accelerator.SourceUrl
+			options, err := GetAcceleratorOptionsFromUiServer(url, accelerator.Name, cmd)
+			if err != nil {
+				return err
 			}
-			fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, gitRepoUrl, accelerator.SourceBranch, accelerator.SourceTag)
-			w.Flush()
+			tagsYaml, _ := yaml.Marshal(accelerator.Tags)
+			optionsYaml, _ := yaml.Marshal(options)
+			fmt.Fprintf(cmd.OutOrStdout(), "name: %s\n", accelerator.Name)
+			fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Description)
+			fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.DisplayName)
+			fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.IconUrl)
+			fmt.Fprintf(cmd.OutOrStdout(), "sourceUrl: %s\n", accelerator.SourceUrl)
+			if string(tagsYaml) != "[]\n" {
+				fmt.Fprintln(cmd.OutOrStdout(), "tags:")
+				fmt.Fprint(cmd.OutOrStdout(), string(tagsYaml))
+			} else {
+				fmt.Fprintf(cmd.OutOrStdout(), "tags: %s", string(tagsYaml))
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Ready)
+			if string(optionsYaml) != "[]\n" {
+				fmt.Fprintln(cmd.OutOrStdout(), "options:")
+				fmt.Fprint(cmd.OutOrStdout(), string(optionsYaml))
+			} else {
+				fmt.Fprintf(cmd.OutOrStdout(), "options: %s", string(optionsYaml))
+			}
+			fmt.Fprintln(cmd.OutOrStdout(), "artifact:")
+			fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", accelerator.ArchiveMessage)
+			fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", accelerator.ArchiveReady)
+			fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.ArchiveUrl)
 			return nil
 		}
 	}
@@ -83,8 +138,42 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s\n", name)
 		return err
 	}
-	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
-	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Git.Reference.Tag)
+	ignore := ""
+	if accelerator.Spec.Ignore != nil {
+		ignore = *accelerator.Spec.Ignore
+	}
+	var options []interface{}
+	yaml.Unmarshal([]byte(accelerator.Status.Options), &options)
+	tagsYaml, _ := yaml.Marshal(accelerator.Status.Tags)
+	optionsYaml, _ := yaml.Marshal(options)
+	fmt.Fprintf(cmd.OutOrStdout(), "name: %s\n", accelerator.Name)
+	fmt.Fprintf(cmd.OutOrStdout(), "namespace: %s\n", accelerator.Namespace)
+	fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Status.Description)
+	fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.Status.DisplayName)
+	fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
+	fmt.Fprintln(cmd.OutOrStdout(), "git:")
+	fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", ignore)
+	fmt.Fprintf(cmd.OutOrStdout(), "  ref\n")
+	fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
+	fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.Spec.Git.Reference.Branch)
+	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
+	if string(tagsYaml) != "[]\n" {
+		fmt.Fprintln(cmd.OutOrStdout(), "tags:")
+		fmt.Fprint(cmd.OutOrStdout(), string(tagsYaml))
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "tags: %s", string(tagsYaml))
+	}
+	fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Status.ArtifactInfo.Ready)
+	if string(optionsYaml) != "[]\n" {
+		fmt.Fprintln(cmd.OutOrStdout(), "options:")
+		fmt.Fprint(cmd.OutOrStdout(), string(optionsYaml))
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "options: %s", string(optionsYaml))
+	}
+	fmt.Fprintln(cmd.OutOrStdout(), "artifact:")
+	fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", accelerator.Status.ArtifactInfo.Message)
+	fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", accelerator.Status.ArtifactInfo.Ready)
+	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Status.ArtifactInfo.URL)
 	w.Flush()
 	return nil
 }
