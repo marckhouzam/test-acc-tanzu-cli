@@ -6,6 +6,9 @@ LD_FLAGS = -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildDate=$(BUILD
 LD_FLAGS += -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildSHA=$(BUILD_SHA)'
 LD_FLAGS += -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildVersion=$(BUILD_VERSION)'
 
+GO_SOURCES = $(shell find ./cmd ./pkg -type f -name '*.go')
+
+
 
 build-local:
 	@echo BUILD_VERSION: $(BUILD_VERSION)
@@ -19,3 +22,8 @@ test:
 
 create-artifact: build
 	tar -zcvf tanzu-accelerator-plugin.tar.gz artifacts
+
+docs: $(GO_SOURCES)
+	@rm -rf docs
+	go run --ldflags "$(LD_FLAGS)" ./cmd/plugin/accelerator docs -d docs
+	

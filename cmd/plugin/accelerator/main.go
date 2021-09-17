@@ -55,6 +55,7 @@ func main() {
 		commands.ListCmd(ctx, c),
 		commands.GetCmd(ctx, c),
 		commands.UpdateCmd(ctx, c),
+		commands.DocsCommand(ctx, c),
 		commands.GenerateCmd(),
 	)
 
