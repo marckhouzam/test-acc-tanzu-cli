@@ -13,8 +13,28 @@ to build the plugin you need to:
  - To install the plugin to tanzu, you need to run `tanzu plugin install accelerator --local ./artifacts`
 
 # Troubleshooting
-If you get the error `fatal: could not read Username for 'https://github.com': terminal prompts disabled` while downloading the go dependencies
-run the following command
-```
-git config --global url."git@github.com:".insteadOf https://github.com/
-```
+If you get the error `fatal: could not read Username for 'https://github.com': terminal prompts disabled` while downloading the go dependencies: 
+
+- run the following command:
+
+    ```
+    git config --global url."git@github.com:".insteadOf https://github.com/
+    ```
+
+- also make sure `GOPRIVATE` is set for 
+
+    - github.com/pivotal
+    - github.com/vmware-tanzu/*
+    - github.com/vmware-tanzu-private/*`
+
+    check with:
+
+    ```
+    go env GOPRIVATE
+    ```
+
+    if it is not set add it with something like the following (adjust if you aready have something in there):
+
+    ```
+    go env -w GOPRIVATE='github.com/pivotal,github.com/vmware-tanzu/*,github.com/vmware-tanzu-private/*'
+    ```

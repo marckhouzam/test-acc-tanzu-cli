@@ -1,4 +1,4 @@
-module github/vmware-tanzu-private/tanzu-cli-app-accelerator
+module github.com/pivotal/acc-tanzu-cli
 
 go 1.16
 

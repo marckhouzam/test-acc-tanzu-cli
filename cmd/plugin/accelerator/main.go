@@ -6,9 +6,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github/vmware-tanzu-private/tanzu-cli-app-accelerator/pkg/commands"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
+	"github.com/pivotal/acc-tanzu-cli/pkg/commands"
 	tanzucliv1alpha1 "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
 	"github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli/command/plugin"
 	"k8s.io/apimachinery/pkg/runtime"
