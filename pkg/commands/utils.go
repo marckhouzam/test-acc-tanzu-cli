@@ -50,7 +50,7 @@ type Option struct {
 	Name         string      `json:"name"`
 	DefaultValue interface{} `json:"defaultValue" yaml:"defaultValue"`
 	Display      bool        `json:"display"`
-	DataType     string      `json:"dataType" yaml:"dataType"`
+	DataType     interface{} `json:"dataType" yaml:"dataType"`
 	Choices      []Choice    `json:"choices,omitempty"`
 }
 
