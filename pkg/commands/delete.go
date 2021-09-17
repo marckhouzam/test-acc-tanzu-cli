@@ -26,7 +26,8 @@ func DeleteCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 			}
 			return nil
 		},
-		Example: "tanzu accelerator delete <accelerator-name>",
+		ValidArgsFunction: SuggestAcceleratorNamesFromConfig(context.Background(), c),
+		Example:           "tanzu accelerator delete <accelerator-name>",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			accelerator := &acceleratorv1alpha1.Accelerator{}
 			err := c.Get(ctx, client.ObjectKey{Namespace: opts.Namespace, Name: args[0]}, accelerator)

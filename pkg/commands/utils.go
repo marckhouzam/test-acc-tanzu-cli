@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -8,7 +9,10 @@ import (
 	"net/http"
 	"os"
 
+	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
+	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func EnvVar(key string, defVal string) string {
@@ -94,4 +98,41 @@ func GetAcceleratorOptionsFromUiServer(url string, acceleratorName string, cmd *
 		return nil, err
 	}
 	return optionsResponse.Options, nil
+}
+
+func SuggestAcceleratorNamesFromUiServer(ctx context.Context) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		suggestions := []string{}
+		uiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
+		if cmd.Flags().Changed("server-url") {
+			uiServerUrl, _ = cmd.Flags().GetString("server-url")
+		}
+		var response UiAcceleratorList
+		resp, err := http.Get(uiServerUrl + "/api/accelerators")
+		if err != nil {
+			return suggestions, cobra.ShellCompDirectiveError
+		}
+		defer resp.Body.Close()
+		jsonBody, _ := ioutil.ReadAll(resp.Body)
+		json.Unmarshal(jsonBody, &response)
+		for _, accelerator := range response.Embedded.Accelerators {
+			suggestions = append(suggestions, accelerator.Name)
+		}
+		return suggestions, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func SuggestAcceleratorNamesFromConfig(ctx context.Context, c *cli.Config) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		suggestions := []string{}
+		accelerators := &acceleratorv1alpha1.AcceleratorList{}
+		err := c.List(ctx, accelerators, client.InNamespace(cmd.Flag("namespace").Value.String()))
+		if err != nil {
+			return suggestions, cobra.ShellCompDirectiveError
+		}
+		for _, accelerator := range accelerators.Items {
+			suggestions = append(suggestions, accelerator.Name)
+		}
+		return suggestions, cobra.ShellCompDirectiveNoFileComp
+	}
 }

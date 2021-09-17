@@ -49,6 +49,18 @@ func CastAcceleratorSpecToGetOutput(acc acceleratorv1alpha1.Accelerator) GetOutp
 	}
 }
 
+func getSuggestion(ctx context.Context, c *cli.Config) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if cmd.Flags().Changed("from-context") ||
+			cmd.Parent().PersistentFlags().Changed("context") ||
+			cmd.Parent().PersistentFlags().Changed("kubeconfig") {
+			return SuggestAcceleratorNamesFromConfig(ctx, c)(cmd, args, toComplete)
+		} else {
+			return SuggestAcceleratorNamesFromUiServer(ctx)(cmd, args, toComplete)
+		}
+	}
+}
+
 func GetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	var accServerUrl string
 	opts := GetOptions{}
@@ -65,7 +77,8 @@ or from a Kubernetes context using --from-context flag.`,
 			}
 			return nil
 		},
-		Example: "tanzu accelerator get <accelerator-name>",
+		Example:           "tanzu accelerator get <accelerator-name>",
+		ValidArgsFunction: getSuggestion(ctx, c),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var context, kubeconfig bool
 			if cmd.Parent() != nil {

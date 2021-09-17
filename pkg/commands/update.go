@@ -22,9 +22,10 @@ func UpdateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := UpdateOptions{}
 	requestedAtAnnotation := "reconcile.accelerator.apps.tanzu.vmware.com/requestedAt"
 	var updateCmd = &cobra.Command{
-		Use:   "update",
-		Short: "Update an accelerator",
-		Long:  `Update an accelerator resource using the provided options`,
+		Use:               "update",
+		Short:             "Update an accelerator",
+		Long:              `Update an accelerator resource using the provided options`,
+		ValidArgsFunction: SuggestAcceleratorNamesFromConfig(context.Background(), c),
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("you must specify the name of the accelerator")

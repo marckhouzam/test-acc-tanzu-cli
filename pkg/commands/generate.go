@@ -5,6 +5,7 @@ package commands
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -24,15 +25,27 @@ type OptionsProjectName struct {
 	ProjectName string `json:"projectName"`
 }
 
+type AcceleratorName struct {
+	Name string `json:"name"`
+}
+type Accelerators struct {
+	Accelerators []AcceleratorName `json:"accelerators"`
+}
+
+type UiAcceleratorList struct {
+	Embedded Accelerators `json:"_embedded"`
+}
+
 func GenerateCmd() *cobra.Command {
 	var uiServer string
 	var optionsString string
 	var filepath string
 	var outputDir string
 	var generateCmd = &cobra.Command{
-		Use:   "generate",
-		Short: "Generate project from accelerator",
-		Long:  `Generate a project from an accelerator and download project artifacts as a ZIP file`,
+		Use:               "generate",
+		Short:             "Generate project from accelerator",
+		Long:              `Generate a project from an accelerator and download project artifacts as a ZIP file`,
+		ValidArgsFunction: SuggestAcceleratorNamesFromUiServer(context.Background()),
 		Run: func(cmd *cobra.Command, args []string) {
 			if optionsString == "" {
 				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
