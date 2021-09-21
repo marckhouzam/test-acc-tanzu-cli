@@ -66,7 +66,8 @@ func GetAcceleratorsFromUiServer(url string, cmd *cobra.Command) ([]Accelerator,
 	client := &http.Client{}
 	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators", url))
 	if err != nil {
-		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerators from %s\n", url)
+		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerators from %s, check that the ACC_SERVER_URL"+
+			" env variable is set with the correct value, or use the --from-context flag to get the accelerators from your current context\n", url)
 		return nil, err
 	}
 	body, _ := ioutil.ReadAll(resp.Body)

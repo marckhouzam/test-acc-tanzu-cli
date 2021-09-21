@@ -3,3 +3,4 @@
 vendor/
 cover.out
 docs/
+.DS_Store

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +11,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -158,6 +160,22 @@ func TestGetCommand(t *testing.T) {
 			Args:         []string{"non-existent"},
 			ShouldError:  true,
 			ExpectOutput: "accelerator non-existent not found.\n",
+		},
+		{
+			Name: "Wrong acc server URL",
+			Prepare: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) (context.Context, error) {
+				os.Setenv("ACC_SERVER_URL", "http://not-found")
+				return ctx, nil
+			},
+			Args: []string{"error"},
+			ExpectOutput: "Error getting accelerators from http://not-found," +
+				" check that the ACC_SERVER_URL env variable is set with the correct value," +
+				" or use the --from-context flag to get the accelerators from your current context\n",
+			CleanUp: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) error {
+				os.Setenv("ACC_SERVER_URL", ts.URL)
+				return nil
+			},
+			ShouldError: true,
 		},
 		{
 			Name: "Error getting accelerator from context",

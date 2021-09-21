@@ -52,15 +52,15 @@ func TestAcceleratorListCommand(t *testing.T) {
 
 	table := clitesting.CommandTestSuite{
 		{
-			Name: "empty",
+			Name: "Wrong acc server URL",
 			Prepare: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) (context.Context, error) {
 				os.Setenv("ACC_SERVER_URL", "http://not-found")
 				return ctx, nil
 			},
 			Args: []string{},
-			ExpectOutput: `
-Error getting accelerators from http://not-found
-`,
+			ExpectOutput: "Error getting accelerators from http://not-found," +
+				" check that the ACC_SERVER_URL env variable is set with the correct value," +
+				" or use the --from-context flag to get the accelerators from your current context\n",
 			CleanUp: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) error {
 				os.Setenv("ACC_SERVER_URL", ts.URL)
 				return nil
