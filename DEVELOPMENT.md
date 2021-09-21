@@ -1,7 +1,20 @@
 # App Accelerator tanzu CLI plugin - Development Guide
 
-Before installing the plugin in your tanzu instance, you need to follow the steps described here https://github.com/vmware-tanzu/tanzu-framework/blob/main/docs/cli/getting-started.md
-for running plugins locally
+Before installing the plugin in your tanzu instance, you need to follow the steps described for installing [Tanzu CLI in the TAP Installation docs](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/0.1/tap-0-1/GUID-install.html#install-the-tanzu-cli-and-package-plugin-4).
+
+Then install the Tanzu builder and test plugins:
+
+```sh
+tanzu plugin repo add -b tanzu-cli-admin-plugins -n admin -p artifacts-admin
+```
+
+```sh
+tanzu plugin install builder
+```
+
+```sh
+tanzu plugin install test
+```
 
 # Build the plugin
 
