@@ -7,9 +7,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -36,6 +36,12 @@ type UiAcceleratorList struct {
 	Embedded Accelerators `json:"_embedded"`
 }
 
+type UiErrorResponse struct {
+	Title  string `json:"title"`
+	Status int    `json:"status"`
+	Detail string `json:"detail"`
+}
+
 func GenerateCmd() *cobra.Command {
 	var uiServer string
 	var optionsString string
@@ -46,7 +52,7 @@ func GenerateCmd() *cobra.Command {
 		Short:             "Generate project from accelerator",
 		Long:              `Generate a project from an accelerator and download project artifacts as a ZIP file`,
 		ValidArgsFunction: SuggestAcceleratorNamesFromUiServer(context.Background()),
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if optionsString == "" {
 				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
 			}
@@ -63,13 +69,13 @@ func GenerateCmd() *cobra.Command {
 			if filepath != "" {
 				fileBytes, err := ioutil.ReadFile(filepath)
 				if err != nil {
-					log.Fatal(err.Error())
+					return err
 				}
 				optionsString = string(fileBytes)
 			}
 			err := json.Unmarshal([]byte(optionsString), &options)
 			if err != nil {
-				log.Fatal(err.Error())
+				return err
 			}
 			uiServerBody := UiServerBody{
 				Accelerator: args[0],
@@ -77,27 +83,44 @@ func GenerateCmd() *cobra.Command {
 			}
 			JsonProxyBodyBytes, err := json.Marshal(uiServerBody)
 			if err != nil {
-				log.Fatal(err, "Error marshalling proxy body")
-				return
+				return errors.New("error marshalling proxy body")
 			}
 			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", uiServer, args[0]), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
 			if err != nil {
-				log.Fatal(err, "Error creating proxy request")
-				return
+				return errors.New("error creating proxy request")
 			}
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
-				log.Fatal(err, "Error proxying engine invocation")
-				return
+				return errors.New("error proxying engine invocation")
 			}
+
+			if resp.StatusCode >= 400 {
+				var errorMsg string
+				if resp.StatusCode == http.StatusNotFound {
+					errorMsg = fmt.Sprintf("the accelerator was not found\n")
+				} else {
+					var errorResponse UiErrorResponse
+					body, _ := ioutil.ReadAll(resp.Body)
+					json.Unmarshal(body, &errorResponse)
+					if errorResponse.Detail > "" {
+						errorMsg = fmt.Sprintf("there was an error generating the accelerator, the server response was: \"%s\"\n", errorResponse.Detail)
+					} else {
+						errorMsg = fmt.Sprintf("there was an error generating the accelerator, the server response code was: \"%v\"\n", resp.StatusCode)
+					}
+				}
+				return fmt.Errorf(errorMsg)
+			}
+
 			body, _ := ioutil.ReadAll(resp.Body)
 			zipfile := outputDir + projectName.ProjectName + ".zip"
 			err = ioutil.WriteFile(zipfile, body, 0644)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
+
+			return nil
 		},
 	}
 	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
