@@ -3,4 +3,10 @@
 vendor/
 cover.out
 docs/
+<<<<<<< HEAD
 .DS_Store
+=======
+
+.DS_store
+e2e/packaging
+>>>>>>> Issue 41: Added e2e tests

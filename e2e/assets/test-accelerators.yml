@@ -1,0 +1,53 @@
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  name: spring-petclinic
+spec:
+  # Add fields here
+  displayName: Spring Petclinic
+  description: A sample Spring-based application
+  iconUrl: https://github.com/scothis/spring-petclinic/raw/main/src/main/resources/static/resources/images/pets.png
+  tags:
+    - java
+    - spring
+  git:
+    url: https://github.com/simple-starters/e2e-spring-petclinic
+    ref:
+      branch: main
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  name: podinfo
+spec:
+  # Add fields here
+  displayName: Podinfo
+  description: Podinfo is a tiny web application made with Go that showcases best practices of running microservices in Kubernetes. Forked from https://github.com/stefanprodan/podinfo.
+  iconUrl: https://kubernetes.io/images/favicon.png
+  tags:
+    - go
+    - kubernetes
+  git:
+    url: https://github.com/simple-starters/e2e-podinfo
+    ref:
+      branch: main
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  name: new-accelerator
+spec:
+  git:
+    url: https://github.com/simple-starters/e2e-new-accelerator
+    ref:
+      branch: main
+---
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Accelerator
+metadata:
+  name: engine-features
+spec:
+  git:
+    url: https://github.com/simple-starters/e2e-engine-features
+    ref:
+      branch: main

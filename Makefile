@@ -26,4 +26,20 @@ create-artifact: build
 docs: $(GO_SOURCES)
 	@rm -rf docs
 	go run --ldflags "$(LD_FLAGS)" ./cmd/plugin/accelerator docs -d docs
-	
+
+create-kind-cluster:
+	kind delete clusters e2e-acc-cluster
+	kind create cluster --name e2e-acc-cluster --config ./e2e/assets/acc-kind-node.yml
+	kubectl config use-context kind-e2e-acc-cluster
+
+install-flux2:
+	kubectl apply -f https://gist.githubusercontent.com/trisberg/f53bbaa0b8aacba0ec64372a6fb6acdf/raw/45259afd682caa2f6270f4b8c07c995aa8487a12/acc-flux2.yaml	
+
+install-bundle:
+	kubectl create namespace accelerator-system	
+	./e2e/scripts/deploy-app.sh
+
+add-test-accelerators:
+	kubectl create -f ./e2e/assets/test-accelerators.yml
+
+create-context: create-kind-cluster install-flux2 install-bundle add-test-accelerators	
