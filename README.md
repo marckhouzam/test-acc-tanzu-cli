@@ -25,7 +25,7 @@ tar -zxvf tanzu-accelerator-plugin-*.tar.gz
 Install the apps plugin:
 
 ```sh
-APPS_VERSION=v0.3.0-dev
+APPS_VERSION=v0.3.0-rc.2
 tanzu plugin install accelerator --local ./artifacts --version $APPS_VERSION
 ```
 
