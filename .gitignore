@@ -2,7 +2,6 @@
 .vscode
 vendor/
 cover.out
-docs/
 
 .DS_store
 e2e/packaging
