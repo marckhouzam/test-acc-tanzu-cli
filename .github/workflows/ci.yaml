@@ -37,6 +37,13 @@ jobs:
       run: make test
     - name: Create Artifact
       run: make create-artifact
+    - name: Install
+      run: tanzu plugin install accelerator --local ./artifacts  --version $(cat BUILD_VERSION)
+    - name: Verify docs
+      run: |
+        rm -rf docs
+        tanzu accelerator docs --directory docs
+        git diff --exit-code docs
     - uses: actions/upload-artifact@v2
       with:
         name: tanzu-accelerator-plugin.tar.gz
