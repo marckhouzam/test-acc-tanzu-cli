@@ -80,7 +80,7 @@ var _ = Describe("command run", func() {
 				generateCmd.SetArgs([]string{"test-missing", "--server-url", ets404.URL})
 				err := generateCmd.Execute()
 				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).Should(Equal("the accelerator was not found\n"))
+				Expect(err.Error()).Should(Equal("accelerator test-missing not found\n"))
 			})
 		})
 	})

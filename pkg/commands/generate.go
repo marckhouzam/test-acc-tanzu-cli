@@ -98,7 +98,7 @@ func GenerateCmd() *cobra.Command {
 			if resp.StatusCode >= 400 {
 				var errorMsg string
 				if resp.StatusCode == http.StatusNotFound {
-					errorMsg = fmt.Sprintf("the accelerator was not found\n")
+					errorMsg = fmt.Sprintf("accelerator %s not found\n", args[0])
 				} else {
 					var errorResponse UiErrorResponse
 					body, _ := ioutil.ReadAll(resp.Body)
