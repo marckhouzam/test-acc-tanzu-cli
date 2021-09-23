@@ -7,6 +7,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
 	"text/tabwriter"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
@@ -58,6 +60,9 @@ func printListFromUiServer(url string, w *tabwriter.Writer, cmd *cobra.Command) 
 	if err != nil {
 		return err
 	}
+	sort.Slice(Accelerators, func(i, j int) bool {
+		return strings.Compare(Accelerators[i].Name, Accelerators[j].Name) < 0
+	})
 	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
 	for _, accelerator := range Accelerators {
 		gitRepoUrl := accelerator.SpecGitRepositoryUrl

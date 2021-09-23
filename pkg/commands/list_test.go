@@ -118,10 +118,25 @@ no accelerators found.
 						},
 					},
 				}),
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "another-accelerator",
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
 			},
 			ExpectOutput: `
-NAME               GIT REPOSITORY         BRANCH   TAG
-test-accelerator   https://www.test.com   main     
+NAME                  GIT REPOSITORY         BRANCH   TAG
+another-accelerator   https://www.test.com   main     
+test-accelerator      https://www.test.com   main     
 `,
 		},
 		{
