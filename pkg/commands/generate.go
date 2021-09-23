@@ -48,10 +48,28 @@ func GenerateCmd() *cobra.Command {
 	var filepath string
 	var outputDir string
 	var generateCmd = &cobra.Command{
-		Use:               "generate",
-		Short:             "Generate project from accelerator",
-		Long:              `Generate a project from an accelerator and download project artifacts as a ZIP file`,
+		Use:   "generate",
+		Short: "Generate project from accelerator",
+		Long: `Generate a project from an accelerator using provided options and download project artifacts as a ZIP file.
+
+Generation options are provided as a JSON string and should match the metadata options that are specified for the
+accelerator used for the generation. The options can include "projectName" which defaults to the name of the accelerator.
+This "projectName" will be used as the name of the generated ZIP file.
+
+You can see the available options by using the "tanzu accelerator list <accelerator-name>" command.
+
+Here is an example of an options JSON string that specifies the "projectName" and an "includeKubernetes" boolean flag:
+
+    --options '{"projectName":"test", "includeKubernetes": true}'
+
+You can also provide a file that specifies the JSON string using the --options-file flag.
+
+The generate command needs access to the Application Accelerator server. You can specify the --server-url flag or set
+an ACC_SERVER_URL environment variable. If you specify the --server-url flag it will override the ACC_SERVER_URL
+environmnet variable if it is set.
+`,
 		ValidArgsFunction: SuggestAcceleratorNamesFromUiServer(context.Background()),
+		Example:           "tanzu accelerator generate <accelerator-name> --options '{\"projectName\":\"test\"}'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if optionsString == "" {
 				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
@@ -124,9 +142,9 @@ func GenerateCmd() *cobra.Command {
 		},
 	}
 	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
-	generateCmd.Flags().StringVar(&optionsString, "options", "", "Enter options string")
-	generateCmd.Flags().StringVar(&filepath, "options-file", "", "Enter file path with json body")
-	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "Directory where the zip file should be written")
-	generateCmd.Flags().StringVar(&uiServer, "server-url", defaultUiServerUrl, "The App Accelerator server URL, this will override ACC_SERVER_URL env variable")
+	generateCmd.Flags().StringVar(&optionsString, "options", "", "options JSON string")
+	generateCmd.Flags().StringVar(&filepath, "options-file", "", "path to file containing options JSON string")
+	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "directory that the zip file will be written to")
+	generateCmd.Flags().StringVar(&uiServer, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
 	return generateCmd
 }

@@ -22,9 +22,17 @@ func UpdateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := UpdateOptions{}
 	requestedAtAnnotation := "reconcile.accelerator.apps.tanzu.vmware.com/requestedAt"
 	var updateCmd = &cobra.Command{
-		Use:               "update",
-		Short:             "Update an accelerator",
-		Long:              `Update an accelerator resource using the provided options`,
+		Use:   "update",
+		Short: "Update an accelerator",
+		Long: `Udate an accelerator resource with the specified name using the specified configuration.
+
+Accelerator configuration options include:
+- Git repository URL and branch/tag where accelerator code and metadata is defined
+- Metadata like description, display-name, tags and icon-url
+
+The update command also provides a --reoncile flag that will force the accelerator to be refreshed
+with any changes made to the associated Git repository.
+`,
 		ValidArgsFunction: SuggestAcceleratorNamesFromConfig(context.Background(), c),
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
@@ -57,6 +65,7 @@ func UpdateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 						URL: opts.GitRepoUrl,
 						Reference: &fluxcdv1beta1.GitRepositoryRef{
 							Branch: opts.GitBranch,
+							Tag:    opts.GitTag,
 						},
 					},
 				},

@@ -69,15 +69,18 @@ func GetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 		Short: "Get accelerator info",
 		Long: `Get accelerator info.
 
-You can choose to get the accelerator from a server using --server-url flag 
-or from a Kubernetes context using --from-context flag.`,
+You can choose to get the accelerator from the Application Accelerator server using --server-url flag
+or from a Kubernetes context using --from-context flag. The default is to get accelerators from the
+Application Acceleratior server and you can set the ACC_SERVER_URL environment variable with the URL for
+the Application Acceleratior server you want to access.
+`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("you must specify the name of the accelerator")
 			}
 			return nil
 		},
-		Example:           "tanzu accelerator get <accelerator-name>",
+		Example:           "tanzu accelerator get <accelerator-name> --from-context",
 		ValidArgsFunction: getSuggestion(ctx, c),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var context, kubeconfig bool

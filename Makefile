@@ -25,7 +25,7 @@ create-artifact: build
 
 docs: $(GO_SOURCES)
 	@rm -rf docs
-	go run --ldflags "$(LD_FLAGS)" ./cmd/plugin/accelerator docs -d docs
+	ACC_SERVER_URL="" go run --ldflags "$(LD_FLAGS)" ./cmd/plugin/accelerator docs -d docs
 
 create-kind-cluster:
 	kind delete clusters e2e-acc-cluster

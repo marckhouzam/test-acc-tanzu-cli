@@ -18,10 +18,18 @@ import (
 func CreateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := CreateOptions{}
 	cmd := &cobra.Command{
-		Use:     "create",
-		Short:   "Create a new accelerator",
-		Long:    `Create a new accelerator resource using the provided options`,
-		Example: "tanzu accelerator create <accelerator-name> -git-repository <git-repo-URL>",
+		Use:   "create",
+		Short: "Create a new accelerator",
+		Long: `Create a new accelerator resource with specified configuration.
+
+Accelerator configuration options include:
+- Git repository URL and branch/tag where accelerator code and metadata is defined
+- Metadata like description, display-name, tags and icon-url
+
+The Git repository option is required. Metadata options are optional and will override any values for
+the same options specified in the accelerator metadata retrieved from the Git repository.
+`,
+		Example: "tanzu accelerator create <accelerator-name> --git-repository <URL> --git-branch <branch>",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return errors.New("you must specify the name of the accelerator")

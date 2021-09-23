@@ -23,13 +23,13 @@ type CreateOptions struct {
 
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &co.Namespace)
-	cmd.Flags().StringVar(&co.Description, "description", "", "Accelerator description")
-	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "Accelerator display name")
-	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "Accelerator icon location")
-	cmd.Flags().StringSliceVar(&co.Tags, "tags", []string{}, "Accelerator Tags")
-	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
-	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Accelerator repo branch")
-	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Accelerator repo tag")
+	cmd.Flags().StringVar(&co.Description, "description", "", "description of this accelerator")
+	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "display name for the accelerator")
+	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
+	cmd.Flags().StringSliceVar(&co.Tags, "tags", []string{}, "tags that can be used to search for accelerators")
+	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
+	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Git repository branch to be used")
+	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
 
 	cmd.MarkFlagRequired("git-repository")
 }
@@ -41,19 +41,21 @@ type UpdateOptions struct {
 	IconUrl     string
 	GitRepoUrl  string
 	GitBranch   string
+	GitTag      string
 	Tags        []string
 	Reconcile   bool
 }
 
 func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cli.NamespaceFlag(ctx, cmd, c, &uo.Namespace)
-	cmd.Flags().StringVar(&uo.Description, "description", "", "Accelerator description")
-	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "Accelerator display name")
-	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "Accelerator icon location")
-	cmd.Flags().StringSliceVar(&uo.Tags, "tags", []string{}, "Accelerator Tags")
-	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Accelerator repo URL")
-	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Accelerator repo branch")
-	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "Trigger a reconciliation including the associated GitRepository resource")
+	cmd.Flags().StringVar(&uo.Description, "description", "", "description of this accelerator")
+	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "display name for the accelerator")
+	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
+	cmd.Flags().StringSliceVar(&uo.Tags, "tags", []string{}, "tags that can be used to search for accelerators")
+	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
+	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Git repository branch to be used")
+	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 }
 
 type DeleteOptions struct {
@@ -71,9 +73,10 @@ type ListOptions struct {
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
-	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "Accelerator server URL to use for retrieving resources")
-	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "Retrieve resources from current context defined in kubeconfig")
+	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
+	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }
 
 type GetOptions struct {
@@ -83,7 +86,8 @@ type GetOptions struct {
 }
 
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
-	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "Accelerator server URL to use for retrieving resources")
-	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "Retrieve resources from current context defined in kubeconfig")
+	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
+	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }
