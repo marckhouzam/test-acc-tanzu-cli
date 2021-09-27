@@ -1,7 +1,7 @@
 apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
-  name: spring-petclinic
+  name: spring-petclinic-e2e
 spec:
   # Add fields here
   displayName: Spring Petclinic
@@ -35,7 +35,7 @@ spec:
 apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
-  name: new-accelerator
+  name: new-accelerator-e2e
 spec:
   git:
     url: https://github.com/simple-starters/e2e-new-accelerator
