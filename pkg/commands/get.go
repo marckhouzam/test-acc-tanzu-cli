@@ -171,6 +171,11 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.Status.DisplayName)
 	fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
 	fmt.Fprintln(cmd.OutOrStdout(), "git:")
+	if accelerator.Spec.Interval != nil {
+		fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Interval.Duration)
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "  interval: \n")
+	}
 	fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", ignore)
 	fmt.Fprintf(cmd.OutOrStdout(), "  ref\n")
 	fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)

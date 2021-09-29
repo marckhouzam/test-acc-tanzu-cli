@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
@@ -92,6 +93,7 @@ func TestGetCommand(t *testing.T) {
 	acceleratorName := "test-accelerator"
 	namespace := "default"
 	ignore := ".ignore"
+	duration, _ := time.ParseDuration("2m")
 
 	testAccelerator := acceleratorv1alpha1.Accelerator{
 		ObjectMeta: metav1.ObjectMeta{
@@ -99,12 +101,15 @@ func TestGetCommand(t *testing.T) {
 			Namespace: namespace,
 		},
 		Spec: acceleratorv1alpha1.AcceleratorSpec{
-			Git: acceleratorv1alpha1.Git{
+			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
 				Reference: &v1beta1.GitRepositoryRef{
 					Branch: "main",
 					Tag:    "v1.0.0",
+				},
+				Interval: &metav1.Duration{
+					Duration: duration,
 				},
 			},
 		},
@@ -128,7 +133,7 @@ func TestGetCommand(t *testing.T) {
 			Namespace: namespace,
 		},
 		Spec: acceleratorv1alpha1.AcceleratorSpec{
-			Git: acceleratorv1alpha1.Git{
+			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
 				Reference: &v1beta1.GitRepositoryRef{
@@ -202,6 +207,7 @@ description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png
 git:
+  interval: 2m0s
   ignore: .ignore
   ref
     tag: v1.0.0
@@ -234,6 +240,7 @@ description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png
 git:
+  interval: 
   ignore: .ignore
   ref
     tag: v1.0.0

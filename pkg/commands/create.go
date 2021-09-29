@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
@@ -51,7 +52,7 @@ the same options specified in the accelerator metadata retrieved from the Git re
 					Description: opts.Description,
 					IconUrl:     opts.IconUrl,
 					Tags:        opts.Tags,
-					Git: acceleratorv1alpha1.Git{
+					Git: &acceleratorv1alpha1.Git{
 						URL: opts.GitRepoUrl,
 						Reference: &fluxcdv1beta1.GitRepositoryRef{
 							Branch: opts.GitBranch,
@@ -59,6 +60,17 @@ the same options specified in the accelerator metadata retrieved from the Git re
 						},
 					},
 				},
+			}
+			if opts.GitInterval != "" {
+				duration, err := time.ParseDuration(opts.GitInterval)
+				if err != nil {
+					fmt.Fprintf(cmd.OutOrStderr(), "Error parsing interval %s\n", opts.GitInterval)
+					return err
+				}
+				interval := v1.Duration{
+					Duration: duration,
+				}
+				acc.Spec.Git.Interval = &interval
 			}
 			err := c.Create(ctx, acc)
 			if err != nil {

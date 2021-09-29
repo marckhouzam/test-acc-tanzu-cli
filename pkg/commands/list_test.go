@@ -88,7 +88,7 @@ no accelerators found.
 						Namespace: namespace,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -110,7 +110,7 @@ no accelerators found.
 						Namespace: namespace,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -124,7 +124,7 @@ no accelerators found.
 						Namespace: namespace,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -157,7 +157,7 @@ mock   http://www.test.com   main     v1.0.0
 						Namespace: namespace,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",

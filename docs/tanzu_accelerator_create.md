@@ -30,6 +30,7 @@ tanzu accelerator create <accelerator-name> --git-repository <URL> --git-branch 
       --description string      description of this accelerator
       --display-name string     display name for the accelerator
       --git-branch string       Git repository branch to be used
+      --git-interval string     interval at which to check for Git repository updates
       --git-repository string   Git repository URL for the accelerator
       --git-tag string          Git repository tag to be used
   -h, --help                    help for create

@@ -61,7 +61,7 @@ with any changes made to the associated Git repository.
 					Description: opts.Description,
 					IconUrl:     opts.IconUrl,
 					Tags:        opts.Tags,
-					Git: acceleratorv1alpha1.Git{
+					Git: &acceleratorv1alpha1.Git{
 						URL: opts.GitRepoUrl,
 						Reference: &fluxcdv1beta1.GitRepositoryRef{
 							Branch: opts.GitBranch,
@@ -69,6 +69,14 @@ with any changes made to the associated Git repository.
 						},
 					},
 				},
+			}
+			if opts.GitInterval != "" {
+				duration, _ := time.ParseDuration(opts.GitInterval)
+				interval := &v1.Duration{
+					Duration: duration,
+				}
+				time.ParseDuration(opts.GitInterval)
+				updatedAccelerator.Spec.Git.Interval = interval
 			}
 			if opts.Reconcile {
 				if accelerator.ObjectMeta.Annotations == nil {

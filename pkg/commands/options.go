@@ -18,6 +18,7 @@ type CreateOptions struct {
 	GitRepoUrl  string
 	GitBranch   string
 	GitTag      string
+	GitInterval string
 	Tags        []string
 }
 
@@ -30,6 +31,7 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
 	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Git repository branch to be used")
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().StringVar(&co.GitInterval, "git-interval", "", "interval at which to check for Git repository updates")
 
 	cmd.MarkFlagRequired("git-repository")
 }
@@ -42,6 +44,7 @@ type UpdateOptions struct {
 	GitRepoUrl  string
 	GitBranch   string
 	GitTag      string
+	GitInterval string
 	Tags        []string
 	Reconcile   bool
 }
@@ -56,6 +59,7 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Git repository branch to be used")
 	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
+	cmd.Flags().StringVar(&uo.GitInterval, "git-interval", "", "interval at which to check for Git repository updates")
 }
 
 type DeleteOptions struct {

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"testing"
+	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
@@ -21,6 +22,8 @@ func TestCreateCommand(t *testing.T) {
 	gitBranch := "main"
 	gitTag := "v0.0.1"
 	namespace := "default"
+	gitInterval := "2m"
+	expectedDuration, _ := time.ParseDuration(gitInterval)
 
 	table := clitesting.CommandTestSuite{
 		{
@@ -41,7 +44,7 @@ func TestCreateCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: noGitBranch,
@@ -64,7 +67,7 @@ func TestCreateCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: noGitBranch,
@@ -78,7 +81,12 @@ func TestCreateCommand(t *testing.T) {
 		},
 		{
 			Name: "Create Accelerator with Branch and Tag",
-			Args: []string{acceleratorName, "--git-repository", gitRepoUrl, "--git-branch", gitBranch, "--git-tag", gitTag},
+			Args: []string{acceleratorName,
+				"--git-repository", gitRepoUrl,
+				"--git-branch", gitBranch,
+				"--git-tag", gitTag,
+				"--git-interval", gitInterval,
+			},
 			ExpectCreates: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
@@ -86,11 +94,14 @@ func TestCreateCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
 								Tag:    gitTag,
+							},
+							Interval: &v1.Duration{
+								Duration: expectedDuration,
 							},
 						},
 					},

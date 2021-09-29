@@ -2,6 +2,7 @@ package commands
 
 import (
 	"testing"
+	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
@@ -14,6 +15,10 @@ func TestUpdateCmd(t *testing.T) {
 	acceleratorName := "test-accelerator"
 	testDescription := "another description"
 	namespace := "default"
+	expectedDuration, _ := time.ParseDuration("2m")
+	expectedInterval := &metav1.Duration{
+		Duration: expectedDuration,
+	}
 	scheme := runtime.NewScheme()
 	_ = acceleratorv1alpha1.AddToScheme(scheme)
 
@@ -43,7 +48,7 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: "first description",
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -60,7 +65,7 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: testDescription,
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -74,7 +79,7 @@ func TestUpdateCmd(t *testing.T) {
 		},
 		{
 			Name: "Updates accelerator",
-			Args: []string{acceleratorName, "--description", testDescription},
+			Args: []string{acceleratorName, "--description", testDescription, "--git-interval", "2m"},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
@@ -83,7 +88,7 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: "first description",
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
@@ -100,11 +105,12 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: testDescription,
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
 							},
+							Interval: expectedInterval,
 						},
 					},
 				}),

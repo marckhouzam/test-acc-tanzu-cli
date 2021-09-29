@@ -39,7 +39,7 @@ func TestDeleteCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
@@ -69,7 +69,7 @@ func TestDeleteCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
@@ -91,7 +91,7 @@ func TestDeleteCommand(t *testing.T) {
 						Name:      acceleratorName,
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
-						Git: acceleratorv1alpha1.Git{
+						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
