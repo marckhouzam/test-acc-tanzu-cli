@@ -1,5 +1,7 @@
 # App Accelerator tanzu CLI plugin
 
+![ci](https://github.com/pivotal/acc-tanzu-cli/actions/workflows/ci.yaml/badge.svg?branch=main)
+
 Early prototype for Accelerator CLI commands.
 
 To check the plugin documentation go to 
