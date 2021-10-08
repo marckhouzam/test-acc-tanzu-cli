@@ -11,6 +11,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,6 +39,15 @@ the same options specified in the accelerator metadata retrieved from the Git re
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			if opts.GitRepoUrl == "" && opts.SourceImage == "" {
+				return errors.New("you must provide --git-repository or --source-image")
+			}
+
+			if opts.GitRepoUrl != "" && opts.SourceImage != "" {
+				return errors.New("you may only provide one of --git-repository or --source-image")
+			}
+
 			acc := &acceleratorv1alpha1.Accelerator{
 				TypeMeta: v1.TypeMeta{
 					APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",
@@ -52,15 +62,25 @@ the same options specified in the accelerator metadata retrieved from the Git re
 					Description: opts.Description,
 					IconUrl:     opts.IconUrl,
 					Tags:        opts.Tags,
-					Git: &acceleratorv1alpha1.Git{
-						URL: opts.GitRepoUrl,
-						Reference: &fluxcdv1beta1.GitRepositoryRef{
-							Branch: opts.GitBranch,
-							Tag:    opts.GitTag,
-						},
-					},
 				},
 			}
+
+			if opts.GitRepoUrl != "" {
+				acc.Spec.Git = &acceleratorv1alpha1.Git{
+					URL: opts.GitRepoUrl,
+					Reference: &fluxcdv1beta1.GitRepositoryRef{
+						Branch: opts.GitBranch,
+						Tag:    opts.GitTag,
+					},
+				}
+			}
+
+			if opts.SourceImage != "" {
+				acc.Spec.Source = &v1alpha1.ImageRepositorySpec{
+					Image: opts.SourceImage,
+				}
+			}
+
 			if opts.GitInterval != "" {
 				duration, err := time.ParseDuration(opts.GitInterval)
 				if err != nil {

@@ -37,6 +37,7 @@ tanzu accelerator update <accelerator-name> --description "Lorem Ipsum"
       --icon-url string         URL for icon to use with the accelerator
   -n, --namespace name          kubernetes namespace (defaulted from kube config)
       --reconcile               trigger a reconciliation including the associated GitRepository resource
+      --source-image string     name of the source image for the accelerator
       --tags strings            tags that can be used to search for accelerators
 ```
 

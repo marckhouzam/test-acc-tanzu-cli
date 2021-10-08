@@ -6,6 +6,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -17,6 +18,7 @@ func TestCreateCommand(t *testing.T) {
 
 	acceleratorName := "test-accelerator"
 	gitRepoUrl := "https://www.test.com"
+	imageName := "test-image"
 	noGitBranch := ""
 	noGitTag := ""
 	gitBranch := "main"
@@ -73,6 +75,24 @@ func TestCreateCommand(t *testing.T) {
 								Branch: noGitBranch,
 								Tag:    noGitTag,
 							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+		},
+		{
+			Name: "Create Accelerator Image",
+			Args: []string{acceleratorName, "--source-image", imageName},
+			ExpectCreates: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: v1.ObjectMeta{
+						Namespace: namespace,
+						Name:      acceleratorName,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Source: &v1alpha1.ImageRepositorySpec{
+							Image: imageName,
 						},
 					},
 				}),

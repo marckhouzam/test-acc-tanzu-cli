@@ -13,6 +13,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -132,11 +133,23 @@ no accelerators found.
 						},
 					},
 				}),
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "image-accelerator",
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Source: &v1alpha1.ImageRepositorySpec{
+							Image: "test-image",
+						},
+					},
+				}),
 			},
 			ExpectOutput: `
-NAME                  GIT REPOSITORY         BRANCH   TAG
-another-accelerator   https://www.test.com   main     
-test-accelerator      https://www.test.com   main     
+NAME                  GIT REPOSITORY         BRANCH   TAG   IMAGE
+another-accelerator   https://www.test.com   main           
+image-accelerator                                           test-image
+test-accelerator      https://www.test.com   main           
 `,
 		},
 		{
@@ -167,8 +180,8 @@ mock   http://www.test.com   main     v1.0.0
 				}),
 			},
 			ExpectOutput: `
-NAME               GIT REPOSITORY         BRANCH   TAG
-test-accelerator   https://www.test.com   main     
+NAME               GIT REPOSITORY         BRANCH   TAG   IMAGE
+test-accelerator   https://www.test.com   main           
 `,
 		},
 	}

@@ -12,6 +12,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -154,6 +155,30 @@ func TestGetCommand(t *testing.T) {
 		},
 	}
 
+	testAcceleratorImage := acceleratorv1alpha1.Accelerator{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      acceleratorName,
+			Namespace: namespace,
+		},
+		Spec: acceleratorv1alpha1.AcceleratorSpec{
+			Source: &v1alpha1.ImageRepositorySpec{
+				Image: "test-image",
+			},
+		},
+		Status: acceleratorv1alpha1.AcceleratorStatus{
+			Description: "Lorem Ipsum",
+			DisplayName: "Test Accelerator",
+			IconUrl:     "http://icon.png",
+			Tags:        []string{"first", "second"},
+			ArtifactInfo: acceleratorv1alpha1.ArtifactInfo{
+				Ready:   true,
+				Message: "test",
+				URL:     "http://www.test.com",
+			},
+			Options: `[{"defaultValue": "","name":"test","label":"test"}]`,
+		},
+	}
+
 	table := clitesting.CommandTestSuite{
 		{
 			Name:        "Missing args",
@@ -209,9 +234,9 @@ iconUrl: http://icon.png
 git:
   interval: 2m0s
   ignore: .ignore
-  ref
-    tag: v1.0.0
+  ref:
     branch: main
+    tag: v1.0.0
   url: http://www.test.com
 tags:
 - first
@@ -242,13 +267,41 @@ iconUrl: http://icon.png
 git:
   interval: 
   ignore: .ignore
-  ref
-    tag: v1.0.0
+  ref:
     branch: main
+    tag: v1.0.0
   url: http://www.test.com
 tags: []
 ready: true
 options: []
+artifact:
+  message: test
+  ready: true
+  url: http://www.test.com
+`,
+		},
+		{
+			Name: "Get an accelerator with image from context",
+			Args: []string{acceleratorName, "--from-context"},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&testAcceleratorImage),
+			},
+			ExpectOutput: `
+name: test-accelerator
+namespace: default
+description: Lorem Ipsum
+displayName: Test Accelerator
+iconUrl: http://icon.png
+source:
+  image: test-image
+tags:
+- first
+- second
+ready: true
+options:
+- defaultValue: ""
+  label: test
+  name: test
 artifact:
   message: test
   ready: true

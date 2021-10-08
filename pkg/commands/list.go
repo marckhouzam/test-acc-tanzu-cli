@@ -88,9 +88,22 @@ func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, c
 		fmt.Fprintf(cmd.OutOrStderr(), errorMsg+".\n")
 		return errors.New(errorMsg)
 	}
-	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
+	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG\tIMAGE")
 	for _, accelerator := range accelerators.Items {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Git.Reference.Tag)
+		values := []string{accelerator.Name}
+
+		if accelerator.Spec.Git != nil {
+			values = append(values, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Reference.Tag)
+		} else {
+			values = append(values, "", "", "")
+		}
+
+		if accelerator.Spec.Source != nil {
+			values = append(values, accelerator.Spec.Source.Image)
+		} else {
+			values = append(values, "")
+		}
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", values[0], values[1], values[2], values[3], values[4])
 	}
 	w.Flush()
 	return nil

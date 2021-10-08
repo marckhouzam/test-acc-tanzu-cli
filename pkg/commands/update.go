@@ -12,6 +12,7 @@ import (
 	"github.com/imdario/mergo"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,16 +62,28 @@ with any changes made to the associated Git repository.
 					Description: opts.Description,
 					IconUrl:     opts.IconUrl,
 					Tags:        opts.Tags,
-					Git: &acceleratorv1alpha1.Git{
-						URL: opts.GitRepoUrl,
-						Reference: &fluxcdv1beta1.GitRepositoryRef{
-							Branch: opts.GitBranch,
-							Tag:    opts.GitTag,
-						},
-					},
 				},
 			}
+			if opts.GitRepoUrl != "" {
+				updatedAccelerator.Spec.Git = &acceleratorv1alpha1.Git{
+					URL: opts.GitRepoUrl,
+					Reference: &fluxcdv1beta1.GitRepositoryRef{
+						Branch: opts.GitBranch,
+						Tag:    opts.GitTag,
+					},
+				}
+			}
+
+			if opts.SourceImage != "" {
+				updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{
+					Image: opts.SourceImage,
+				}
+			}
+
 			if opts.GitInterval != "" {
+				if updatedAccelerator.Spec.Git == nil {
+					updatedAccelerator.Spec.Git = &acceleratorv1alpha1.Git{}
+				}
 				duration, _ := time.ParseDuration(opts.GitInterval)
 				interval := &v1.Duration{
 					Duration: duration,

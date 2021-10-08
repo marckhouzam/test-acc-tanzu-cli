@@ -29,6 +29,7 @@ type Accelerator struct {
 	SpecGitRepositoryUrl string   `json:"specGitRepositoryUrl,omitempty"`
 	SourceBranch         string   `json:"sourceBranch,omitempty"`
 	SourceTag            string   `json:"sourceTag,omitempty"`
+	SpecImageRepository  string   `json:"specImageRepository,omitempty"`
 	Tags                 []string `json:"tags,omitempty"`
 	Description          string   `json:"description,omitempty"`
 	DisplayName          string   `json:"displayName,omitempty"`

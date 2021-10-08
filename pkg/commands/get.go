@@ -124,7 +124,20 @@ func printAcceleratorFromUiServer(url string, name string, w *tabwriter.Writer, 
 			fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Description)
 			fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.DisplayName)
 			fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.IconUrl)
-			fmt.Fprintf(cmd.OutOrStdout(), "sourceUrl: %s\n", accelerator.SourceUrl)
+			if accelerator.SpecImageRepository != "" {
+				fmt.Fprintf(cmd.OutOrStdout(), "source:\n")
+				fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", accelerator.SpecImageRepository)
+			} else {
+				if accelerator.SpecGitRepositoryUrl != "" {
+					fmt.Fprintf(cmd.OutOrStdout(), "git:\n")
+					fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.SpecGitRepositoryUrl)
+					fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
+					fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.SourceBranch)
+					fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.SourceTag)
+				} else {
+					fmt.Fprintf(cmd.OutOrStdout(), "sourceUrl: %s\n", accelerator.SourceUrl)
+				}
+			}
 			if string(tagsYaml) != "[]\n" {
 				fmt.Fprintln(cmd.OutOrStdout(), "tags:")
 				fmt.Fprint(cmd.OutOrStdout(), string(tagsYaml))
@@ -158,7 +171,7 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		return err
 	}
 	ignore := ""
-	if accelerator.Spec.Ignore != nil {
+	if accelerator.Spec.Git != nil && accelerator.Spec.Ignore != nil {
 		ignore = *accelerator.Spec.Ignore
 	}
 	var options []interface{}
@@ -170,17 +183,23 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Status.Description)
 	fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.Status.DisplayName)
 	fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
-	fmt.Fprintln(cmd.OutOrStdout(), "git:")
-	if accelerator.Spec.Interval != nil {
-		fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Interval.Duration)
-	} else {
-		fmt.Fprintf(cmd.OutOrStdout(), "  interval: \n")
+	if accelerator.Spec.Git != nil {
+		fmt.Fprintln(cmd.OutOrStdout(), "git:")
+		if accelerator.Spec.Interval != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Interval.Duration)
+		} else {
+			fmt.Fprintf(cmd.OutOrStdout(), "  interval: \n")
+		}
+		fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", ignore)
+		fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
+		fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.Spec.Git.Reference.Branch)
+		fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
+		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
 	}
-	fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", ignore)
-	fmt.Fprintf(cmd.OutOrStdout(), "  ref\n")
-	fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
-	fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.Spec.Git.Reference.Branch)
-	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
+	if accelerator.Spec.Source != nil {
+		fmt.Fprintln(cmd.OutOrStdout(), "source:")
+		fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", accelerator.Spec.Source.Image)
+	}
 	if string(tagsYaml) != "[]\n" {
 		fmt.Fprintln(cmd.OutOrStdout(), "tags:")
 		fmt.Fprint(cmd.OutOrStdout(), string(tagsYaml))
