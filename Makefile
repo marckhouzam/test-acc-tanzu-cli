@@ -2,13 +2,11 @@ BUILD_VERSION ?= $$(cat BUILD_VERSION)
 BUILD_SHA ?= $$(git rev-parse --short HEAD)
 BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
 
-LD_FLAGS = -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildDate=$(BUILD_DATE)'
-LD_FLAGS += -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildSHA=$(BUILD_SHA)'
-LD_FLAGS += -X 'github.com/vmware-tanzu-private/core/pkg/v1/cli.BuildVersion=$(BUILD_VERSION)'
+LD_FLAGS = -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildDate=$(BUILD_DATE)' \
+           -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildSHA=$(BUILD_SHA)$(BUILD_DIRTY)' \
+           -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildVersion=$(BUILD_VERSION)'
 
 GO_SOURCES = $(shell find ./cmd ./pkg -type f -name '*.go')
-
-
 
 build-local:
 	@echo BUILD_VERSION: $(BUILD_VERSION)

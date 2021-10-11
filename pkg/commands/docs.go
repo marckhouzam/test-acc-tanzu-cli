@@ -16,7 +16,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-	cli "github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
 )
 
 type DocsOptions struct {

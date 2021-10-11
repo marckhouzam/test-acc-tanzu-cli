@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
 )
 
 type CreateOptions struct {

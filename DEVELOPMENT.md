@@ -38,7 +38,6 @@ If you get the error `fatal: could not read Username for 'https://github.com': t
 
     - github.com/pivotal
     - github.com/vmware-tanzu/*
-    - github.com/vmware-tanzu-private/*`
 
     check with:
 
@@ -49,5 +48,5 @@ If you get the error `fatal: could not read Username for 'https://github.com': t
     if it is not set add it with something like the following (adjust if you aready have something in there):
 
     ```
-    go env -w GOPRIVATE='github.com/pivotal,github.com/vmware-tanzu/*,github.com/vmware-tanzu-private/*'
+    go env -w GOPRIVATE='github.com/pivotal,github.com/vmware-tanzu/*'
     ```

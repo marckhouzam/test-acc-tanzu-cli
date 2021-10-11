@@ -14,7 +14,7 @@ import (
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu-private/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

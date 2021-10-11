@@ -8,7 +8,7 @@ on:
     - '**'
 
 env:
-  GOPRIVATE: github.com/pivotal,github.com/vmware-tanzu-private/*,github.com/vmware-tanzu/tanzu-framework
+  GOPRIVATE: github.com/pivotal,github.com/vmware-tanzu/*
   TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 jobs:
   unit:
