@@ -199,7 +199,7 @@ func TestGetCommand(t *testing.T) {
 			},
 			Args: []string{"error"},
 			ExpectOutput: "Error getting accelerators from http://not-found," +
-				" check that the ACC_SERVER_URL env variable is set with the correct value," +
+				" check that --server-url or the ACC_SERVER_URL env variable is set with the correct value," +
 				" or use the --from-context flag to get the accelerators from your current context\n",
 			CleanUp: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) error {
 				os.Setenv("ACC_SERVER_URL", ts.URL)

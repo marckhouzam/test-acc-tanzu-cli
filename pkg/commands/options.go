@@ -93,9 +93,8 @@ type ListOptions struct {
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
-	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
+	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }
 
@@ -106,8 +105,7 @@ type GetOptions struct {
 }
 
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
-	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
+	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }

@@ -69,7 +69,7 @@ func GetAcceleratorsFromUiServer(url string, cmd *cobra.Command) ([]Accelerator,
 	client := &http.Client{}
 	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators", url))
 	if err != nil {
-		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerators from %s, check that the ACC_SERVER_URL"+
+		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerators from %s, check that --server-url or the ACC_SERVER_URL"+
 			" env variable is set with the correct value, or use the --from-context flag to get the accelerators from your current context\n", url)
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func GetAcceleratorOptionsFromUiServer(url string, acceleratorName string, cmd *
 func SuggestAcceleratorNamesFromUiServer(ctx context.Context) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
 	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		suggestions := []string{}
-		uiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
+		uiServerUrl := EnvVar("ACC_SERVER_URL", "")
 		if cmd.Flags().Changed("server-url") {
 			uiServerUrl, _ = cmd.Flags().GetString("server-url")
 		}

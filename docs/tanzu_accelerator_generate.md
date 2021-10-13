@@ -40,7 +40,7 @@ tanzu accelerator generate <accelerator-name> --options '{"projectName":"test"}'
       --options string        options JSON string
       --options-file string   path to file containing options JSON string
       --output-dir string     directory that the zip file will be written to
-      --server-url string     the URL for the Application Accelerator server (default "http://localhost:8877")
+      --server-url string     the URL for the Application Accelerator server
 ```
 
 ### Options inherited from parent commands

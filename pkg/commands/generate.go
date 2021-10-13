@@ -44,6 +44,7 @@ type UiErrorResponse struct {
 
 func GenerateCmd() *cobra.Command {
 	var uiServer string
+	var accServerUrl string
 	var optionsString string
 	var filepath string
 	var outputDir string
@@ -101,16 +102,23 @@ environmnet variable if it is set.
 			}
 			JsonProxyBodyBytes, err := json.Marshal(uiServerBody)
 			if err != nil {
-				return errors.New("error marshalling proxy body")
+				return errors.New("error marshalling request body")
 			}
-			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", uiServer, args[0]), bytes.NewReader(JsonProxyBodyBytes))
+			serverUrl := accServerUrl
+			if uiServer != "" {
+				serverUrl = uiServer
+			}
+			if serverUrl == "" {
+				return errors.New("no server URL provided, you must provide --server-url option or set ACC_SERVER_URL environment variable")
+			}
+			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", serverUrl, args[0]), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
 			if err != nil {
-				return errors.New("error creating proxy request")
+				return errors.New(fmt.Sprintf("error creating request for %s", serverUrl))
 			}
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
-				return errors.New("error proxying engine invocation")
+				return errors.New(fmt.Sprintf("error invoking %s", serverUrl))
 			}
 
 			if resp.StatusCode >= 400 {
@@ -141,10 +149,10 @@ environmnet variable if it is set.
 			return nil
 		},
 	}
-	defaultUiServerUrl := EnvVar("ACC_SERVER_URL", "http://localhost:8877")
 	generateCmd.Flags().StringVar(&optionsString, "options", "", "options JSON string")
 	generateCmd.Flags().StringVar(&filepath, "options-file", "", "path to file containing options JSON string")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "directory that the zip file will be written to")
-	generateCmd.Flags().StringVar(&uiServer, "server-url", defaultUiServerUrl, "the URL for the Application Accelerator server")
+	generateCmd.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")
+	accServerUrl = EnvVar("ACC_SERVER_URL", "")
 	return generateCmd
 }

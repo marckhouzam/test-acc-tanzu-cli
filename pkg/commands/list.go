@@ -43,14 +43,14 @@ the Application Acceleratior server you want to access.
 			}
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
-			if !opts.FromContext && !context && !kubeconfig {
+			if serverUrl != "" && !opts.FromContext && !context && !kubeconfig {
 				return printListFromUiServer(serverUrl, w, cmd)
 			} else {
 				return printListFromClient(ctx, c, opts, cmd, w)
 			}
 		},
 	}
-	accServerUrl = EnvVar("ACC_SERVER_URL", "http://localhost:8877")
+	accServerUrl = EnvVar("ACC_SERVER_URL", "")
 	opts.DefineFlags(ctx, listCmd, c)
 	return listCmd
 }
