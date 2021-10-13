@@ -35,6 +35,7 @@ tanzu accelerator create <accelerator-name> --git-repository <URL> --git-branch 
       --git-tag string          Git repository tag to be used
   -h, --help                    help for create
       --icon-url string         URL for icon to use with the accelerator
+      --local-path string       path to the directory containing the source for the accelerator
   -n, --namespace name          kubernetes namespace (defaulted from kube config)
       --source-image string     name of the source image for the accelerator
       --tags strings            tags that can be used to search for accelerators

@@ -40,12 +40,16 @@ the same options specified in the accelerator metadata retrieved from the Git re
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			if opts.GitRepoUrl == "" && opts.SourceImage == "" {
+			if opts.GitRepoUrl == "" && opts.SourceImage == "" && opts.LocalPath == "" {
 				return errors.New("you must provide --git-repository or --source-image")
 			}
 
 			if opts.GitRepoUrl != "" && opts.SourceImage != "" {
 				return errors.New("you may only provide one of --git-repository or --source-image")
+			}
+
+			if opts.LocalPath != "" && opts.SourceImage == "" {
+				return errors.New("you must provide --source-image when using --local-path")
 			}
 
 			acc := &acceleratorv1alpha1.Accelerator{
@@ -72,6 +76,12 @@ the same options specified in the accelerator metadata retrieved from the Git re
 						Branch: opts.GitBranch,
 						Tag:    opts.GitTag,
 					},
+				}
+			}
+
+			if opts.LocalPath != "" {
+				if err := opts.PublishLocalSource(ctx, c); err != nil {
+					return err
 				}
 			}
 

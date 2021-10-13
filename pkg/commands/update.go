@@ -72,11 +72,17 @@ with any changes made to the associated Git repository.
 						Tag:    opts.GitTag,
 					},
 				}
+				if accelerator.Spec.Source != nil {
+					accelerator.Spec.Source = nil
+				}
 			}
 
 			if opts.SourceImage != "" {
 				updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{
 					Image: opts.SourceImage,
+				}
+				if accelerator.Spec.Git != nil {
+					accelerator.Spec.Git = nil
 				}
 			}
 

@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/fsnotify/fsnotify v1.5.0 // indirect
+	github.com/google/go-containerregistry v0.6.0
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
@@ -11,7 +12,6 @@ require (
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211007192245-181c97eeb1d0
 	github.com/vmware-tanzu/tanzu-framework v0.6.0
-	golang.org/x/tools v0.1.5 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v0.22.2

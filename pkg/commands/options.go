@@ -19,6 +19,7 @@ type CreateOptions struct {
 	GitBranch   string
 	GitTag      string
 	GitInterval string
+	LocalPath   string
 	SourceImage string
 	Tags        []string
 }
@@ -34,6 +35,7 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().StringVar(&co.GitInterval, "git-interval", "", "interval at which to check for Git repository updates")
 	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
+	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
 }
 
 type UpdateOptions struct {
@@ -62,6 +64,18 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.GitInterval, "git-interval", "", "interval at which to check for Git repository updates")
 	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
+}
+
+type PushOptions struct {
+	LocalPath   string
+	SourceImage string
+}
+
+func (po *PushOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVar(&po.SourceImage, "source-image", "", "name of the source image for the accelerator")
+	cmd.MarkFlagRequired("source-image")
+	cmd.Flags().StringVar(&po.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
+	cmd.MarkFlagRequired("local-path")
 }
 
 type DeleteOptions struct {

@@ -8,10 +8,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/source"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -137,4 +139,34 @@ func SuggestAcceleratorNamesFromConfig(ctx context.Context, c *cli.Config) func(
 		}
 		return suggestions, cobra.ShellCompDirectiveNoFileComp
 	}
+}
+
+func (opts CreateOptions) PublishLocalSource(ctx context.Context, c *cli.Config) error {
+	digestedImage, err := pushSourceImage(ctx, c, opts.SourceImage, opts.LocalPath)
+	if err != nil {
+		return err
+	}
+	opts.SourceImage = digestedImage
+	c.Successf("published accelerator\n")
+	return nil
+}
+
+func (opts PushOptions) PublishLocalSource(ctx context.Context, c *cli.Config) error {
+	digestedImage, err := pushSourceImage(ctx, c, opts.SourceImage, opts.LocalPath)
+	if err != nil {
+		return err
+	}
+	opts.SourceImage = digestedImage
+	c.Successf("published accelerator\n")
+	return nil
+}
+
+func pushSourceImage(ctx context.Context, c *cli.Config, image string, path string) (string, error) {
+	taggedImage := strings.Split(image, "@sha")[0]
+	c.Infof("publishing accelerator source in %q to %q...\n", path, taggedImage)
+	digestedImage, err := source.ImgpkgPush(ctx, path, taggedImage)
+	if err != nil {
+		return "", err
+	}
+	return digestedImage, nil
 }

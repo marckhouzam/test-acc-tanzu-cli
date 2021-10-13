@@ -1,0 +1,13 @@
+accelerator:
+  displayName: Test
+  description: Accelerator for Testing
+  tags:
+    - test
+  options:
+    - name: greeting
+      label: Greeting
+      defaultValue: Hello
+      display: true
+
+engine:
+  include: [ "**/*" ]
