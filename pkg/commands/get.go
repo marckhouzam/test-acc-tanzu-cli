@@ -95,7 +95,7 @@ the Application Acceleratior server you want to access.
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
 			if serverUrl != "" && !opts.FromContext && !context && !kubeconfig {
-				return printAcceleratorFromUiServer(serverUrl, args[0], w, cmd)
+				return printAcceleratorFromApiServer(serverUrl, args[0], w, cmd)
 			} else {
 				return printAcceleratorFromClient(ctx, opts, cmd, args[0], w, c)
 			}
@@ -106,9 +106,9 @@ the Application Acceleratior server you want to access.
 	return getCmd
 }
 
-func printAcceleratorFromUiServer(url string, name string, w *tabwriter.Writer, cmd *cobra.Command) error {
+func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer, cmd *cobra.Command) error {
 	errorMsg := "accelerator %s not found"
-	Accelerators, err := GetAcceleratorsFromUiServer(url, cmd)
+	Accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
 		return err
 	}
@@ -127,13 +127,21 @@ func printAcceleratorFromUiServer(url string, name string, w *tabwriter.Writer, 
 			if accelerator.SpecImageRepository != "" {
 				fmt.Fprintf(cmd.OutOrStdout(), "source:\n")
 				fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", accelerator.SpecImageRepository)
+				if accelerator.SpecImagePullSecrets != nil {
+					fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.SpecImagePullSecrets)
+				}
 			} else {
 				if accelerator.SpecGitRepositoryUrl != "" {
 					fmt.Fprintf(cmd.OutOrStdout(), "git:\n")
 					fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.SpecGitRepositoryUrl)
 					fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
 					fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.SourceBranch)
-					fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.SourceTag)
+					if accelerator.SourceTag != "" {
+						fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.SourceTag)
+					}
+					if accelerator.SpecGitSecretRefName != "" {
+						fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.SpecGitSecretRefName)
+					}
 				} else {
 					fmt.Fprintf(cmd.OutOrStdout(), "sourceUrl: %s\n", accelerator.SourceUrl)
 				}
@@ -170,10 +178,6 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s\n", name)
 		return err
 	}
-	ignore := ""
-	if accelerator.Spec.Git != nil && accelerator.Spec.Ignore != nil {
-		ignore = *accelerator.Spec.Ignore
-	}
 	var options []interface{}
 	yaml.Unmarshal([]byte(accelerator.Status.Options), &options)
 	tagsYaml, _ := yaml.Marshal(accelerator.Status.Tags)
@@ -185,20 +189,28 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
 	if accelerator.Spec.Git != nil {
 		fmt.Fprintln(cmd.OutOrStdout(), "git:")
-		if accelerator.Spec.Interval != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Interval.Duration)
-		} else {
-			fmt.Fprintf(cmd.OutOrStdout(), "  interval: \n")
+		if accelerator.Spec.Git.Interval != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Git.Interval.Duration)
 		}
-		fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", ignore)
+		if accelerator.Spec.Git.Ignore != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", *accelerator.Spec.Ignore)
+		}
 		fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
 		fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.Spec.Git.Reference.Branch)
-		fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
+		if accelerator.Spec.Git.Reference.Tag != "" {
+			fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
+		}
 		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
+		if accelerator.Spec.Git.SecretRef != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.Spec.Git.SecretRef.Name)
+		}
 	}
 	if accelerator.Spec.Source != nil {
 		fmt.Fprintln(cmd.OutOrStdout(), "source:")
 		fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", accelerator.Spec.Source.Image)
+		if accelerator.Spec.Source.ImagePullSecrets != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.Spec.Source.ImagePullSecrets)
+		}
 	}
 	if string(tagsYaml) != "[]\n" {
 		fmt.Fprintln(cmd.OutOrStdout(), "tags:")

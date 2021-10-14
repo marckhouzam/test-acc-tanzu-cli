@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fluxcd/pkg/apis/meta"
 	ggcrregistry "github.com/google/go-containerregistry/pkg/registry"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
@@ -32,6 +33,7 @@ func TestCreateCommand(t *testing.T) {
 	gitTag := "v0.0.1"
 	namespace := "default"
 	gitInterval := "2m"
+	secretRef := "mysecret"
 	expectedDuration, _ := time.ParseDuration(gitInterval)
 
 	table := clitesting.CommandTestSuite{
@@ -89,8 +91,8 @@ func TestCreateCommand(t *testing.T) {
 			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
 		},
 		{
-			Name: "Create Accelerator Image",
-			Args: []string{acceleratorName, "--source-image", imageName},
+			Name: "Create Accelerator Image with Secret ref",
+			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef},
 			ExpectCreates: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
@@ -100,6 +102,11 @@ func TestCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Source: &v1alpha1.ImageRepositorySpec{
 							Image: imageName,
+							ImagePullSecrets: []meta.LocalObjectReference{
+								{
+									Name: secretRef,
+								},
+							},
 						},
 					},
 				}),
@@ -107,12 +114,13 @@ func TestCreateCommand(t *testing.T) {
 			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
 		},
 		{
-			Name: "Create Accelerator with Branch and Tag",
+			Name: "Create Accelerator with Branch and Tag and Secret ref",
 			Args: []string{acceleratorName,
 				"--git-repository", gitRepoUrl,
 				"--git-branch", gitBranch,
 				"--git-tag", gitTag,
 				"--git-interval", gitInterval,
+				"--secret-ref", secretRef,
 			},
 			ExpectCreates: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
@@ -126,6 +134,9 @@ func TestCreateCommand(t *testing.T) {
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: gitBranch,
 								Tag:    gitTag,
+							},
+							SecretRef: &meta.LocalObjectReference{
+								Name: secretRef,
 							},
 							Interval: &v1.Duration{
 								Duration: expectedDuration,

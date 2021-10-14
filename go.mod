@@ -3,6 +3,7 @@ module github.com/pivotal/acc-tanzu-cli
 go 1.16
 
 require (
+	github.com/fluxcd/pkg/apis/meta v0.9.0
 	github.com/fsnotify/fsnotify v1.5.0 // indirect
 	github.com/google/go-containerregistry v0.6.0
 	github.com/imdario/mergo v0.3.12

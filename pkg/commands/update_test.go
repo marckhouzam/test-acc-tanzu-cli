@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fluxcd/pkg/apis/meta"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
@@ -18,6 +19,7 @@ func TestUpdateCmd(t *testing.T) {
 	namespace := "default"
 	repositoryUrl := "http://www.test.com"
 	imageName := "test-image"
+	secretRef := "mysecret"
 	expectedDuration, _ := time.ParseDuration("2m")
 	expectedInterval := &metav1.Duration{
 		Duration: expectedDuration,
@@ -122,7 +124,7 @@ func TestUpdateCmd(t *testing.T) {
 		},
 		{
 			Name: "Updates repo url from accelerator",
-			Args: []string{acceleratorName, "--git-repository", repositoryUrl},
+			Args: []string{acceleratorName, "--git-repository", repositoryUrl, "--secret-ref", secretRef},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
@@ -147,6 +149,9 @@ func TestUpdateCmd(t *testing.T) {
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
 							},
+							SecretRef: &meta.LocalObjectReference{
+								Name: secretRef,
+							},
 						},
 					},
 				}),
@@ -155,7 +160,7 @@ func TestUpdateCmd(t *testing.T) {
 		},
 		{
 			Name: "Updates repo image name from accelerator",
-			Args: []string{acceleratorName, "--source-image", imageName},
+			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
@@ -177,6 +182,11 @@ func TestUpdateCmd(t *testing.T) {
 						Description: testDescription,
 						Source: &v1alpha1.ImageRepositorySpec{
 							Image: imageName,
+							ImagePullSecrets: []meta.LocalObjectReference{
+								{
+									Name: secretRef,
+								},
+							},
 						},
 					},
 				}),

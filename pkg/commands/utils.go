@@ -29,9 +29,11 @@ type Accelerator struct {
 	IconUrl              string   `json:"iconUrl,omitempty"`
 	SourceUrl            string   `json:"sourceUrl,omitempty"`
 	SpecGitRepositoryUrl string   `json:"specGitRepositoryUrl,omitempty"`
+	SpecGitSecretRefName string   `json:"specGitSecretRefName,omitempty"`
 	SourceBranch         string   `json:"sourceBranch,omitempty"`
 	SourceTag            string   `json:"sourceTag,omitempty"`
 	SpecImageRepository  string   `json:"specImageRepository,omitempty"`
+	SpecImagePullSecrets []string `json:"specImagePullSecrets,omitempty"`
 	Tags                 []string `json:"tags,omitempty"`
 	Description          string   `json:"description,omitempty"`
 	DisplayName          string   `json:"displayName,omitempty"`
@@ -65,7 +67,7 @@ type OptionsResponse struct {
 	Options []Option `json:"options"`
 }
 
-func GetAcceleratorsFromUiServer(url string, cmd *cobra.Command) ([]Accelerator, error) {
+func GetAcceleratorsFromApiServer(url string, cmd *cobra.Command) ([]Accelerator, error) {
 	client := &http.Client{}
 	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators", url))
 	if err != nil {

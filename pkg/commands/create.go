@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fluxcd/pkg/apis/meta"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
@@ -91,6 +92,17 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				}
 			}
 
+			if opts.SecretRef != "" {
+				ref := meta.LocalObjectReference{
+					Name: opts.SecretRef,
+				}
+				if opts.SourceImage != "" {
+					acc.Spec.Source.ImagePullSecrets = []meta.LocalObjectReference{ref}
+				} else {
+					acc.Spec.Git.SecretRef = &ref
+				}
+			}
+
 			if opts.GitInterval != "" {
 				duration, err := time.ParseDuration(opts.GitInterval)
 				if err != nil {
@@ -102,6 +114,7 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				}
 				acc.Spec.Git.Interval = &interval
 			}
+
 			err := c.Create(ctx, acc)
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", args[0])

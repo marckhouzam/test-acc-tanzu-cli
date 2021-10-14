@@ -56,7 +56,7 @@ the Application Acceleratior server you want to access.
 }
 
 func printListFromUiServer(url string, w *tabwriter.Writer, cmd *cobra.Command) error {
-	Accelerators, err := GetAcceleratorsFromUiServer(url, cmd)
+	Accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
 		return err
 	}

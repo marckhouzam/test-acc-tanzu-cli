@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/fluxcd/pkg/apis/meta"
 	"github.com/imdario/mergo"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
@@ -83,6 +84,17 @@ with any changes made to the associated Git repository.
 				}
 				if accelerator.Spec.Git != nil {
 					accelerator.Spec.Git = nil
+				}
+			}
+
+			if opts.SecretRef != "" {
+				ref := meta.LocalObjectReference{
+					Name: opts.SecretRef,
+				}
+				if opts.SourceImage != "" {
+					updatedAccelerator.Spec.Source.ImagePullSecrets = []meta.LocalObjectReference{ref}
+				} else {
+					updatedAccelerator.Spec.Git.SecretRef = &ref
 				}
 			}
 

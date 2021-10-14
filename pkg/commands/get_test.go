@@ -265,7 +265,6 @@ description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png
 git:
-  interval: 
   ignore: .ignore
   ref:
     branch: main
