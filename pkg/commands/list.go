@@ -5,7 +5,6 @@ package commands
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -44,7 +43,7 @@ the Application Acceleratior server you want to access.
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
 			if serverUrl != "" && !opts.FromContext && !context && !kubeconfig {
-				return printListFromUiServer(serverUrl, w, cmd)
+				return printListFromUiServer(c, serverUrl, w, cmd)
 			} else {
 				return printListFromClient(ctx, c, opts, cmd, w)
 			}
@@ -55,24 +54,40 @@ the Application Acceleratior server you want to access.
 	return listCmd
 }
 
-func printListFromUiServer(url string, w *tabwriter.Writer, cmd *cobra.Command) error {
-	Accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
+func printListFromUiServer(c *cli.Config, url string, w *tabwriter.Writer, cmd *cobra.Command) error {
+	accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
 		return err
 	}
-	sort.Slice(Accelerators, func(i, j int) bool {
-		return strings.Compare(Accelerators[i].Name, Accelerators[j].Name) < 0
+	sort.Slice(accelerators, func(i, j int) bool {
+		return strings.Compare(accelerators[i].Name, accelerators[j].Name) < 0
 	})
-	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG")
-	for _, accelerator := range Accelerators {
-		gitRepoUrl := accelerator.SpecGitRepositoryUrl
-		if gitRepoUrl == "" {
-			gitRepoUrl = accelerator.SourceUrl
+
+	accList := [][]string{}
+	for _, accelerator := range accelerators {
+		repo := ""
+		if accelerator.SpecGitRepositoryUrl != "" {
+			repo = "git-repository: " + accelerator.SpecGitRepositoryUrl
+			if accelerator.SourceTag != "" {
+				repo = repo + ":" + accelerator.SourceTag
+			} else if accelerator.SourceBranch != "" {
+				repo = repo + ":" + accelerator.SourceBranch
+			}
+		} else if accelerator.SpecImageRepository != "" {
+			repo = "source-image: " + accelerator.SpecImageRepository
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", accelerator.Name, gitRepoUrl, accelerator.SourceBranch, accelerator.SourceTag)
+		status := "unknown"
+		if accelerator.Ready {
+			status = "true"
+		} else {
+			status = "false"
+		}
+
+		accList = append(accList, []string{accelerator.Name, repo, status})
 	}
 	w.Flush()
 
+	printAcceleratorList(c, cmd, w, accList)
 	return nil
 }
 
@@ -83,28 +98,54 @@ func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, c
 		fmt.Fprintf(cmd.OutOrStderr(), "There was an error listing accelerators\n")
 		return err
 	}
-	if len(accelerators.Items) == 0 {
-		errorMsg := "no accelerators found"
-		fmt.Fprintf(cmd.OutOrStderr(), errorMsg+".\n")
-		return errors.New(errorMsg)
-	}
-	fmt.Fprintln(w, "NAME\tGIT REPOSITORY\tBRANCH\tTAG\tIMAGE")
+
+	accList := [][]string{}
+
 	for _, accelerator := range accelerators.Items {
 		values := []string{accelerator.Name}
 
-		if accelerator.Spec.Git != nil {
-			values = append(values, accelerator.Spec.Git.URL, accelerator.Spec.Git.Reference.Branch, accelerator.Spec.Reference.Tag)
-		} else {
-			values = append(values, "", "", "")
+		status := "unknown"
+		for _, cond := range accelerator.Status.Conditions {
+			if cond.Type == "Ready" {
+				if cond.Status == "True" {
+					status = "true"
+				} else {
+					status = "false"
+				}
+				break
+			}
 		}
 
-		if accelerator.Spec.Source != nil {
-			values = append(values, accelerator.Spec.Source.Image)
+		repo := ""
+		if accelerator.Spec.Git != nil {
+			repo = "git-repository: " + accelerator.Spec.Git.URL
+			if accelerator.Spec.Git.Reference.Tag != "" {
+				repo = repo + ":" + accelerator.Spec.Git.Reference.Tag
+			} else if accelerator.Spec.Git.Reference.Branch != "" {
+				repo = repo + ":" + accelerator.Spec.Git.Reference.Branch
+			}
+			values = append(values, repo, status)
+		} else if accelerator.Spec.Source != nil {
+			repo = "source-image: " + accelerator.Spec.Source.Image
+			values = append(values, repo, status)
 		} else {
-			values = append(values, "")
+			values = append(values, "", "")
 		}
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", values[0], values[1], values[2], values[3], values[4])
+		accList = append(accList, values)
 	}
-	w.Flush()
+
+	printAcceleratorList(c, cmd, w, accList)
 	return nil
+}
+
+func printAcceleratorList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, accelerators [][]string) {
+	if len(accelerators) == 0 {
+		c.Infof("No accelerators found.\n")
+	} else {
+		fmt.Fprintln(w, "NAME\tREADY\tREPOSITORY")
+		for _, values := range accelerators {
+			fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[2], values[1])
+		}
+		w.Flush()
+	}
 }

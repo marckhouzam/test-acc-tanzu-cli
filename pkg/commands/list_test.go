@@ -72,9 +72,9 @@ func TestAcceleratorListCommand(t *testing.T) {
 			Name: "empty from context",
 			Args: []string{"--from-context"},
 			ExpectOutput: `
-no accelerators found.
+No accelerators found.
 `,
-			ShouldError: true,
+			ShouldError: false,
 		},
 		{
 			Name: "Error listing accelerators from context",
@@ -146,18 +146,18 @@ no accelerators found.
 				}),
 			},
 			ExpectOutput: `
-NAME                  GIT REPOSITORY         BRANCH   TAG   IMAGE
-another-accelerator   https://www.test.com   main           
-image-accelerator                                           test-image
-test-accelerator      https://www.test.com   main           
+NAME                  READY     REPOSITORY
+another-accelerator   unknown   git-repository: https://www.test.com:main
+image-accelerator     unknown   source-image: test-image
+test-accelerator      unknown   git-repository: https://www.test.com:main
 `,
 		},
 		{
 			Name: "List accelerators server-url",
 			Args: []string{"--server-url", ts.URL},
 			ExpectOutput: `
-NAME   GIT REPOSITORY        BRANCH   TAG
-mock   http://www.test.com   main     v1.0.0
+NAME   READY   REPOSITORY
+mock   true    
 `,
 		},
 		{
@@ -180,8 +180,8 @@ mock   http://www.test.com   main     v1.0.0
 				}),
 			},
 			ExpectOutput: `
-NAME               GIT REPOSITORY         BRANCH   TAG   IMAGE
-test-accelerator   https://www.test.com   main           
+NAME               READY     REPOSITORY
+test-accelerator   unknown   git-repository: https://www.test.com:main
 `,
 		},
 	}
