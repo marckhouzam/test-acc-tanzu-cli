@@ -82,9 +82,17 @@ with any changes made to the associated Git repository.
 				updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{
 					Image: opts.SourceImage,
 				}
-				if accelerator.Spec.Git != nil {
-					accelerator.Spec.Git = nil
+			}
+
+			if opts.SourceInterval != "" {
+				if updatedAccelerator.Spec.Source == nil {
+					updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{}
 				}
+				duration, _ := time.ParseDuration(opts.SourceInterval)
+				interval := v1.Duration{
+					Duration: duration,
+				}
+				updatedAccelerator.Spec.Source.Interval = &interval
 			}
 
 			if opts.SecretRef != "" {

@@ -211,6 +211,9 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		if accelerator.Spec.Source.ImagePullSecrets != nil {
 			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.Spec.Source.ImagePullSecrets)
 		}
+		if accelerator.Spec.Source.Interval != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Source.Interval)
+		}
 	}
 	if string(tagsYaml) != "[]\n" {
 		fmt.Fprintln(cmd.OutOrStdout(), "tags:")

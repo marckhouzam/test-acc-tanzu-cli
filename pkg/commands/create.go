@@ -92,6 +92,17 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				}
 			}
 
+			if opts.SourceInterval != "" {
+				if acc.Spec.Source == nil {
+					acc.Spec.Source = &v1alpha1.ImageRepositorySpec{}
+				}
+				duration, _ := time.ParseDuration(opts.SourceInterval)
+				interval := v1.Duration{
+					Duration: duration,
+				}
+				acc.Spec.Source.Interval = &interval
+			}
+
 			if opts.SecretRef != "" {
 				ref := meta.LocalObjectReference{
 					Name: opts.SecretRef,
