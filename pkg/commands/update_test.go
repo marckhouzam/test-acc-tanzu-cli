@@ -20,6 +20,7 @@ func TestUpdateCmd(t *testing.T) {
 	repositoryUrl := "http://www.test.com"
 	imageName := "test-image"
 	secretRef := "mysecret"
+	interval := "2m"
 	expectedDuration, _ := time.ParseDuration("2m")
 	expectedInterval := &metav1.Duration{
 		Duration: expectedDuration,
@@ -84,7 +85,7 @@ func TestUpdateCmd(t *testing.T) {
 		},
 		{
 			Name: "Updates accelerator",
-			Args: []string{acceleratorName, "--description", testDescription, "--git-interval", "2m"},
+			Args: []string{acceleratorName, "--description", testDescription, "--interval", interval},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
@@ -98,6 +99,7 @@ func TestUpdateCmd(t *testing.T) {
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
 							},
+							Interval: expectedInterval,
 						},
 					},
 				}),
@@ -160,7 +162,7 @@ func TestUpdateCmd(t *testing.T) {
 		},
 		{
 			Name: "Updates repo image name from accelerator",
-			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef},
+			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef, "--interval", interval},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
@@ -187,6 +189,7 @@ func TestUpdateCmd(t *testing.T) {
 									Name: secretRef,
 								},
 							},
+							Interval: expectedInterval,
 						},
 					},
 				}),

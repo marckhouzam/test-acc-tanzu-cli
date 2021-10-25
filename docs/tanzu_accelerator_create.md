@@ -27,20 +27,19 @@ tanzu accelerator create <accelerator-name> --git-repository <URL> --git-branch 
 ### Options
 
 ```
-      --description string       description of this accelerator
-      --display-name string      display name for the accelerator
-      --git-branch string        Git repository branch to be used
-      --git-interval string      interval for checking for Git repository updates
-      --git-repository string    Git repository URL for the accelerator
-      --git-tag string           Git repository tag to be used
-  -h, --help                     help for create
-      --icon-url string          URL for icon to use with the accelerator
-      --local-path string        path to the directory containing the source for the accelerator
-  -n, --namespace name           kubernetes namespace (defaulted from kube config)
-      --secret-ref string        name of secret containing credentials for private Git or source repository
-      --source-image string      name of the source image for the accelerator
-      --source-interval string   interval for checking for source image updates
-      --tags strings             tags that can be used to search for accelerators
+      --description string      description of this accelerator
+      --display-name string     display name for the accelerator
+      --git-branch string       Git repository branch to be used
+      --git-repository string   Git repository URL for the accelerator
+      --git-tag string          Git repository tag to be used
+  -h, --help                    help for create
+      --icon-url string         URL for icon to use with the accelerator
+      --interval string         interval for checking for updates to Git or image repository
+      --local-path string       path to the directory containing the source for the accelerator
+  -n, --namespace name          kubernetes namespace (defaulted from kube config)
+      --secret-ref string       name of secret containing credentials for private Git or image repository
+      --source-image string     name of the source image for the accelerator
+      --tags strings            tags that can be used to search for accelerators
 ```
 
 ### Options inherited from parent commands

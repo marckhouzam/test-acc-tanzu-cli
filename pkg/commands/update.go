@@ -84,17 +84,6 @@ with any changes made to the associated Git repository.
 				}
 			}
 
-			if opts.SourceInterval != "" {
-				if updatedAccelerator.Spec.Source == nil {
-					updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{}
-				}
-				duration, _ := time.ParseDuration(opts.SourceInterval)
-				interval := v1.Duration{
-					Duration: duration,
-				}
-				updatedAccelerator.Spec.Source.Interval = &interval
-			}
-
 			if opts.SecretRef != "" {
 				ref := meta.LocalObjectReference{
 					Name: opts.SecretRef,
@@ -106,16 +95,19 @@ with any changes made to the associated Git repository.
 				}
 			}
 
-			if opts.GitInterval != "" {
-				if updatedAccelerator.Spec.Git == nil {
-					updatedAccelerator.Spec.Git = &acceleratorv1alpha1.Git{}
-				}
-				duration, _ := time.ParseDuration(opts.GitInterval)
-				interval := &v1.Duration{
+			if opts.Interval != "" {
+				duration, _ := time.ParseDuration(opts.Interval)
+				interval := v1.Duration{
 					Duration: duration,
 				}
-				time.ParseDuration(opts.GitInterval)
-				updatedAccelerator.Spec.Git.Interval = interval
+
+				if updatedAccelerator.Spec.Source != nil {
+					updatedAccelerator.Spec.Source.Interval = &interval
+				}
+
+				if updatedAccelerator.Spec.Git != nil {
+					updatedAccelerator.Spec.Git.Interval = &interval
+				}
 			}
 			if opts.Reconcile {
 				if accelerator.ObjectMeta.Annotations == nil {

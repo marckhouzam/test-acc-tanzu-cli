@@ -9,7 +9,7 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
-	github.com/pivotal/acc-controller v0.3.1-0.20211022173537-549a443af488
+	github.com/pivotal/acc-controller v0.4.0
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211007192245-181c97eeb1d0
 	github.com/vmware-tanzu/tanzu-framework v0.6.0

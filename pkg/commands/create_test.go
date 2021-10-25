@@ -32,9 +32,9 @@ func TestCreateCommand(t *testing.T) {
 	gitBranch := "main"
 	gitTag := "v0.0.1"
 	namespace := "default"
-	gitInterval := "2m"
+	interval := "2m"
 	secretRef := "mysecret"
-	expectedDuration, _ := time.ParseDuration(gitInterval)
+	expectedDuration, _ := time.ParseDuration(interval)
 
 	table := clitesting.CommandTestSuite{
 		{
@@ -92,7 +92,7 @@ func TestCreateCommand(t *testing.T) {
 		},
 		{
 			Name: "Create Accelerator Image with Secret ref",
-			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef},
+			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef, "--interval", interval},
 			ExpectCreates: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
@@ -107,6 +107,9 @@ func TestCreateCommand(t *testing.T) {
 									Name: secretRef,
 								},
 							},
+							Interval: &v1.Duration{
+								Duration: expectedDuration,
+							},
 						},
 					},
 				}),
@@ -119,7 +122,7 @@ func TestCreateCommand(t *testing.T) {
 				"--git-repository", gitRepoUrl,
 				"--git-branch", gitBranch,
 				"--git-tag", gitTag,
-				"--git-interval", gitInterval,
+				"--interval", interval,
 				"--secret-ref", secretRef,
 			},
 			ExpectCreates: []clitesting.Factory{

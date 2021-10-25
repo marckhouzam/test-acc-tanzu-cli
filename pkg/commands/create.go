@@ -92,15 +92,19 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				}
 			}
 
-			if opts.SourceInterval != "" {
-				if acc.Spec.Source == nil {
-					acc.Spec.Source = &v1alpha1.ImageRepositorySpec{}
-				}
-				duration, _ := time.ParseDuration(opts.SourceInterval)
+			if opts.Interval != "" {
+				duration, _ := time.ParseDuration(opts.Interval)
 				interval := v1.Duration{
 					Duration: duration,
 				}
-				acc.Spec.Source.Interval = &interval
+
+				if acc.Spec.Source != nil {
+					acc.Spec.Source.Interval = &interval
+				}
+
+				if acc.Spec.Git != nil {
+					acc.Spec.Git.Interval = &interval
+				}
 			}
 
 			if opts.SecretRef != "" {
@@ -112,18 +116,6 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				} else {
 					acc.Spec.Git.SecretRef = &ref
 				}
-			}
-
-			if opts.GitInterval != "" {
-				duration, err := time.ParseDuration(opts.GitInterval)
-				if err != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "Error parsing interval %s\n", opts.GitInterval)
-					return err
-				}
-				interval := v1.Duration{
-					Duration: duration,
-				}
-				acc.Spec.Git.Interval = &interval
 			}
 
 			err := c.Create(ctx, acc)

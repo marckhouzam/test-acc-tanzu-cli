@@ -11,19 +11,18 @@ import (
 )
 
 type CreateOptions struct {
-	Namespace      string
-	DisplayName    string
-	Description    string
-	IconUrl        string
-	GitRepoUrl     string
-	GitBranch      string
-	GitTag         string
-	GitInterval    string
-	LocalPath      string
-	SourceImage    string
-	SourceInterval string
-	SecretRef      string
-	Tags           []string
+	Namespace   string
+	DisplayName string
+	Description string
+	IconUrl     string
+	GitRepoUrl  string
+	GitBranch   string
+	GitTag      string
+	Interval    string
+	LocalPath   string
+	SourceImage string
+	SecretRef   string
+	Tags        []string
 }
 
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
@@ -35,27 +34,25 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
 	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Git repository branch to be used")
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
-	cmd.Flags().StringVar(&co.GitInterval, "git-interval", "", "interval for checking for Git repository updates")
+	cmd.Flags().StringVar(&co.Interval, "interval", "", "interval for checking for updates to Git or image repository")
 	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
-	cmd.Flags().StringVar(&co.SourceInterval, "source-interval", "", "interval for checking for source image updates")
-	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or source repository")
+	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
 }
 
 type UpdateOptions struct {
-	Namespace      string
-	DisplayName    string
-	Description    string
-	IconUrl        string
-	GitRepoUrl     string
-	GitBranch      string
-	GitTag         string
-	GitInterval    string
-	SourceImage    string
-	SourceInterval string
-	SecretRef      string
-	Tags           []string
-	Reconcile      bool
+	Namespace   string
+	DisplayName string
+	Description string
+	IconUrl     string
+	GitRepoUrl  string
+	GitBranch   string
+	GitTag      string
+	Interval    string
+	SourceImage string
+	SecretRef   string
+	Tags        []string
+	Reconcile   bool
 }
 
 func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
@@ -68,10 +65,9 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Git repository branch to be used")
 	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
-	cmd.Flags().StringVar(&uo.GitInterval, "git-interval", "", "interval for checking for Git repository updates")
+	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
 	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
-	cmd.Flags().StringVar(&uo.SourceInterval, "source-interval", "", "interval for checking for source image updates")
-	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or source repository")
+	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 }
 
 type PushOptions struct {
