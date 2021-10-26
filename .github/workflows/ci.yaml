@@ -101,13 +101,13 @@ jobs:
           tanzu accelerator create test-accelerator --git-repository http://www.test.com
         echo "##[endgroup]"
         echo "##[group]Get Acceletor"
-          tanzu accelerator get spring-petclinic
+          tanzu accelerator get spring-petclinic --server-url=http://localhost:8877
         echo "##[endgroup]"
         echo "##[group]Update Accelerator"
           tanzu accelerator update spring-petclinic --description "Lorem Ipsum"
         echo "##[endgroup]"
         echo "##[group]Generate Accelerator"
-          tanzu accelerator generate spring-petclinic
+          tanzu accelerator generate spring-petclinic --server-url=http://localhost:8877
         echo "##[endgroup]"
         echo "##[group]Delete Accelerator"
           tanzu accelerator delete test-accelerator
