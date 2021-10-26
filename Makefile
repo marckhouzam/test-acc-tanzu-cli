@@ -30,8 +30,9 @@ create-kind-cluster:
 	kind create cluster --name e2e-acc-cluster --config ./e2e/assets/acc-kind-node.yml
 	kubectl config use-context kind-e2e-acc-cluster
 
-install-flux2:
+install-prereqs:
 	kubectl apply -f https://gist.githubusercontent.com/trisberg/f53bbaa0b8aacba0ec64372a6fb6acdf/raw/45259afd682caa2f6270f4b8c07c995aa8487a12/acc-flux2.yaml	
+	kubectl apply -f https://gist.githubusercontent.com/trisberg/0fc3ed74e3673af72c63e867ffcf8972/raw/9d5834bd81fa407665c00a238d6dd0ade135ca10/acc-source.yaml
 
 install-bundle:
 	kubectl create namespace accelerator-system	
@@ -40,4 +41,4 @@ install-bundle:
 add-test-accelerators:
 	kubectl create -f ./e2e/assets/test-accelerators.yml
 
-create-context: create-kind-cluster install-flux2 install-bundle add-test-accelerators	
+create-context: create-kind-cluster install-prereqs install-bundle add-test-accelerators	
