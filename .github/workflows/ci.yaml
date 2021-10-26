@@ -86,7 +86,7 @@ jobs:
         tar -xvf tanzu-accelerator-plugin.tar.gz
         tanzu plugin install accelerator --local ./artifacts --version ${{env.BUILD_VERSION}}
     - name: Create Context
-      run: |        
+      run: |
         make create-context
     - name: Test CLI commands
       run: |
