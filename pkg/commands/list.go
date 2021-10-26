@@ -26,8 +26,8 @@ func ListCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 
 You can choose to list the accelerators from the Application Accelerator server using --server-url flag
 or from a Kubernetes context using --from-context flag. The default is to list accelerators from the
-Application Acceleratior server and you can set the ACC_SERVER_URL environment variable with the URL for
-the Application Acceleratior server you want to access.
+Kubernetes context. To override this, you can set the ACC_SERVER_URL environment variable with the URL for
+the Application Accelerator server you want to access.
 `,
 		Example: "tanzu accelerator list",
 		RunE: func(cmd *cobra.Command, args []string) error {
