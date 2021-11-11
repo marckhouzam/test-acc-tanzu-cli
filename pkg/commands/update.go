@@ -65,6 +65,7 @@ with any changes made to the associated Git repository.
 					Tags:        opts.Tags,
 				},
 			}
+
 			if opts.GitRepoUrl != "" {
 				updatedAccelerator.Spec.Git = &acceleratorv1alpha1.Git{
 					URL: opts.GitRepoUrl,
@@ -72,9 +73,6 @@ with any changes made to the associated Git repository.
 						Branch: opts.GitBranch,
 						Tag:    opts.GitTag,
 					},
-				}
-				if accelerator.Spec.Source != nil {
-					accelerator.Spec.Source = nil
 				}
 			}
 
@@ -84,15 +82,21 @@ with any changes made to the associated Git repository.
 				}
 			}
 
-			if opts.SecretRef != "" {
-				ref := meta.LocalObjectReference{
-					Name: opts.SecretRef,
+			if opts.Reconcile {
+				if accelerator.ObjectMeta.Annotations == nil {
+					accelerator.ObjectMeta.Annotations = make(map[string]string)
 				}
-				if opts.SourceImage != "" {
-					updatedAccelerator.Spec.Source.ImagePullSecrets = []meta.LocalObjectReference{ref}
-				} else {
-					updatedAccelerator.Spec.Git.SecretRef = &ref
-				}
+				accelerator.ObjectMeta.Annotations[requestedAtAnnotation] = time.Now().UTC().Format(time.RFC3339)
+			}
+
+			mergo.Merge(updatedAccelerator, *accelerator)
+
+			if opts.GitRepoUrl == "" && opts.GitBranch != "" {
+				updatedAccelerator.Spec.Git.Reference.Branch = opts.GitBranch
+			}
+
+			if opts.GitRepoUrl == "" && opts.GitTag != "" {
+				updatedAccelerator.Spec.Git.Reference.Tag = opts.GitTag
 			}
 
 			if opts.Interval != "" {
@@ -109,13 +113,20 @@ with any changes made to the associated Git repository.
 					updatedAccelerator.Spec.Git.Interval = &interval
 				}
 			}
-			if opts.Reconcile {
-				if accelerator.ObjectMeta.Annotations == nil {
-					accelerator.ObjectMeta.Annotations = make(map[string]string)
+
+			if opts.SecretRef != "" {
+				ref := meta.LocalObjectReference{
+					Name: opts.SecretRef,
 				}
-				accelerator.ObjectMeta.Annotations[requestedAtAnnotation] = time.Now().UTC().Format(time.RFC3339)
+				if updatedAccelerator.Spec.Source != nil {
+					updatedAccelerator.Spec.Source.ImagePullSecrets = []meta.LocalObjectReference{ref}
+				}
+
+				if updatedAccelerator.Spec.Git != nil {
+					updatedAccelerator.Spec.Git.SecretRef = &ref
+				}
 			}
-			mergo.Merge(updatedAccelerator, *accelerator)
+
 			err = c.Update(ctx, updatedAccelerator)
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "there was an error updating accelerator %s\n", args[0])

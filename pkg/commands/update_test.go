@@ -99,7 +99,6 @@ func TestUpdateCmd(t *testing.T) {
 							Reference: &v1beta1.GitRepositoryRef{
 								Branch: "main",
 							},
-							Interval: expectedInterval,
 						},
 					},
 				}),
@@ -149,7 +148,7 @@ func TestUpdateCmd(t *testing.T) {
 						Git: &acceleratorv1alpha1.Git{
 							URL: "http://www.test.com",
 							Reference: &v1beta1.GitRepositoryRef{
-								Branch: "main",
+								Branch: "",
 							},
 							SecretRef: &meta.LocalObjectReference{
 								Name: secretRef,

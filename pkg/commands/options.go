@@ -62,7 +62,7 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
 	cmd.Flags().StringSliceVar(&uo.Tags, "tags", []string{}, "tags that can be used to search for accelerators")
 	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
-	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "main", "Git repository branch to be used")
+	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "", "Git repository branch to be used")
 	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
