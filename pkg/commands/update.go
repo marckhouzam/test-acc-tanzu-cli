@@ -44,6 +44,10 @@ with any changes made to the associated Git repository.
 		},
 		Example: "tanzu accelerator update <accelerator-name> --description \"Lorem Ipsum\"",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.GitRepoUrl != "" && opts.SourceImage != "" {
+				return errors.New("you may only provide one of --git-repository or --source-image")
+			}
+
 			accelerator := &acceleratorv1alpha1.Accelerator{}
 			err := c.Get(context.Background(), client.ObjectKey{Namespace: opts.Namespace, Name: args[0]}, accelerator)
 			if err != nil {
@@ -74,12 +78,14 @@ with any changes made to the associated Git repository.
 						Tag:    opts.GitTag,
 					},
 				}
+				accelerator.Spec.Source = nil
 			}
 
 			if opts.SourceImage != "" {
 				updatedAccelerator.Spec.Source = &v1alpha1.ImageRepositorySpec{
 					Image: opts.SourceImage,
 				}
+				accelerator.Spec.Git = nil
 			}
 
 			if opts.Reconcile {

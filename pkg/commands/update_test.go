@@ -41,6 +41,11 @@ func TestUpdateCmd(t *testing.T) {
 			ExpectOutput: "accelerator non-existent not found\n",
 		},
 		{
+			Name:        "Error updating accelerator when providing both git-repository and source-image",
+			Args:        []string{acceleratorName, "--git-repository", repositoryUrl, "--source-image", imageName},
+			ShouldError: true,
+		},
+		{
 			Name: "Error updating accelerator",
 			Args: []string{acceleratorName, "--description", testDescription},
 			WithReactors: []clitesting.ReactionFunc{
@@ -134,6 +139,9 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: "first description",
+						Source: &v1alpha1.ImageRepositorySpec{
+							Image: "some-image",
+						},
 					},
 				}),
 			},
@@ -154,6 +162,7 @@ func TestUpdateCmd(t *testing.T) {
 								Name: secretRef,
 							},
 						},
+						Source: nil,
 					},
 				}),
 			},
@@ -170,6 +179,15 @@ func TestUpdateCmd(t *testing.T) {
 					},
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Description: testDescription,
+						Git: &acceleratorv1alpha1.Git{
+							URL: "http://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+							SecretRef: &meta.LocalObjectReference{
+								Name: secretRef,
+							},
+						},
 					},
 				}),
 			},
@@ -190,6 +208,7 @@ func TestUpdateCmd(t *testing.T) {
 							},
 							Interval: expectedInterval,
 						},
+						Git: nil,
 					},
 				}),
 			},
