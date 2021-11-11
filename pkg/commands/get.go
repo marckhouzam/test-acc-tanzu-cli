@@ -212,7 +212,7 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.Spec.Source.ImagePullSecrets)
 		}
 		if accelerator.Spec.Source.Interval != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Source.Interval)
+			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", accelerator.Spec.Source.Interval.Duration)
 		}
 	}
 	if string(tagsYaml) != "[]\n" {
