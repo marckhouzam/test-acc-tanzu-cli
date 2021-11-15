@@ -18,7 +18,7 @@ func TestDeleteCommand(t *testing.T) {
 	acceleratorNotFound := "non-existent"
 	gitRepoUrl := "https://www.test.com"
 	gitBranch := "main"
-	namespace := "default"
+	namespace := "accelerator-system"
 
 	table := clitesting.CommandTestSuite{
 		{

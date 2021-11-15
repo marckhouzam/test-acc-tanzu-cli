@@ -26,7 +26,7 @@ type CreateOptions struct {
 }
 
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cli.NamespaceFlag(ctx, cmd, c, &co.Namespace)
+	cmd.Flags().StringVar(&co.Namespace, "namespace", "accelerator-system", "namespace for accelerators")
 	cmd.Flags().StringVar(&co.Description, "description", "", "description of this accelerator")
 	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "display name for the accelerator")
 	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
@@ -56,7 +56,7 @@ type UpdateOptions struct {
 }
 
 func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cli.NamespaceFlag(ctx, cmd, c, &uo.Namespace)
+	cmd.Flags().StringVar(&uo.Namespace, "namespace", "accelerator-system", "namespace for accelerators")
 	cmd.Flags().StringVar(&uo.Description, "description", "", "description of this accelerator")
 	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "display name for the accelerator")
 	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
@@ -87,7 +87,8 @@ type DeleteOptions struct {
 }
 
 func (do *DeleteOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cli.NamespaceFlag(ctx, cmd, c, &do.Namespace)
+	cmd.Flags().StringVar(&do.Namespace, "namespace", "accelerator-system", "namespace for accelerators")
+
 }
 
 type ListOptions struct {
@@ -97,7 +98,7 @@ type ListOptions struct {
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cli.NamespaceFlag(ctx, cmd, c, &lo.Namespace)
+	cmd.Flags().StringVar(&lo.Namespace, "namespace", "accelerator-system", "namespace for accelerators")
 	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }
@@ -109,7 +110,7 @@ type GetOptions struct {
 }
 
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cli.NamespaceFlag(ctx, cmd, c, &gopts.Namespace)
+	cmd.Flags().StringVar(&gopts.Namespace, "namespace", "accelerator-system", "namespace for accelerators")
 	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }

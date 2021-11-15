@@ -27,7 +27,7 @@ tanzu accelerator get <accelerator-name> --from-context
 ```
       --from-context        retrieve resources from current context defined in kubeconfig
   -h, --help                help for get
-  -n, --namespace name      kubernetes namespace (defaulted from kube config)
+      --namespace string    namespace for accelerators (default "accelerator-system")
       --server-url string   the URL for the Application Accelerator server
 ```
 

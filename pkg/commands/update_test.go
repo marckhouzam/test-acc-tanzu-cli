@@ -16,7 +16,7 @@ import (
 func TestUpdateCmd(t *testing.T) {
 	acceleratorName := "test-accelerator"
 	testDescription := "another description"
-	namespace := "default"
+	namespace := "accelerator-system"
 	repositoryUrl := "http://www.test.com"
 	imageName := "test-image"
 	secretRef := "mysecret"

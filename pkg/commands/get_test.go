@@ -92,7 +92,7 @@ func TestGetCommand(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = acceleratorv1alpha1.AddToScheme(scheme)
 	acceleratorName := "test-accelerator"
-	namespace := "default"
+	namespace := "accelerator-system"
 	ignore := ".ignore"
 	duration, _ := time.ParseDuration("2m")
 
@@ -227,7 +227,7 @@ func TestGetCommand(t *testing.T) {
 			},
 			ExpectOutput: `
 name: test-accelerator
-namespace: default
+namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png
@@ -260,7 +260,7 @@ artifact:
 			},
 			ExpectOutput: `
 name: test-accelerator
-namespace: default
+namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png
@@ -287,7 +287,7 @@ artifact:
 			},
 			ExpectOutput: `
 name: test-accelerator
-namespace: default
+namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
 iconUrl: http://icon.png

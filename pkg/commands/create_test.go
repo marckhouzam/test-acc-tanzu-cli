@@ -31,7 +31,7 @@ func TestCreateCommand(t *testing.T) {
 	noGitTag := ""
 	gitBranch := "main"
 	gitTag := "v0.0.1"
-	namespace := "default"
+	namespace := "accelerator-system"
 	interval := "2m"
 	secretRef := "mysecret"
 	expectedDuration, _ := time.ParseDuration(interval)
@@ -88,7 +88,7 @@ func TestCreateCommand(t *testing.T) {
 					},
 				}),
 			},
-			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
 		{
 			Name: "Create Accelerator Image with Secret ref",
@@ -114,7 +114,7 @@ func TestCreateCommand(t *testing.T) {
 					},
 				}),
 			},
-			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
 		{
 			Name: "Create Accelerator with Branch and Tag and Secret ref",
@@ -148,7 +148,7 @@ func TestCreateCommand(t *testing.T) {
 					},
 				}),
 			},
-			ExpectOutput: "created accelerator test-accelerator in namespace default\n",
+			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
 	}
 	table.Run(t, scheme, CreateCmd)
@@ -170,7 +170,7 @@ func TestCreateCommandLocalPath(t *testing.T) {
 	c.Client = clitesting.NewFakeCliClient(clitesting.NewFakeClient(scheme))
 
 	acceleratorName := "test-accelerator"
-	namespace := "default"
+	namespace := "accelerator-system"
 
 	table := clitesting.CommandTestSuite{
 		{
@@ -198,7 +198,7 @@ func TestCreateCommandLocalPath(t *testing.T) {
 					},
 				}),
 			},
-			ExpectOutput: "publishing accelerator source in \"testdata/test-acc\" to \"" + imageName + "\"...\npublished accelerator\ncreated accelerator test-accelerator in namespace default\n",
+			ExpectOutput: "publishing accelerator source in \"testdata/test-acc\" to \"" + imageName + "\"...\npublished accelerator\ncreated accelerator test-accelerator in namespace accelerator-system\n",
 		},
 	}
 	table.Run(t, scheme, CreateCmd)

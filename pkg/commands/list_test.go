@@ -20,7 +20,7 @@ import (
 
 func TestAcceleratorListCommand(t *testing.T) {
 	acceleratorName := "test-accelerator"
-	namespace := "default"
+	namespace := "accelerator-system"
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mockAccelerator := UiAcceleratorsApiResponse{

@@ -19,8 +19,8 @@ tanzu accelerator delete <accelerator-name>
 ### Options
 
 ```
-  -h, --help             help for delete
-  -n, --namespace name   kubernetes namespace (defaulted from kube config)
+  -h, --help               help for delete
+      --namespace string   namespace for accelerators (default "accelerator-system")
 ```
 
 ### Options inherited from parent commands
