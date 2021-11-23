@@ -9,6 +9,7 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
+	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pivotal/acc-controller v0.4.0
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211007192245-181c97eeb1d0
