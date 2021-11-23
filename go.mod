@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/fluxcd/pkg/apis/meta v0.9.0
 	github.com/fsnotify/fsnotify v1.5.0 // indirect
-	github.com/google/go-containerregistry v0.6.0
+	github.com/google/go-containerregistry v0.7.0
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
