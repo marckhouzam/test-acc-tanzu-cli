@@ -1548,8 +1548,8 @@ github.com/vmware-tanzu/carvel-vendir v0.23.0 h1:7tn0D14nxpYQS4SPRqOGp0ePKAgikYw
 github.com/vmware-tanzu/carvel-vendir v0.23.0/go.mod h1:l35I00eXhYiIaZdOPeGX/zrj0WGfimSSqj81PrxGpAw=
 github.com/vmware-tanzu/difflib v0.0.0-20201117154628-0c031775bf57 h1:NmeWaPuGdwr2+NdXEFqDfcBYiA8Qi/z+twfED7mqCyY=
 github.com/vmware-tanzu/difflib v0.0.0-20201117154628-0c031775bf57/go.mod h1:q4R37lXdaJmkpws5TUoMwT2GXOMs8qJJ9P+zxrtHv28=
-github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211124060151-5b1cce20cda0 h1:qH+d3BXl7q6yMdm74WFaY1aRaCh8Nqaz/VOlVWnfq6A=
-github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211124060151-5b1cce20cda0/go.mod h1:kOiq/Z1CamDPFudsmaGtyN5qFYRUUnClwVAUBj02kjg=
+github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.3.0 h1:na6iKMcSEWb/56HQLKlFkh2nLSkJHWSU9Yzd/GKHdEU=
+github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.3.0/go.mod h1:kOiq/Z1CamDPFudsmaGtyN5qFYRUUnClwVAUBj02kjg=
 github.com/vmware-tanzu/tanzu-framework v0.10.0 h1:ikk2qJVdS2sDb2FF/j1clbYUl+YlY4Eb3at4FJ+FiVw=
 github.com/vmware-tanzu/tanzu-framework v0.10.0/go.mod h1:oll9F1u0wqQUQvB9StKNw3qFilemMVBuccXfiuYSVWE=
 github.com/vmware/govmomi v0.20.3/go.mod h1:URlwyTFZX72RmxtxuaFL2Uj3fD1JTvZdx59bHWk6aFU=

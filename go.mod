@@ -12,7 +12,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pivotal/acc-controller v0.5.0
 	github.com/spf13/cobra v1.2.1
-	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211124060151-5b1cce20cda0
+	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.3.0
 	github.com/vmware-tanzu/tanzu-framework v0.10.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/apimachinery v0.22.4
