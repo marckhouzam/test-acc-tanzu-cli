@@ -9,6 +9,7 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.15.0
+	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pivotal/acc-controller v0.5.0
 	github.com/spf13/cobra v1.2.1
 	github.com/vmware-tanzu/tanzu-cli-apps-plugins v0.2.1-0.20211124060151-5b1cce20cda0
@@ -18,8 +19,6 @@ require (
 	k8s.io/client-go v0.22.4
 	sigs.k8s.io/controller-runtime v0.10.3
 )
-
-replace github.com/opencontainers/image-spec v1.0.1 => github.com/opencontainers/image-spec v1.0.2
 
 replace go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.5.1
 
