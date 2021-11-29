@@ -23,4 +23,4 @@ ytt -f $BUNDLE_PATH/config -f $BUNDLE_PATH/values.yml --data-values-env acc  \
 | kbld -f $BUNDLE_PATH/.imgpkg/images.yml -f- \
 | kapp deploy -y -n accelerator-system -a accelerator -f-
 
-kubectl port-forward service/acc-ui-server -n accelerator-system 8877:80 &
+kubectl port-forward service/acc-server -n accelerator-system 8877:80 &
