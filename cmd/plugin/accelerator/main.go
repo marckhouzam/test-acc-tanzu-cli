@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-tanzu-cli/pkg/commands"
@@ -64,7 +65,8 @@ func main() {
 	p.Cmd.PersistentFlags().StringVar(&c.CurrentContext, "context", "", "`name` of the kubeconfig context to use (default is current-context defined by kubeconfig)")
 
 	if err := p.Execute(); err != nil {
-		panic(err)
+		println(err.Error())
+		os.Exit(1)
 	}
 
 }
