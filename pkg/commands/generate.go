@@ -46,7 +46,7 @@ func GenerateCmd() *cobra.Command {
 	var uiServer string
 	var accServerUrl string
 	var optionsString string
-	var filepath string
+	var filename string
 	var outputDir string
 	var generateCmd = &cobra.Command{
 		Use:   "generate",
@@ -85,8 +85,8 @@ environmnet variable if it is set.
 			json.Unmarshal([]byte(optionsString), &projectName)
 			client := &http.Client{}
 			var options map[string]interface{}
-			if filepath != "" {
-				fileBytes, err := ioutil.ReadFile(filepath)
+			if filename != "" {
+				fileBytes, err := ioutil.ReadFile(filename)
 				if err != nil {
 					return err
 				}
@@ -151,7 +151,7 @@ environmnet variable if it is set.
 		},
 	}
 	generateCmd.Flags().StringVar(&optionsString, "options", "", "options JSON string")
-	generateCmd.Flags().StringVar(&filepath, "options-file", "", "path to file containing options JSON string")
+	generateCmd.Flags().StringVar(&filename, "options-file", "", "path to file containing options JSON string")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "directory that the zip file will be written to")
 	generateCmd.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")
 	accServerUrl = EnvVar("ACC_SERVER_URL", "")

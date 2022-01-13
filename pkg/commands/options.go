@@ -114,3 +114,12 @@ func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
 }
+
+type ApplyOptions struct {
+	FileName string
+}
+
+func (appopts *ApplyOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVarP(&appopts.FileName, "filename", "f", "", "path of manifest file for the accelerator")
+	cmd.MarkFlagRequired("filename")
+}
