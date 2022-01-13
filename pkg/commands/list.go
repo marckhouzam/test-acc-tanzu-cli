@@ -5,6 +5,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -57,7 +58,11 @@ the Application Accelerator server you want to access.
 func printListFromUiServer(c *cli.Config, url string, w *tabwriter.Writer, cmd *cobra.Command) error {
 	accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
-		return err
+		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
+			return err
+		} else {
+			return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", url))
+		}
 	}
 	sort.Slice(accelerators, func(i, j int) bool {
 		return strings.Compare(accelerators[i].Name, accelerators[j].Name) < 0

@@ -116,7 +116,7 @@ environmnet variable if it is set.
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
 				if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
-					return errors.New(fmt.Sprintf("error invoking %s", serverUrl))
+					return err
 				} else {
 					return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
 				}
