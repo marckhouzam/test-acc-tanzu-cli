@@ -113,12 +113,13 @@ environmnet variable if it is set.
 			}
 			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", serverUrl, args[0]), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
-			if err != nil {
-				return errors.New(fmt.Sprintf("error creating request for %s", serverUrl))
-			}
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
-				return errors.New(fmt.Sprintf("error invoking %s", serverUrl))
+				if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
+					return errors.New(fmt.Sprintf("error invoking %s", serverUrl))
+				} else {
+					return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
+				}
 			}
 
 			if resp.StatusCode >= 400 {
