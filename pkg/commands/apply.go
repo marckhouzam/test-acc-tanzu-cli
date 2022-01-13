@@ -58,10 +58,12 @@ func ApplyCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 			fileAcc := acceleratorv1alpha1.Accelerator{}
 			err := loadAcceleratorFromFile(opts.FileName, &fileAcc)
 			acceleratorName := fileAcc.ObjectMeta.Name
-			acceleratorNamespace := fileAcc.ObjectMeta.Namespace
-			if acceleratorNamespace == "" {
-				acceleratorNamespace = "accelerator-system"
-				fileAcc.ObjectMeta.Namespace = "accelerator-system"
+			if fileAcc.ObjectMeta.Namespace > "" && fileAcc.ObjectMeta.Namespace != opts.Namespace {
+				return fmt.Errorf("the namespace specified in the provided file \"%s\" does not match the namespace \"%s\". You must pass '--namespace=%s' to perform this operation.", fileAcc.ObjectMeta.Namespace, opts.Namespace, fileAcc.ObjectMeta.Namespace)
+			}
+			acceleratorNamespace := opts.Namespace
+			if fileAcc.ObjectMeta.Namespace == "" {
+				fileAcc.ObjectMeta.Namespace = opts.Namespace
 			}
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "Error loading file %s\n", opts.FileName)
@@ -70,12 +72,12 @@ func ApplyCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 			currentAcc := &acceleratorv1alpha1.Accelerator{}
 			err = c.Get(ctx, client.ObjectKey{Namespace: acceleratorNamespace, Name: acceleratorName}, currentAcc)
 			if err != nil && !errors.IsNotFound(err) {
-				fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s\n", args[0])
+				fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s\n", fileAcc.Name)
 				return err
 			} else if err != nil && errors.IsNotFound(err) {
 				err = c.Create(ctx, &fileAcc)
 				if err != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", args[0])
+					fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", fileAcc.Name)
 					return err
 				}
 				fmt.Fprintf(cmd.OutOrStdout(), "created accelerator %s in namespace %s\n", fileAcc.Name, fileAcc.Namespace)

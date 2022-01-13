@@ -19,8 +19,9 @@ tanzu accelerator apply --filename <path-to-accelerator-manifest>
 ### Options
 
 ```
-  -f, --filename string   path of manifest file for the accelerator
-  -h, --help              help for apply
+  -f, --filename string    path of manifest file for the accelerator
+  -h, --help               help for apply
+  -n, --namespace string   namespace for accelerators (default "accelerator-system")
 ```
 
 ### Options inherited from parent commands

@@ -35,7 +35,7 @@ tanzu accelerator update <accelerator-name> --description "Lorem Ipsum"
   -h, --help                    help for update
       --icon-url string         URL for icon to use with the accelerator
       --interval string         interval for checking for updates to Git or image repository
-      --namespace string        namespace for accelerators (default "accelerator-system")
+  -n, --namespace string        namespace for accelerators (default "accelerator-system")
       --reconcile               trigger a reconciliation including the associated GitRepository resource
       --secret-ref string       name of secret containing credentials for private Git or image repository
       --source-image string     name of the source image for the accelerator
