@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
 )
 
@@ -25,6 +26,14 @@ type CreateOptions struct {
 	Tags        []string
 }
 
+func normalizeGitRepoRun(f *pflag.FlagSet, name string) pflag.NormalizedName {
+    switch name {
+    case "git-repository":
+        name = "git-repo"
+    }
+    return pflag.NormalizedName(name)
+}
+
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
 	cmd.Flags().StringVar(&co.Description, "description", "", "description of this accelerator")
@@ -38,6 +47,7 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
 	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
+	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
 type UpdateOptions struct {
@@ -68,6 +78,7 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
 	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
+	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
 type PushOptions struct {
