@@ -22,4 +22,6 @@ require (
 
 replace go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.5.1
 
-replace github.com/containerd/containerd v1.5.7 => github.com/containerd/containerd v1.5.9
+replace github.com/containerd/containerd v1.5.7 => github.com/containerd/containerd v1.5.10
+
+replace github.com/docker/distribution => github.com/docker/distribution v2.8.0+incompatible
