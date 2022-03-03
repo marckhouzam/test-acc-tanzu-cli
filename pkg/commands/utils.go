@@ -38,6 +38,7 @@ type Accelerator struct {
 	Description          string   `json:"description,omitempty"`
 	DisplayName          string   `json:"displayName,omitempty"`
 	Ready                bool     `json:"ready,omitempty"`
+	ReadyMessage         string   `json:"readyMessage,omitempty"`
 	ArchiveUrl           string   `json:"archiveUrl,omitempty"`
 	ArchiveReady         bool     `json:"archiveReady,omitempty"`
 	ArchiveMessage       string   `json:"archiveMessage,omitempty"`

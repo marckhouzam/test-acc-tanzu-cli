@@ -22,6 +22,7 @@ type GitData struct {
 	Branch string
 	Tag    string
 }
+
 type GetOutput struct {
 	Name        string
 	Namespace   string
@@ -158,6 +159,9 @@ func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer,
 				fmt.Fprintf(cmd.OutOrStdout(), "tags: %s", string(tagsYaml))
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Ready)
+			if !accelerator.Ready {
+				fmt.Fprintf(cmd.OutOrStdout(), "message: %s\n", accelerator.ReadyMessage)
+			}
 			if string(optionsYaml) != "[]\n" {
 				fmt.Fprintln(cmd.OutOrStdout(), "options:")
 				fmt.Fprint(cmd.OutOrStdout(), string(optionsYaml))
@@ -226,7 +230,15 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	} else {
 		fmt.Fprintf(cmd.OutOrStdout(), "tags: %s", string(tagsYaml))
 	}
-	fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Status.ArtifactInfo.Ready)
+	if len(accelerator.Status.Conditions) > 0 {
+		fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].IsTrue())
+		if accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].IsFalse() {
+			fmt.Fprintf(cmd.OutOrStdout(), "reason: %s\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].Reason)
+			fmt.Fprintf(cmd.OutOrStdout(), "message: %s\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].Message)
+		}
+	} else {
+		fmt.Fprintf(cmd.OutOrStdout(), "ready: %s\n", "true")
+	}
 	if string(optionsYaml) != "[]\n" {
 		fmt.Fprintln(cmd.OutOrStdout(), "options:")
 		fmt.Fprint(cmd.OutOrStdout(), string(optionsYaml))
