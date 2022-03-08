@@ -24,15 +24,14 @@ jobs:
         kind create cluster
     - name: Install tanzu cli
       run: |
-        curl -o tanzu https://storage.googleapis.com/tanzu-cli/artifacts/core/latest/tanzu-core-linux_amd64 && \
-          sudo mv tanzu /usr/local/bin/tanzu && \
-          chmod +x /usr/local/bin/tanzu
-        env
-        tanzu init
-        tanzu plugin repo add -b tanzu-cli-admin-plugins -n admin -p artifacts-admin
-        tanzu plugin install builder
-        tanzu plugin install test
-        tanzu plugin list
+        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-cli-linux-amd64.tar.gz && \
+          mkdir -p tanzu && \
+          tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
+        sudo install tanzu/v0.17.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+        curl -L -o tanzu-framework-plugins-admin-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-framework-plugins-admin-linux-amd64.tar.gz && \
+          tar xvzf tanzu-framework-plugins-admin-linux-amd64.tar.gz
+        tanzu plugin install builder -l admin-plugins
+        tanzu plugin install test -l admin-plugins
     - name: Test
       run: make test
     - name: Create Artifact
@@ -70,11 +69,10 @@ jobs:
         name: tanzu-accelerator-plugin.tar.gz
     - name: Install tanzu cli
       run: |
-        curl -o tanzu https://storage.googleapis.com/tanzu-cli/artifacts/core/latest/tanzu-core-linux_amd64 && \
-          sudo mv tanzu /usr/local/bin/tanzu && \
-          chmod +x /usr/local/bin/tanzu
-        env
-        tanzu init
+        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-cli-linux-amd64.tar.gz && \
+          mkdir -p tanzu && \
+          tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu && \
+          sudo install tanzu/v0.17.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
     - name: Build Version
       run: echo "BUILD_VERSION=$(cat BUILD_VERSION)" >> $GITHUB_ENV          
     - name: Install CLI
