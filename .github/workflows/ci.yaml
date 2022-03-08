@@ -37,7 +37,7 @@ jobs:
     - name: Create Artifact
       run: make create-artifact
     - name: Install
-      run: tanzu plugin install accelerator --local ./artifacts  --version $(cat BUILD_VERSION)
+      run: tanzu plugin install accelerator --local standalone --version $(cat BUILD_VERSION)
     - name: Verify docs
       run: |
         rm -rf docs
@@ -71,8 +71,8 @@ jobs:
       run: |
         curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-cli-linux-amd64.tar.gz && \
           mkdir -p tanzu && \
-          tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu && \
-          sudo install tanzu/v0.17.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+          tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
+        sudo install tanzu/v0.17.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
     - name: Build Version
       run: echo "BUILD_VERSION=$(cat BUILD_VERSION)" >> $GITHUB_ENV          
     - name: Install CLI
@@ -82,7 +82,7 @@ jobs:
         set -o pipefail
 
         tar -xvf tanzu-accelerator-plugin.tar.gz
-        tanzu plugin install accelerator --local ./artifacts --version ${{env.BUILD_VERSION}}
+        tanzu plugin install accelerator --local standalone --version ${{env.BUILD_VERSION}}
     - name: Create Context
       run: |
         make create-context
