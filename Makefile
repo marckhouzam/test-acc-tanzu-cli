@@ -15,6 +15,16 @@ build-local:
 build:
 	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin
 
+.PHONY: build-%
+build-%:
+	$(eval ARCH = $(word 2,$(subst -, ,$*)))
+	$(eval OS = $(word 1,$(subst -, ,$*)))
+	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin --artifacts artifacts/${OS}/${ARCH}/cli --target ${OS}_${ARCH}
+
+.PHONY: publish
+publish:
+	tanzu builder publish --type local --plugins "accelerator" --version $(BUILD_VERSION) --local-output-discovery-dir standalone/discovery/standalone --local-output-distribution-dir standalone/distribution --input-artifact-dir artifacts --os-arch "darwin-amd64 linux-amd64 windows-amd64"
+
 test:
 	go test -coverprofile cover.out ./...
 

@@ -1,4 +1,6 @@
 /artifacts
+/standalone
+
 .vscode
 vendor/
 cover.out
