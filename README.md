@@ -27,7 +27,7 @@ tar -zxvf tanzu-accelerator-plugin-*.tar.gz
 Install the accelerator plugin:
 
 ```sh
-tanzu plugin install accelerator --local ./artifacts --version v1.1.1-build.1
+tanzu plugin install accelerator --local ./artifacts --version v1.1.1-dev
 ```
 
 ### Build from source
