@@ -231,10 +231,23 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		fmt.Fprintf(cmd.OutOrStdout(), "tags: %s", string(tagsYaml))
 	}
 	if len(accelerator.Status.Conditions) > 0 {
-		fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].IsTrue())
-		if accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].IsFalse() {
-			fmt.Fprintf(cmd.OutOrStdout(), "reason: %s\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].Reason)
-			fmt.Fprintf(cmd.OutOrStdout(), "message: %s\n", accelerator.Status.Conditions[len(accelerator.Status.Conditions)-1].Message)
+		ready := false
+		reason := ""
+		message := ""
+		for i := 0; i < len(accelerator.Status.Conditions); i++ {
+			if accelerator.Status.Conditions[i].Type == "Ready" {
+				reason = accelerator.Status.Conditions[i].Reason
+				message = accelerator.Status.Conditions[i].Message
+				if accelerator.Status.Conditions[i].IsTrue() {
+					ready = true
+				}
+				break
+			}
+		}
+		fmt.Fprintf(cmd.OutOrStdout(), "ready: %t\n", ready)
+		if !ready {
+			fmt.Fprintf(cmd.OutOrStdout(), "reason: %s\n", reason)
+			fmt.Fprintf(cmd.OutOrStdout(), "message: %s\n", message)
 		}
 	} else {
 		fmt.Fprintf(cmd.OutOrStdout(), "ready: %s\n", "true")
