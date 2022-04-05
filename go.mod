@@ -25,3 +25,5 @@ replace go.mongodb.org/mongo-driver v1.1.2 => go.mongodb.org/mongo-driver v1.5.1
 replace github.com/containerd/containerd v1.5.7 => github.com/containerd/containerd v1.5.10
 
 replace github.com/docker/distribution => github.com/docker/distribution v2.8.0+incompatible
+
+replace vbom.ml/util => github.com/fvbommel/util v0.0.0-20160121211510-db5cfe13f5cc
