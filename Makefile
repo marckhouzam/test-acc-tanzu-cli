@@ -21,14 +21,16 @@ build-%:
 	$(eval OS = $(word 1,$(subst -, ,$*)))
 	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin --artifacts artifacts/${OS}/${ARCH}/cli --target ${OS}_${ARCH}
 
-.PHONY: publish
-publish:
-	tanzu builder publish --type local --plugins "accelerator" --version $(BUILD_VERSION) --local-output-discovery-dir standalone/discovery/standalone --local-output-distribution-dir standalone/distribution --input-artifact-dir artifacts --os-arch "darwin-amd64 linux-amd64 windows-amd64"
+.PHONY: publish-%
+publish-%:
+	$(eval ARCH = $(word 2,$(subst -, ,$*)))
+	$(eval OS = $(word 1,$(subst -, ,$*)))
+	tanzu builder publish --type local --plugins "accelerator" --version $(BUILD_VERSION) --local-output-discovery-dir standalone/${OS}-${ARCH}/discovery/standalone --local-output-distribution-dir standalone/${OS}-${ARCH}/distribution --input-artifact-dir artifacts --os-arch "${OS}-${ARCH}"
 
 test:
 	go test -coverprofile cover.out ./...
 
-create-artifact: build-darwin-amd64 build-linux-amd64 build-windows-amd64 publish
+create-artifact: build-darwin-amd64 build-linux-amd64 build-windows-amd64 publish-darwin-amd64 publish-linux-amd64 publish-windows-amd64
 	tar -zcvf tanzu-accelerator-plugin.tar.gz standalone
 
 docs: $(GO_SOURCES)
