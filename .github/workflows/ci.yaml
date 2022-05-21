@@ -37,7 +37,7 @@ jobs:
     - name: Create Artifact
       run: make create-artifact
     - name: Install
-      run: tanzu plugin install accelerator --local standalone --version $(cat BUILD_VERSION)
+      run: tanzu plugin install accelerator --local standalone/linux-amd64 --version $(cat BUILD_VERSION)
     - name: Verify docs
       run: |
         rm -rf docs
