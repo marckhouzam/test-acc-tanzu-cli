@@ -82,7 +82,7 @@ jobs:
         set -o pipefail
 
         tar -xvf tanzu-accelerator-plugin.tar.gz
-        tanzu plugin install accelerator --local standalone --version ${{env.BUILD_VERSION}}
+        tanzu plugin install accelerator --local standalone/linux-amd64 --version ${{env.BUILD_VERSION}}
     - name: Create Context
       run: |
         make create-context
