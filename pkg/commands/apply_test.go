@@ -5,9 +5,10 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestApplyCommand(t *testing.T) {
@@ -29,8 +30,8 @@ func TestApplyCommand(t *testing.T) {
 		{
 			Name: "Create Accelerator",
 			Args: []string{acceleratorName, "--filename", filename},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -43,7 +44,7 @@ func TestApplyCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
@@ -66,8 +67,8 @@ func TestApplyCommand(t *testing.T) {
 					},
 				}),
 			},
-			ExpectUpdates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -80,7 +81,7 @@ func TestApplyCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "updated accelerator test-accelerator in namespace accelerator-system\n",
 		},

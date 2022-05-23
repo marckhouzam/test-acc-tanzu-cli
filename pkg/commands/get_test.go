@@ -13,8 +13,8 @@ import (
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )

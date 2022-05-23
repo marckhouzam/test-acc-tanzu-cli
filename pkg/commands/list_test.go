@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"

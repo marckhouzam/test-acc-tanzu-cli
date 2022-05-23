@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 )
 
 type CreateOptions struct {
@@ -27,11 +27,11 @@ type CreateOptions struct {
 }
 
 func normalizeGitRepoRun(f *pflag.FlagSet, name string) pflag.NormalizedName {
-    switch name {
-    case "git-repository":
-        name = "git-repo"
-    }
-    return pflag.NormalizedName(name)
+	switch name {
+	case "git-repository":
+		name = "git-repo"
+	}
+	return pflag.NormalizedName(name)
 }
 
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {

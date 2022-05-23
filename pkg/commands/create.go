@@ -14,7 +14,8 @@ import (
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -108,12 +109,15 @@ the same options specified in the accelerator metadata retrieved from the Git re
 			}
 
 			if opts.SecretRef != "" {
-				ref := meta.LocalObjectReference{
-					Name: opts.SecretRef,
-				}
 				if opts.SourceImage != "" {
-					acc.Spec.Source.ImagePullSecrets = []meta.LocalObjectReference{ref}
+					ref := corev1.LocalObjectReference{
+						Name: opts.SecretRef,
+					}
+					acc.Spec.Source.ImagePullSecrets = []corev1.LocalObjectReference{ref}
 				} else {
+					ref := meta.LocalObjectReference{
+						Name: opts.SecretRef,
+					}
 					acc.Spec.Git.SecretRef = &ref
 				}
 			}

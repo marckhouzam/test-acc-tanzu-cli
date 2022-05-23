@@ -19,7 +19,7 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 )
 
 var (

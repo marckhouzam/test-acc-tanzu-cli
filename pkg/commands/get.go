@@ -12,7 +12,7 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	"gopkg.in/yaml.v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -238,7 +238,7 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 			if accelerator.Status.Conditions[i].Type == "Ready" {
 				reason = accelerator.Status.Conditions[i].Reason
 				message = accelerator.Status.Conditions[i].Message
-				if accelerator.Status.Conditions[i].IsTrue() {
+				if accelerator.Status.Conditions[i].Status == "True" {
 					ready = true
 				}
 				break

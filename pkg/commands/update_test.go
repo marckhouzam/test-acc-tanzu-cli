@@ -8,9 +8,11 @@ import (
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestUpdateCmd(t *testing.T) {
@@ -68,8 +70,8 @@ func TestUpdateCmd(t *testing.T) {
 					},
 				}),
 			},
-			ExpectUpdates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -83,7 +85,7 @@ func TestUpdateCmd(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ShouldError:  true,
 			ExpectOutput: "there was an error updating accelerator test-accelerator\n",
@@ -108,8 +110,8 @@ func TestUpdateCmd(t *testing.T) {
 					},
 				}),
 			},
-			ExpectUpdates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -124,7 +126,7 @@ func TestUpdateCmd(t *testing.T) {
 							Interval: expectedInterval,
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "accelerator test-accelerator updated successfully\n",
 		},
@@ -145,8 +147,8 @@ func TestUpdateCmd(t *testing.T) {
 					},
 				}),
 			},
-			ExpectUpdates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -164,7 +166,7 @@ func TestUpdateCmd(t *testing.T) {
 						},
 						Source: nil,
 					},
-				}),
+				},
 			},
 			ExpectOutput: "accelerator test-accelerator updated successfully\n",
 		},
@@ -191,8 +193,8 @@ func TestUpdateCmd(t *testing.T) {
 					},
 				}),
 			},
-			ExpectUpdates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -201,7 +203,7 @@ func TestUpdateCmd(t *testing.T) {
 						Description: testDescription,
 						Source: &v1alpha1.ImageRepositorySpec{
 							Image: imageName,
-							ImagePullSecrets: []meta.LocalObjectReference{
+							ImagePullSecrets: []corev1.LocalObjectReference{
 								{
 									Name: secretRef,
 								},
@@ -210,7 +212,7 @@ func TestUpdateCmd(t *testing.T) {
 						},
 						Git: nil,
 					},
-				}),
+				},
 			},
 			ExpectOutput: "accelerator test-accelerator updated successfully\n",
 		},

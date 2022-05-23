@@ -12,12 +12,14 @@ import (
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/source"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/source"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestCreateCommand(t *testing.T) {
@@ -48,8 +50,8 @@ func TestCreateCommand(t *testing.T) {
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("create", "Accelerator"),
 			},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -63,7 +65,7 @@ func TestCreateCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "Error creating accelerator test-accelerator\n",
 			ShouldError:  true,
@@ -71,8 +73,8 @@ func TestCreateCommand(t *testing.T) {
 		{
 			Name: "Create Accelerator just GitRepository",
 			Args: []string{acceleratorName, "--git-repository", gitRepoUrl},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -86,15 +88,15 @@ func TestCreateCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
 		{
 			Name: "Create Accelerator Image with Secret ref",
 			Args: []string{acceleratorName, "--source-image", imageName, "--secret-ref", secretRef, "--interval", interval},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -102,7 +104,7 @@ func TestCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Source: &v1alpha1.ImageRepositorySpec{
 							Image: imageName,
-							ImagePullSecrets: []meta.LocalObjectReference{
+							ImagePullSecrets: []corev1.LocalObjectReference{
 								{
 									Name: secretRef,
 								},
@@ -112,7 +114,7 @@ func TestCreateCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
@@ -125,8 +127,8 @@ func TestCreateCommand(t *testing.T) {
 				"--interval", interval,
 				"--secret-ref", secretRef,
 			},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -146,7 +148,7 @@ func TestCreateCommand(t *testing.T) {
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "created accelerator test-accelerator in namespace accelerator-system\n",
 		},
@@ -185,8 +187,8 @@ func TestCreateCommandLocalPath(t *testing.T) {
 			},
 			Name: "Create Accelerator Image from Local Path",
 			Args: []string{acceleratorName, "--source-image", imageName, "--local-path", localPath},
-			ExpectCreates: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      acceleratorName,
@@ -196,7 +198,7 @@ func TestCreateCommandLocalPath(t *testing.T) {
 							Image: imageName,
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "publishing accelerator source in \"testdata/test-acc\" to \"" + imageName + "\"...\npublished accelerator\ncreated accelerator test-accelerator in namespace accelerator-system\n",
 		},

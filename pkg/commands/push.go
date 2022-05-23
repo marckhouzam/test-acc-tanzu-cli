@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 )
 
 func PushCmd(ctx context.Context, c *cli.Config) *cobra.Command {

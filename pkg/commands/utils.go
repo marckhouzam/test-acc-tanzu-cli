@@ -12,8 +12,8 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/source"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/source"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 

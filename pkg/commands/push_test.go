@@ -8,9 +8,9 @@ import (
 	ggcrregistry "github.com/google/go-containerregistry/pkg/registry"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	cli "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime"
-	clitesting "github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/cli-runtime/testing"
-	"github.com/vmware-tanzu/tanzu-cli-apps-plugins/pkg/source"
+	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/source"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
