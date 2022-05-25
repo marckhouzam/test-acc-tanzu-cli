@@ -34,7 +34,7 @@ func main() {
 	ctx := context.Background()
 	p, err := plugin.NewPlugin(&tanzucliv1alpha1.PluginDescriptor{
 		Name:           "accelerator",
-		Version:        "v1.2.0-dev",
+		Version:        "v1.2.0-build.1",
 		Description:    "Manage accelerators in a Kubernetes cluster",
 		Group:          tanzucliv1alpha1.BuildCmdGroup,
 		CompletionType: tanzucliv1alpha1.NativePluginCompletion,
