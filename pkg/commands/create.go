@@ -79,6 +79,9 @@ the same options specified in the accelerator metadata retrieved from the Git re
 						Tag:    opts.GitTag,
 					},
 				}
+				if opts.GitSubPath != "" {
+					acc.Spec.Git.SubPath = &opts.GitSubPath
+				}
 			}
 
 			if opts.LocalPath != "" {

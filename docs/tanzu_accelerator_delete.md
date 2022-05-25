@@ -20,7 +20,7 @@ tanzu accelerator delete <accelerator-name>
 
 ```
   -h, --help               help for delete
-  -n, --namespace string   namespace for accelerators (default "accelerator-system")
+  -n, --namespace string   namespace for accelerator system (default "accelerator-system")
 ```
 
 ### Options inherited from parent commands

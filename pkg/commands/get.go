@@ -18,9 +18,10 @@ import (
 )
 
 type GitData struct {
-	URL    string
-	Branch string
-	Tag    string
+	URL     string
+	Branch  string
+	Tag     string
+	SubPath string
 }
 
 type GetOutput struct {
@@ -32,23 +33,6 @@ type GetOutput struct {
 	Tags        []string
 	Ready       bool
 	Git         GitData
-}
-
-func CastAcceleratorSpecToGetOutput(acc acceleratorv1alpha1.Accelerator) GetOutput {
-	return GetOutput{
-		Name:        acc.Name,
-		Namespace:   acc.Namespace,
-		Description: acc.Spec.Description,
-		DisplayName: acc.Spec.DisplayName,
-		Options:     acc.Status.Options,
-		Tags:        acc.Spec.Tags,
-		Ready:       acc.Status.ArtifactInfo.Ready,
-		Git: GitData{
-			URL:    acc.Spec.Git.URL,
-			Branch: acc.Spec.Git.Reference.Branch,
-			Tag:    acc.Spec.Git.Reference.Tag,
-		},
-	}
 }
 
 func getSuggestion(ctx context.Context, c *cli.Config) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
@@ -204,12 +188,15 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 		if accelerator.Spec.Git.Ignore != nil {
 			fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", *accelerator.Spec.Ignore)
 		}
+		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
 		fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
 		fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", accelerator.Spec.Git.Reference.Branch)
 		if accelerator.Spec.Git.Reference.Tag != "" {
 			fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", accelerator.Spec.Git.Reference.Tag)
 		}
-		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Spec.Git.URL)
+		if accelerator.Spec.Git.SubPath != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  subPath: %s\n", *accelerator.Spec.Git.SubPath)
+		}
 		if accelerator.Spec.Git.SecretRef != nil {
 			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", accelerator.Spec.Git.SecretRef.Name)
 		}

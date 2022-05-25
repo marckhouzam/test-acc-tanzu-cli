@@ -27,7 +27,7 @@ tanzu accelerator list
 ```
       --from-context        retrieve resources from current context defined in kubeconfig
   -h, --help                help for list
-  -n, --namespace string    namespace for accelerators (default "accelerator-system")
+  -n, --namespace string    namespace for accelerator system (default "accelerator-system")
       --server-url string   the URL for the Application Accelerator server
 ```
 

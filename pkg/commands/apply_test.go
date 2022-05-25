@@ -16,10 +16,12 @@ func TestApplyCommand(t *testing.T) {
 	_ = acceleratorv1alpha1.AddToScheme(scheme)
 
 	acceleratorName := "test-accelerator"
+	fragmentName := "test-fragment"
 	gitRepoUrl := "https://www.test.com"
 	gitBranch := "main"
 	namespace := "accelerator-system"
-	filename := "testdata/test.yml"
+	acceleratorFilename := "testdata/test-accelerator.yml"
+	fragmentFilename := "testdata/test-fragment.yml"
 
 	table := clitesting.CommandTestSuite{
 		{
@@ -28,8 +30,14 @@ func TestApplyCommand(t *testing.T) {
 			ShouldError: true,
 		},
 		{
+			Name:         "Apply missing file",
+			Args:         []string{acceleratorName, "--filename", "testdata/test.yml"},
+			ShouldError:  true,
+			ExpectOutput: "Error loading file testdata/test.yml\n",
+		},
+		{
 			Name: "Create Accelerator",
-			Args: []string{acceleratorName, "--filename", filename},
+			Args: []string{acceleratorName, "--filename", acceleratorFilename},
 			ExpectCreates: []client.Object{
 				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
@@ -50,7 +58,7 @@ func TestApplyCommand(t *testing.T) {
 		},
 		{
 			Name: "Update Accelerator",
-			Args: []string{acceleratorName, "--filename", filename},
+			Args: []string{acceleratorName, "--filename", acceleratorFilename},
 			GivenObjects: []clitesting.Factory{
 				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
@@ -84,6 +92,64 @@ func TestApplyCommand(t *testing.T) {
 				},
 			},
 			ExpectOutput: "updated accelerator test-accelerator in namespace accelerator-system\n",
+		},
+		{
+			Name: "Create Fragment",
+			Args: []string{fragmentName, "--filename", fragmentFilename},
+			ExpectCreates: []client.Object{
+				&acceleratorv1alpha1.Fragment{
+					ObjectMeta: v1.ObjectMeta{
+						Namespace: namespace,
+						Name:      fragmentName,
+					},
+					Spec: acceleratorv1alpha1.FragmentSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: gitBranch,
+							},
+						},
+					},
+				},
+			},
+			ExpectOutput: "created accelerator fragment test-fragment in namespace accelerator-system\n",
+		},
+		{
+			Name: "Update Fragment",
+			Args: []string{fragmentName, "--filename", fragmentFilename},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+					ObjectMeta: v1.ObjectMeta{
+						Name:      fragmentName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.FragmentSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "not-main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectUpdates: []client.Object{
+				&acceleratorv1alpha1.Fragment{
+					ObjectMeta: v1.ObjectMeta{
+						Name:      fragmentName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.FragmentSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: gitRepoUrl,
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: gitBranch,
+							},
+						},
+					},
+				},
+			},
+			ExpectOutput: "updated accelerator fragment test-fragment in namespace accelerator-system\n",
 		},
 	}
 	table.Run(t, scheme, ApplyCmd)

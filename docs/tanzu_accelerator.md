@@ -12,9 +12,10 @@ Manage accelerators in a Kubernetes cluster
 
 ### SEE ALSO
 
-* [tanzu accelerator apply](tanzu_accelerator_apply.md)	 - Apply accelerator
+* [tanzu accelerator apply](tanzu_accelerator_apply.md)	 - Apply accelerator resource
 * [tanzu accelerator create](tanzu_accelerator_create.md)	 - Create a new accelerator
 * [tanzu accelerator delete](tanzu_accelerator_delete.md)	 - Delete an accelerator
+* [tanzu accelerator fragment](tanzu_accelerator_fragment.md)	 - Fragment commands
 * [tanzu accelerator generate](tanzu_accelerator_generate.md)	 - Generate project from accelerator
 * [tanzu accelerator get](tanzu_accelerator_get.md)	 - Get accelerator info
 * [tanzu accelerator list](tanzu_accelerator_list.md)	 - List accelerators

@@ -51,6 +51,7 @@ type Embedded struct {
 type UiAcceleratorsApiResponse struct {
 	Emdedded Embedded `json:"_embedded"`
 }
+
 type Choice struct {
 	Text  string `json:"text"`
 	Value string `json:"value"`
@@ -139,6 +140,21 @@ func SuggestAcceleratorNamesFromConfig(ctx context.Context, c *cli.Config) func(
 		}
 		for _, accelerator := range accelerators.Items {
 			suggestions = append(suggestions, accelerator.Name)
+		}
+		return suggestions, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+func SuggestFragmentNamesFromConfig(ctx context.Context, c *cli.Config) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		suggestions := []string{}
+		fragments := &acceleratorv1alpha1.FragmentList{}
+		err := c.List(ctx, fragments, client.InNamespace(cmd.Flag("namespace").Value.String()))
+		if err != nil {
+			return suggestions, cobra.ShellCompDirectiveError
+		}
+		for _, fragment := range fragments.Items {
+			suggestions = append(suggestions, fragment.Name)
 		}
 		return suggestions, cobra.ShellCompDirectiveNoFileComp
 	}

@@ -19,11 +19,23 @@ type CreateOptions struct {
 	GitRepoUrl  string
 	GitBranch   string
 	GitTag      string
+	GitSubPath  string
 	Interval    string
 	LocalPath   string
 	SourceImage string
 	SecretRef   string
 	Tags        []string
+}
+
+type FragmentCreateOptions struct {
+	Namespace   string
+	DisplayName string
+	GitRepoUrl  string
+	GitBranch   string
+	GitTag      string
+	GitSubPath  string
+	Interval    string
+	SecretRef   string
 }
 
 func normalizeGitRepoRun(f *pflag.FlagSet, name string) pflag.NormalizedName {
@@ -35,7 +47,7 @@ func normalizeGitRepoRun(f *pflag.FlagSet, name string) pflag.NormalizedName {
 }
 
 func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
+	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&co.Description, "description", "", "description of this accelerator")
 	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "display name for the accelerator")
 	cmd.Flags().StringVar(&co.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
@@ -43,10 +55,23 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
 	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Git repository branch to be used")
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().StringVar(&co.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().StringVar(&co.Interval, "interval", "", "interval for checking for updates to Git or image repository")
 	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
 	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
+	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
+}
+
+func (co *FragmentCreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVarP(&co.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
+	cmd.Flags().StringVar(&co.DisplayName, "display-name", "", "display name for the accelerator")
+	cmd.Flags().StringVar(&co.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
+	cmd.Flags().StringVar(&co.GitBranch, "git-branch", "", "Git repository branch to be used")
+	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().StringVar(&co.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
+	cmd.Flags().StringVar(&co.Interval, "interval", "", "interval for checking for updates to Git or image repository")
+	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
@@ -58,6 +83,7 @@ type UpdateOptions struct {
 	GitRepoUrl  string
 	GitBranch   string
 	GitTag      string
+	GitSubPath  string
 	Interval    string
 	SourceImage string
 	SecretRef   string
@@ -66,7 +92,7 @@ type UpdateOptions struct {
 }
 
 func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
+	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&uo.Description, "description", "", "description of this accelerator")
 	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "display name for the accelerator")
 	cmd.Flags().StringVar(&uo.IconUrl, "icon-url", "", "URL for icon to use with the accelerator")
@@ -74,10 +100,36 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator")
 	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "", "Git repository branch to be used")
 	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
 	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
+	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
+}
+
+type FragmentUpdateOptions struct {
+	Namespace   string
+	DisplayName string
+	GitRepoUrl  string
+	GitBranch   string
+	GitTag      string
+	GitSubPath  string
+	Interval    string
+	SecretRef   string
+	Reconcile   bool
+}
+
+func (uo *FragmentUpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVarP(&uo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator fragments")
+	cmd.Flags().StringVar(&uo.DisplayName, "display-name", "", "display name for the accelerator fragment")
+	cmd.Flags().StringVar(&uo.GitRepoUrl, "git-repository", "", "Git repository URL for the accelerator fragment")
+	cmd.Flags().StringVar(&uo.GitBranch, "git-branch", "", "Git repository branch to be used")
+	cmd.Flags().StringVar(&uo.GitTag, "git-tag", "", "Git repository tag to be used")
+	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
+	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
+	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git repository")
+	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
@@ -98,7 +150,7 @@ type DeleteOptions struct {
 }
 
 func (do *DeleteOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&do.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
+	cmd.Flags().StringVarP(&do.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 
 }
 
@@ -109,9 +161,17 @@ type ListOptions struct {
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
+	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
+}
+
+type FragmentListOptions struct {
+	Namespace string
+}
+
+func (lo *FragmentListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 }
 
 type GetOptions struct {
@@ -120,10 +180,18 @@ type GetOptions struct {
 	FromContext bool
 }
 
+type FragmentGetOptions struct {
+	Namespace string
+}
+
 func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
+	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
+}
+
+func (gopts *FragmentGetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 }
 
 type ApplyOptions struct {
@@ -132,7 +200,7 @@ type ApplyOptions struct {
 }
 
 func (appopts *ApplyOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
-	cmd.Flags().StringVarP(&appopts.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerators")
-	cmd.Flags().StringVarP(&appopts.FileName, "filename", "f", "", "path of manifest file for the accelerator")
+	cmd.Flags().StringVarP(&appopts.Namespace, "namespace", "n", "accelerator-system", "namespace for the resource")
+	cmd.Flags().StringVarP(&appopts.FileName, "filename", "f", "", "path of manifest file for the resource")
 	cmd.MarkFlagRequired("filename")
 }

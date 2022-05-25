@@ -1,10 +1,10 @@
 ## tanzu accelerator apply
 
-Apply accelerator
+Apply accelerator resource
 
 ### Synopsis
 
-Create or update accelerator resource using specified accelerator manifest file.
+Create or update accelerator resource using specified manifest file.
 
 ```
 tanzu accelerator apply [flags]
@@ -13,15 +13,15 @@ tanzu accelerator apply [flags]
 ### Examples
 
 ```
-tanzu accelerator apply --filename <path-to-accelerator-manifest>
+tanzu accelerator apply --filename <path-to-resource-manifest>
 ```
 
 ### Options
 
 ```
-  -f, --filename string    path of manifest file for the accelerator
+  -f, --filename string    path of manifest file for the resource
   -h, --help               help for apply
-  -n, --namespace string   namespace for accelerators (default "accelerator-system")
+  -n, --namespace string   namespace for the resource (default "accelerator-system")
 ```
 
 ### Options inherited from parent commands

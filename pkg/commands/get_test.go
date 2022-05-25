@@ -234,10 +234,10 @@ iconUrl: http://icon.png
 git:
   interval: 2m0s
   ignore: .ignore
+  url: http://www.test.com
   ref:
     branch: main
     tag: v1.0.0
-  url: http://www.test.com
 tags:
 - first
 - second
@@ -266,10 +266,10 @@ displayName: Test Accelerator
 iconUrl: http://icon.png
 git:
   ignore: .ignore
+  url: http://www.test.com
   ref:
     branch: main
     tag: v1.0.0
-  url: http://www.test.com
 tags: []
 ready: true
 options: []

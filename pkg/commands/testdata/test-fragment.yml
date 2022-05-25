@@ -1,0 +1,9 @@
+apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
+kind: Fragment
+metadata:
+  name: test-fragment
+spec:
+  git:
+    url: https://www.test.com
+    ref:
+      branch: main

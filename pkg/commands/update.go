@@ -27,7 +27,7 @@ func UpdateCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	var updateCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Update an accelerator",
-		Long: `Udate an accelerator resource with the specified name using the specified configuration.
+		Long: `Update an accelerator resource with the specified name using the specified configuration.
 
 Accelerator configuration options include:
 - Git repository URL and branch/tag where accelerator code and metadata is defined
@@ -79,6 +79,9 @@ with any changes made to the associated Git repository.
 						Tag:    opts.GitTag,
 					},
 				}
+				if opts.GitSubPath != "" {
+					updatedAccelerator.Spec.Git.SubPath = &opts.GitSubPath
+				}
 				accelerator.Spec.Source = nil
 			}
 
@@ -104,6 +107,10 @@ with any changes made to the associated Git repository.
 
 			if opts.GitRepoUrl == "" && opts.GitTag != "" {
 				updatedAccelerator.Spec.Git.Reference.Tag = opts.GitTag
+			}
+
+			if opts.GitRepoUrl == "" && opts.GitSubPath != "" {
+				updatedAccelerator.Spec.Git.SubPath = &opts.GitSubPath
 			}
 
 			if opts.Interval != "" {

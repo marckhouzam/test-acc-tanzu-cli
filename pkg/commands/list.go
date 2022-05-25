@@ -129,6 +129,9 @@ func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, c
 			} else if accelerator.Spec.Git.Reference.Branch != "" {
 				repo = repo + ":" + accelerator.Spec.Git.Reference.Branch
 			}
+			if accelerator.Spec.Git.SubPath != nil {
+				repo = repo + ":/" + *accelerator.Spec.Git.SubPath
+			}
 			values = append(values, repo, status)
 		} else if accelerator.Spec.Source != nil {
 			repo = "source-image: " + accelerator.Spec.Source.Image

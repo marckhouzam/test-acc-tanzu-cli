@@ -4,7 +4,7 @@ Update an accelerator
 
 ### Synopsis
 
-Udate an accelerator resource with the specified name using the specified configuration.
+Update an accelerator resource with the specified name using the specified configuration.
 
 Accelerator configuration options include:
 - Git repository URL and branch/tag where accelerator code and metadata is defined
@@ -31,11 +31,12 @@ tanzu accelerator update <accelerator-name> --description "Lorem Ipsum"
       --display-name string   display name for the accelerator
       --git-branch string     Git repository branch to be used
       --git-repo string       Git repository URL for the accelerator
+      --git-sub-path string   Git repository subPath to be used
       --git-tag string        Git repository tag to be used
   -h, --help                  help for update
       --icon-url string       URL for icon to use with the accelerator
       --interval string       interval for checking for updates to Git or image repository
-  -n, --namespace string      namespace for accelerators (default "accelerator-system")
+  -n, --namespace string      namespace for accelerator system (default "accelerator-system")
       --reconcile             trigger a reconciliation including the associated GitRepository resource
       --secret-ref string     name of secret containing credentials for private Git or image repository
       --source-image string   name of the source image for the accelerator
