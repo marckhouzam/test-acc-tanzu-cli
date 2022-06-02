@@ -31,7 +31,7 @@ test:
 	go test -coverprofile cover.out ./...
 
 create-artifact: build-darwin-amd64 build-linux-amd64 build-windows-amd64 publish-darwin-amd64 publish-linux-amd64 publish-windows-amd64
-	tar -zcvf tanzu-accelerator-plugin.tar.gz standalone
+	tar -C standalone -zcvf tanzu-accelerator-plugin.tar.gz .
 
 docs: $(GO_SOURCES)
 	@rm -rf docs

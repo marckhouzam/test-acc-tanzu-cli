@@ -7,3 +7,5 @@ cover.out
 
 .DS_store
 e2e/packaging
+
+*.tar.gz
