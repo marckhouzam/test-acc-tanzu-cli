@@ -81,7 +81,8 @@ jobs:
         set -o nounset
         set -o pipefail
 
-        tar -xvf tanzu-accelerator-plugin.tar.gz
+        mkdir standalone
+        tar -xvzf tanzu-accelerator-plugin.tar.gz -C standalone
         tanzu plugin install accelerator --local standalone/linux-amd64 --version ${{env.BUILD_VERSION}}
     - name: Create Context
       run: |
