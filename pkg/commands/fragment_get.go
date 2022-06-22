@@ -106,6 +106,32 @@ func printFragmentFromClient(ctx context.Context, opts FragmentGetOptions, cmd *
 	fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", fragment.Status.ArtifactInfo.Message)
 	fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", fragment.Status.ArtifactInfo.Ready)
 	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", fragment.Status.ArtifactInfo.URL)
+
+	fmt.Fprintln(cmd.OutOrStdout(), "imports:")
+	imports := fragment.Status.ArtifactInfo.Imports
+	if len(imports) == 0 {
+		fmt.Fprintf(cmd.OutOrStdout(), "  None\n")
+	} else {
+		for key, _ := range imports {
+			fmt.Fprintf(cmd.OutOrStdout(), "  %s\n", key)
+		}
+	}
+
+	fmt.Fprintln(cmd.OutOrStdout(), "importedBy:")
+	accelerators := &acceleratorv1alpha1.AcceleratorList{}
+	err = c.List(ctx, accelerators, client.InNamespace(opts.Namespace), client.HasLabels{"imports.accelerator.apps.tanzu.vmware.com/" + fragment.Name})
+	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "  Unable to find any importing accelerators\n")
+	} else {
+		if len(accelerators.Items) > 0 {
+			for _, accelerator := range accelerators.Items {
+				fmt.Fprintf(cmd.OutOrStderr(), "  %s\n", accelerator.Name)
+			}
+		} else {
+			fmt.Fprintf(cmd.OutOrStdout(), "  None\n")
+		}
+	}
+
 	w.Flush()
 	return nil
 }

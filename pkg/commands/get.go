@@ -249,6 +249,17 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", accelerator.Status.ArtifactInfo.Message)
 	fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", accelerator.Status.ArtifactInfo.Ready)
 	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Status.ArtifactInfo.URL)
+
+	fmt.Fprintln(cmd.OutOrStdout(), "imports:")
+	imports := accelerator.Status.ArtifactInfo.Imports
+	if len(imports) == 0 {
+		fmt.Fprintf(cmd.OutOrStdout(), "  None\n")
+	} else {
+		for key, _ := range imports {
+			fmt.Fprintf(cmd.OutOrStdout(), "  %s\n", key)
+		}
+	}
+
 	w.Flush()
 	return nil
 }

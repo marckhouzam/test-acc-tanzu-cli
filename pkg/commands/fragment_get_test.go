@@ -44,6 +44,7 @@ func TestFragmentGetCommand(t *testing.T) {
 				Ready:   true,
 				Message: "test",
 				URL:     "http://www.test.com",
+				Imports: map[string]string{"java-version": "http://www.example.com"},
 			},
 			Options: `[{"defaultValue": "","name":"test","label":"test"}]`,
 		},
@@ -123,6 +124,10 @@ artifact:
   message: test
   ready: true
   url: http://www.test.com
+imports:
+  java-version
+importedBy:
+  None
 `,
 		},
 		{
@@ -147,6 +152,10 @@ artifact:
   message: test
   ready: true
   url: http://www.test.com
+imports:
+  None
+importedBy:
+  None
 `,
 		},
 	}
