@@ -127,9 +127,21 @@ func printFragmentFromClient(ctx context.Context, opts FragmentGetOptions, cmd *
 			for _, accelerator := range accelerators.Items {
 				fmt.Fprintf(cmd.OutOrStderr(), "  %s\n", accelerator.Name)
 			}
-		} else {
-			fmt.Fprintf(cmd.OutOrStdout(), "  None\n")
 		}
+	}
+	fragments := &acceleratorv1alpha1.FragmentList{}
+	err = c.List(ctx, fragments, client.InNamespace(opts.Namespace), client.HasLabels{"imports.accelerator.apps.tanzu.vmware.com/" + fragment.Name})
+	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "  Unable to find any importing fragments\n")
+	} else {
+		if len(fragments.Items) > 0 {
+			for _, fragments := range fragments.Items {
+				fmt.Fprintf(cmd.OutOrStderr(), "  %s\n", fragments.Name)
+			}
+		}
+	}
+	if len(accelerators.Items) == 0 && len(fragments.Items) == 0 {
+		fmt.Fprintf(cmd.OutOrStdout(), "  None\n")
 	}
 
 	w.Flush()
