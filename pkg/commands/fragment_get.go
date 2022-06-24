@@ -125,7 +125,7 @@ func printFragmentFromClient(ctx context.Context, opts FragmentGetOptions, cmd *
 	} else {
 		if len(accelerators.Items) > 0 {
 			for _, accelerator := range accelerators.Items {
-				fmt.Fprintf(cmd.OutOrStderr(), "  %s\n", accelerator.Name)
+				fmt.Fprintf(cmd.OutOrStderr(), "  accelerator/%s\n", accelerator.Name)
 			}
 		}
 	}
@@ -136,7 +136,7 @@ func printFragmentFromClient(ctx context.Context, opts FragmentGetOptions, cmd *
 	} else {
 		if len(fragments.Items) > 0 {
 			for _, fragments := range fragments.Items {
-				fmt.Fprintf(cmd.OutOrStderr(), "  %s\n", fragments.Name)
+				fmt.Fprintf(cmd.OutOrStderr(), "  fragment/%s\n", fragments.Name)
 			}
 		}
 	}
