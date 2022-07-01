@@ -163,7 +163,6 @@ jobs:
         client-id: ${{ secrets.SRP_CLIENT_ID }}
         client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
     - uses: pivotal-cf/srp-helper-action/collect@release/v1
-      id: srp_build
       with:
         git-repos: .
     - uses: pivotal-cf/srp-helper-action/submit@release/v1
