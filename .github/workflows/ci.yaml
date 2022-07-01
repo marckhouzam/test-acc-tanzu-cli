@@ -151,3 +151,19 @@ jobs:
         asset_path: tanzu-accelerator-plugin.tar.gz
         asset_name: tanzu-accelerator-plugin-${{ steps.get_version.outputs.VERSION }}.tar.gz
         asset_content_type: application/gzip
+
+  srp:
+    needs: e2e
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.3.4
+    - uses: pivotal-cf/srp-helper-action/install@release/v1
+    - uses: pivotal-cf/srp-helper-action/init@release/v1
+      with:
+        client-id: ${{ secrets.SRP_CLIENT_ID }}
+        client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
+    - uses: pivotal-cf/srp-helper-action/collect@release/v1
+      id: srp_build
+      with:
+        git-repos: .
+    - uses: pivotal-cf/srp-helper-action/submit@release/v1
