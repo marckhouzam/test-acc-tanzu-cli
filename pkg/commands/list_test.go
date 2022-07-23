@@ -146,18 +146,18 @@ No accelerators found.
 				}),
 			},
 			ExpectOutput: `
-NAME                  READY     REPOSITORY
-another-accelerator   unknown   git-repository: https://www.test.com:main
-image-accelerator     unknown   source-image: test-image
-test-accelerator      unknown   git-repository: https://www.test.com:main
+NAME                  TAGS   READY     REPOSITORY
+another-accelerator   []     unknown   https://www.test.com:main
+image-accelerator     []     unknown   source-image: test-image
+test-accelerator      []     unknown   https://www.test.com:main
 `,
 		},
 		{
 			Name: "List accelerators server-url",
 			Args: []string{"--server-url", ts.URL},
 			ExpectOutput: `
-NAME   READY   REPOSITORY
-mock   true    
+NAME   TAGS             READY   REPOSITORY
+mock   [first second]   true    
 `,
 		},
 		{
@@ -180,8 +180,8 @@ mock   true
 				}),
 			},
 			ExpectOutput: `
-NAME               READY     REPOSITORY
-test-accelerator   unknown   git-repository: https://www.test.com:main
+NAME               TAGS   READY     REPOSITORY
+test-accelerator   []     unknown   https://www.test.com:main
 `,
 		},
 	}

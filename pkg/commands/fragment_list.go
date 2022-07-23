@@ -39,7 +39,7 @@ func printFragmentListFromClient(ctx context.Context, c *cli.Config, opts Fragme
 		return err
 	}
 
-	accList := [][]string{}
+	fragList := [][]string{}
 
 	for _, fragment := range fragments.Items {
 		values := []string{fragment.Name}
@@ -58,7 +58,7 @@ func printFragmentListFromClient(ctx context.Context, c *cli.Config, opts Fragme
 
 		repo := ""
 		if fragment.Spec.Git != nil {
-			repo = "git-repository: " + fragment.Spec.Git.URL
+			repo = fragment.Spec.Git.URL
 			if fragment.Spec.Git.Reference.Tag != "" {
 				repo = repo + ":" + fragment.Spec.Git.Reference.Tag
 			} else if fragment.Spec.Git.Reference.Branch != "" {
@@ -71,19 +71,19 @@ func printFragmentListFromClient(ctx context.Context, c *cli.Config, opts Fragme
 		} else {
 			values = append(values, "", "")
 		}
-		accList = append(accList, values)
+		fragList = append(fragList, values)
 	}
 
-	printAcceleratorFragmentList(c, cmd, w, accList)
+	printAcceleratorFragmentList(c, cmd, w, fragList)
 	return nil
 }
 
-func printAcceleratorFragmentList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, accelerators [][]string) {
-	if len(accelerators) == 0 {
+func printAcceleratorFragmentList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, fragments [][]string) {
+	if len(fragments) == 0 {
 		c.Infof("No accelerator fragments found.\n")
 	} else {
 		fmt.Fprintln(w, "NAME\tREADY\tREPOSITORY")
-		for _, values := range accelerators {
+		for _, values := range fragments {
 			fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[2], values[1])
 		}
 		w.Flush()

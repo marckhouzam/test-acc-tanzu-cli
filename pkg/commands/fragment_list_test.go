@@ -87,8 +87,8 @@ No accelerator fragments found.
 			},
 			ExpectOutput: `
 NAME               READY     REPOSITORY
-another-fragment   unknown   git-repository: https://www.test.com:main
-test-fragment      unknown   git-repository: https://www.test.com:main
+another-fragment   unknown   https://www.test.com:main
+test-fragment      unknown   https://www.test.com:main
 `,
 		},
 		{
@@ -112,7 +112,7 @@ test-fragment      unknown   git-repository: https://www.test.com:main
 			},
 			ExpectOutput: `
 NAME            READY     REPOSITORY
-test-fragment   unknown   git-repository: https://www.test.com:main
+test-fragment   unknown   https://www.test.com:main
 `,
 		},
 	}

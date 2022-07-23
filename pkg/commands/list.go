@@ -44,7 +44,7 @@ the Application Accelerator server you want to access.
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
 			if serverUrl != "" && !opts.FromContext && !context && !kubeconfig {
-				return printListFromUiServer(c, serverUrl, w, cmd)
+				return printListFromUiServer(c, serverUrl, opts, cmd, w)
 			} else {
 				return printListFromClient(ctx, c, opts, cmd, w)
 			}
@@ -55,7 +55,7 @@ the Application Accelerator server you want to access.
 	return listCmd
 }
 
-func printListFromUiServer(c *cli.Config, url string, w *tabwriter.Writer, cmd *cobra.Command) error {
+func printListFromUiServer(c *cli.Config, url string, opts ListOptions, cmd *cobra.Command, w *tabwriter.Writer) error {
 	accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
 		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
@@ -69,26 +69,30 @@ func printListFromUiServer(c *cli.Config, url string, w *tabwriter.Writer, cmd *
 	})
 
 	accList := [][]string{}
-	for _, accelerator := range accelerators {
-		repo := ""
-		if accelerator.SpecGitRepositoryUrl != "" {
-			repo = "git-repository: " + accelerator.SpecGitRepositoryUrl
-			if accelerator.SourceTag != "" {
-				repo = repo + ":" + accelerator.SourceTag
-			} else if accelerator.SourceBranch != "" {
-				repo = repo + ":" + accelerator.SourceBranch
-			}
-		} else if accelerator.SpecImageRepository != "" {
-			repo = "source-image: " + accelerator.SpecImageRepository
-		}
-		status := "unknown"
-		if accelerator.Ready {
-			status = "true"
-		} else {
-			status = "false"
-		}
 
-		accList = append(accList, []string{accelerator.Name, repo, status})
+	for _, accelerator := range accelerators {
+		if len(opts.Tags) == 0 || contains(accelerator.Tags, opts.Tags) {
+			repo := ""
+			tags := fmt.Sprintf("%v", accelerator.Tags)
+			if accelerator.SpecGitRepositoryUrl != "" {
+				repo = accelerator.SpecGitRepositoryUrl
+				if accelerator.SourceTag != "" {
+					repo = repo + ":" + accelerator.SourceTag
+				} else if accelerator.SourceBranch != "" {
+					repo = repo + ":" + accelerator.SourceBranch
+				}
+			} else if accelerator.SpecImageRepository != "" {
+				repo = "source-image: " + accelerator.SpecImageRepository
+			}
+			status := "unknown"
+			if accelerator.Ready {
+				status = "true"
+			} else {
+				status = "false"
+			}
+
+			accList = append(accList, []string{accelerator.Name, tags, repo, status})
+		}
 	}
 	w.Flush()
 
@@ -107,52 +111,74 @@ func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, c
 	accList := [][]string{}
 
 	for _, accelerator := range accelerators.Items {
-		values := []string{accelerator.Name}
 
-		status := "unknown"
-		for _, cond := range accelerator.Status.Conditions {
-			if cond.Type == "Ready" {
-				if cond.Status == "True" {
-					status = "true"
-				} else {
-					status = "false"
+		if len(opts.Tags) == 0 || contains(accelerator.Status.Tags, opts.Tags) {
+
+			values := []string{accelerator.Name}
+
+			status := "unknown"
+			for _, cond := range accelerator.Status.Conditions {
+				if cond.Type == "Ready" {
+					if cond.Status == "True" {
+						status = "true"
+					} else {
+						status = "false"
+					}
+					break
 				}
-				break
 			}
-		}
 
-		repo := ""
-		if accelerator.Spec.Git != nil {
-			repo = "git-repository: " + accelerator.Spec.Git.URL
-			if accelerator.Spec.Git.Reference.Tag != "" {
-				repo = repo + ":" + accelerator.Spec.Git.Reference.Tag
-			} else if accelerator.Spec.Git.Reference.Branch != "" {
-				repo = repo + ":" + accelerator.Spec.Git.Reference.Branch
+			repo := ""
+			tags := fmt.Sprintf("%v", accelerator.Status.Tags)
+			if accelerator.Spec.Git != nil {
+				repo = accelerator.Spec.Git.URL
+				if accelerator.Spec.Git.Reference.Tag != "" {
+					repo = repo + ":" + accelerator.Spec.Git.Reference.Tag
+				} else if accelerator.Spec.Git.Reference.Branch != "" {
+					repo = repo + ":" + accelerator.Spec.Git.Reference.Branch
+				}
+				if accelerator.Spec.Git.SubPath != nil {
+					repo = repo + ":/" + *accelerator.Spec.Git.SubPath
+				}
+				values = append(values, tags, repo, status)
+			} else if accelerator.Spec.Source != nil {
+				repo = "source-image: " + accelerator.Spec.Source.Image
+				values = append(values, tags, repo, status)
+			} else {
+				values = append(values, "", "", "")
 			}
-			if accelerator.Spec.Git.SubPath != nil {
-				repo = repo + ":/" + *accelerator.Spec.Git.SubPath
-			}
-			values = append(values, repo, status)
-		} else if accelerator.Spec.Source != nil {
-			repo = "source-image: " + accelerator.Spec.Source.Image
-			values = append(values, repo, status)
-		} else {
-			values = append(values, "", "")
+			accList = append(accList, values)
 		}
-		accList = append(accList, values)
 	}
 
 	printAcceleratorList(c, cmd, w, accList)
 	return nil
 }
 
+func contains(accTags []string, input []string) bool {
+
+	for _, inputTag := range input {
+		result := false
+		for _, accTag := range accTags {
+			if strings.TrimSpace(inputTag) == accTag {
+				result = true
+			}
+		}
+		if result == false {
+			return false
+		}
+	}
+
+	return true
+}
+
 func printAcceleratorList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, accelerators [][]string) {
 	if len(accelerators) == 0 {
 		c.Infof("No accelerators found.\n")
 	} else {
-		fmt.Fprintln(w, "NAME\tREADY\tREPOSITORY")
+		fmt.Fprintln(w, "NAME\tTAGS\tREADY\tREPOSITORY")
 		for _, values := range accelerators {
-			fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[2], values[1])
+			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", values[0], values[1], values[3], values[2])
 		}
 		w.Flush()
 	}

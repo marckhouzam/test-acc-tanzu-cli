@@ -155,12 +155,14 @@ func (do *DeleteOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 }
 
 type ListOptions struct {
+	Tags        []string
 	Namespace   string
 	ServerUrl   string
 	FromContext bool
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
+	cmd.Flags().StringSliceVarP(&lo.Tags, "tags", "t", []string{}, "accelerator tags to match against")
 	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
