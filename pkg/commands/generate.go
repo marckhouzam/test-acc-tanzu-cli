@@ -146,6 +146,26 @@ environmnet variable if it is set.
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
+			downloadedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/downloaded?name=%s", serverUrl, args[0]), nil)
+			resp, err = client.Do(downloadedRequest)
+			if err != nil {
+				return err
+			}
+
+			if resp.StatusCode == http.StatusNotFound {
+				return nil
+			} else if resp.StatusCode >= 400 {
+				var errorMsg string
+				var errorResponse UiErrorResponse
+				body, _ := ioutil.ReadAll(resp.Body)
+				json.Unmarshal(body, &errorResponse)
+				if errorResponse.Detail > "" {
+					errorMsg = fmt.Sprintf("there was an error registering download for the accelerator, the server response was: \"%s\"\n", errorResponse.Detail)
+				} else {
+					errorMsg = fmt.Sprintf("there was an error registering download for the accelerator, the server response code was: \"%v\"\n", resp.StatusCode)
+				}
+				return fmt.Errorf(errorMsg)
+			}
 
 			return nil
 		},
