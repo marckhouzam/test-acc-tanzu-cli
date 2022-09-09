@@ -68,6 +68,9 @@ func printFragmentListFromClient(ctx context.Context, c *cli.Config, opts Fragme
 				repo = repo + ":/" + *fragment.Spec.Git.SubPath
 			}
 			values = append(values, repo, status)
+		} else if fragment.Spec.Source != nil {
+			repo = "source-image: " + fragment.Spec.Source.Image
+			values = append(values, repo, status)
 		} else {
 			values = append(values, "", "")
 		}
