@@ -53,25 +53,33 @@ func printFragmentFromClient(ctx context.Context, opts FragmentGetOptions, cmd *
 	fmt.Fprintf(cmd.OutOrStdout(), "name: %s\n", fragment.Name)
 	fmt.Fprintf(cmd.OutOrStdout(), "namespace: %s\n", fragment.Namespace)
 	fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", fragment.Status.DisplayName)
-	if fragment.Spec.Git != nil {
-		fmt.Fprintln(cmd.OutOrStdout(), "git:")
-		if fragment.Spec.Git.Interval != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", fragment.Spec.Git.Interval.Duration)
+	if fragment.Spec.Source != nil {
+		fmt.Fprintf(cmd.OutOrStdout(), "source:\n")
+		fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", fragment.Spec.Source.Image)
+		if fragment.Spec.Source.ImagePullSecrets != nil {
+			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", fragment.Spec.Source.ImagePullSecrets)
 		}
-		if fragment.Spec.Git.Ignore != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", *fragment.Spec.Ignore)
-		}
-		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", fragment.Spec.Git.URL)
-		fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
-		fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", fragment.Spec.Git.Reference.Branch)
-		if fragment.Spec.Git.Reference.Tag != "" {
-			fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", fragment.Spec.Git.Reference.Tag)
-		}
-		if fragment.Spec.Git.SubPath != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  subPath: %s\n", *fragment.Spec.Git.SubPath)
-		}
-		if fragment.Spec.Git.SecretRef != nil {
-			fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", fragment.Spec.Git.SecretRef.Name)
+	} else {
+		if fragment.Spec.Git != nil {
+			fmt.Fprintln(cmd.OutOrStdout(), "git:")
+			if fragment.Spec.Git.Interval != nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "  interval: %s\n", fragment.Spec.Git.Interval.Duration)
+			}
+			if fragment.Spec.Git.Ignore != nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "  ignore: %s\n", *fragment.Spec.Ignore)
+			}
+			fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", fragment.Spec.Git.URL)
+			fmt.Fprintf(cmd.OutOrStdout(), "  ref:\n")
+			fmt.Fprintf(cmd.OutOrStdout(), "    branch: %s\n", fragment.Spec.Git.Reference.Branch)
+			if fragment.Spec.Git.Reference.Tag != "" {
+				fmt.Fprintf(cmd.OutOrStdout(), "    tag: %s\n", fragment.Spec.Git.Reference.Tag)
+			}
+			if fragment.Spec.Git.SubPath != nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "  subPath: %s\n", *fragment.Spec.Git.SubPath)
+			}
+			if fragment.Spec.Git.SecretRef != nil {
+				fmt.Fprintf(cmd.OutOrStdout(), "  secret-ref: %s\n", fragment.Spec.Git.SecretRef.Name)
+			}
 		}
 	}
 	if len(fragment.Status.Conditions) > 0 {

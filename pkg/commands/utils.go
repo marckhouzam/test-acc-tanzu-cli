@@ -170,6 +170,16 @@ func (opts CreateOptions) PublishLocalSource(ctx context.Context, c *cli.Config)
 	return nil
 }
 
+func (opts FragmentCreateOptions) PublishLocalSource(ctx context.Context, c *cli.Config) error {
+	digestedImage, err := pushSourceImage(ctx, c, opts.SourceImage, opts.LocalPath)
+	if err != nil {
+		return err
+	}
+	opts.SourceImage = digestedImage
+	c.Successf("published accelerator fragment\n")
+	return nil
+}
+
 func (opts PushOptions) PublishLocalSource(ctx context.Context, c *cli.Config) error {
 	digestedImage, err := pushSourceImage(ctx, c, opts.SourceImage, opts.LocalPath)
 	if err != nil {

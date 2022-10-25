@@ -12,6 +12,7 @@ import (
 	"github.com/fluxcd/pkg/apis/meta"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -40,6 +41,18 @@ the same options specified in the accelerator metadata retrieved from the Git re
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			if opts.GitRepoUrl == "" && opts.SourceImage == "" && opts.LocalPath == "" {
+				return errors.New("you must provide --git-repository or --source-image")
+			}
+
+			if opts.GitRepoUrl != "" && opts.SourceImage != "" {
+				return errors.New("you may only provide one of --git-repository or --source-image")
+			}
+
+			if opts.LocalPath != "" && opts.SourceImage == "" {
+				return errors.New("you must provide --source-image when using --local-path")
+			}
+
 			frag := &acceleratorv1alpha1.Fragment{
 				TypeMeta: v1.TypeMeta{
 					APIVersion: "accelerator.tanzu.vmware.com/v1alpha1",
@@ -64,6 +77,18 @@ the same options specified in the accelerator metadata retrieved from the Git re
 				}
 				if opts.GitSubPath != "" {
 					frag.Spec.Git.SubPath = &opts.GitSubPath
+				}
+			}
+
+			if opts.LocalPath != "" {
+				if err := opts.PublishLocalSource(ctx, c); err != nil {
+					return err
+				}
+			}
+
+			if opts.SourceImage != "" {
+				frag.Spec.Source = &v1alpha1.ImageRepositorySpec{
+					Image: opts.SourceImage,
 				}
 			}
 
