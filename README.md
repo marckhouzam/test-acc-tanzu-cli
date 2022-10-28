@@ -12,7 +12,7 @@ To check the plugin documentation go to
 
 ## Install
 
-The [Tanzu CLI](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/0.1/tap-0-1/GUID-install.html#install-the-tanzu-cli-and-package-plugin-4) is required to use the Accelerator CLI plugin.
+The [Tanzu CLI](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install-tanzu-cli.html#install-or-update-the-tanzu-cli-and-plugins-3) is required to use the Accelerator CLI plugin.
 
 ### From a pre-built distribution
 
@@ -27,7 +27,7 @@ tar -zxvf tanzu-accelerator-plugin-*.tar.gz
 Install the accelerator plugin:
 
 ```sh
-tanzu plugin install accelerator --local ./artifacts --version v1.3.1-dev
+tanzu plugin install accelerator --local ./artifacts --version v1.3.1
 ```
 
 ### Build from source
