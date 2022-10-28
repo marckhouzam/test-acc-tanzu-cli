@@ -107,7 +107,7 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
-	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator fragment")
+	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
@@ -120,6 +120,7 @@ type FragmentUpdateOptions struct {
 	GitTag      string
 	GitSubPath  string
 	Interval    string
+	SourceImage string
 	SecretRef   string
 	Reconcile   bool
 }
@@ -133,6 +134,7 @@ func (uo *FragmentUpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Com
 	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git repository")
+	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator fragment")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }

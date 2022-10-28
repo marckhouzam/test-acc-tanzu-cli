@@ -13,6 +13,7 @@ import (
 	"github.com/imdario/mergo"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -74,6 +75,13 @@ with any changes made to the associated Git repository.
 				if opts.GitSubPath != "" {
 					updatedFragment.Spec.Git.SubPath = &opts.GitSubPath
 				}
+			}
+
+			if opts.SourceImage != "" {
+				updatedFragment.Spec.Source = &v1alpha1.ImageRepositorySpec{
+					Image: opts.SourceImage,
+				}
+				updatedFragment.Spec.Git = nil
 			}
 
 			if opts.Reconcile {
