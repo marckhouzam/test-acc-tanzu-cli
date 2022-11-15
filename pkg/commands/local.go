@@ -1,0 +1,336 @@
+/*
+Copyright 2022 VMware, Inc. All Rights Reserved.
+*/
+package commands
+
+import (
+	"archive/tar"
+	"archive/zip"
+	"bytes"
+	"compress/gzip"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/spf13/cobra"
+)
+
+// kvPair represents a single key-value pair
+type kvPair struct {
+	key   string
+	value string
+}
+
+func (p *kvPair) isEmpty() bool {
+	return len(p.key) == 0 || len(p.value) == 0
+}
+
+// pairValue implements the cobra Value interface, making it usable as a flag
+type pairValue struct {
+	pair *kvPair
+}
+
+func newPairValue(val kvPair, p *kvPair) *pairValue {
+	pairV := new(pairValue)
+	pairV.pair = p
+	*pairV.pair = val
+	return pairV
+}
+
+func (s *pairValue) Type() string {
+	return `"key=value" pair`
+}
+
+func (s *pairValue) String() string {
+	if s.pair == nil || s.pair.isEmpty() {
+		return ""
+	}
+	return s.pair.key + "=" + s.pair.value
+}
+
+func (s *pairValue) Set(val string) error {
+	kv := strings.SplitN(val, "=", 2)
+	if len(kv) != 2 {
+		return fmt.Errorf("%s must be formatted as key=value", val)
+	}
+	*s.pair = kvPair{kv[0], kv[1]}
+	return nil
+}
+
+func LocalGenerateCmd() *cobra.Command {
+	var uiServer string
+	var accServerUrl string
+	var optionsString string
+	var optionsFilename string
+	var acceleratorName string
+	var localAccelerator kvPair
+	var fragmentNames []string
+	var localFragments map[string]string
+	var forceOverwrite bool
+	var localGenerateCommand = &cobra.Command{
+		Use:   "generate-from-local",
+		Short: "Generate project from a combination of registered and local artifacts",
+		Long: `Generate a project from a combination of local files and registered accelerators/fragments using provided 
+options and download project artifacts as a ZIP file.
+
+Options values are provided as a JSON object and should match the declared options that are specified for the
+accelerator used for the generation. The options can include "projectName" which defaults to the name of the accelerator.
+This "projectName" will be used as the name of the generated ZIP file.
+
+Here is an example of an options JSON string that specifies the "projectName" and an "includeKubernetes" boolean flag:
+
+    --options '{"projectName":"test", "includeKubernetes": true}'
+
+You can also provide a file that specifies the JSON string using the --options-file flag.
+
+The generate-from-local command needs access to the Application Accelerator server. You can specify the --server-url flag or set
+an ACC_SERVER_URL environment variable. If you specify the --server-url flag it will override the ACC_SERVER_URL
+environment variable if it is set.
+`,
+		Example: `tanzu accelerator generate-from-local --accelerator-path java-rest=workspace/java-rest --fragment-paths java-version=workspace/version --fragment-names tap-workload --options '{"projectName":"test"}'`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			// build a form body
+			requestBody := &bytes.Buffer{}
+			bodyWriter := multipart.NewWriter(requestBody)
+
+			var projectName string
+			if !localAccelerator.isEmpty() {
+				projectName = localAccelerator.key
+				accFolderName := localAccelerator.value
+				fileWriter, err := bodyWriter.CreateFormFile("accelerator", accFolderName)
+
+				err = tarToWriter(accFolderName, fileWriter)
+				if err != nil {
+					return err
+				}
+			} else if acceleratorName != "" {
+				projectName = acceleratorName
+				field, err := bodyWriter.CreateFormField("accelerator_name")
+				field.Write([]byte(acceleratorName))
+				if err != nil {
+					return err
+				}
+			} else {
+				return errors.New("no accelerator, you must provide --accelerator-name or --accelerator-path")
+			}
+
+			for _, fragmentName := range fragmentNames {
+				field, err := bodyWriter.CreateFormField("fragment_names")
+				field.Write([]byte(fragmentName))
+				if err != nil {
+					return err
+				}
+			}
+
+			for fragmentName, fragmentFolderName := range localFragments {
+				fileWriter, err := bodyWriter.CreateFormFile("fragment_"+fragmentName, fragmentFolderName)
+				err = tarToWriter(fragmentFolderName, fileWriter)
+				if err != nil {
+					return err
+				}
+			}
+
+			if optionsString == "" {
+				optionsString = "{\"projectName\": \"" + projectName + "\"}"
+			}
+			if optionsFilename != "" {
+				fileBytes, err := ioutil.ReadFile(optionsFilename)
+				if err != nil {
+					return err
+				}
+				optionsString = string(fileBytes)
+			}
+			if !strings.Contains(optionsString, "projectName") {
+				optionsString = "{\"projectName\": \"" + projectName + "\"," + optionsString[1:]
+			}
+
+			client := &http.Client{}
+
+			optionsField, err := bodyWriter.CreateFormField("options")
+			optionsField.Write([]byte(optionsString))
+			if err != nil {
+				return err
+			}
+
+			// Close the body writer
+			bodyWriter.Close()
+
+			serverUrl := accServerUrl
+			if uiServer != "" {
+				serverUrl = uiServer
+			}
+			if serverUrl == "" {
+				return errors.New("no server URL provided, you must provide --server-url option or set ACC_SERVER_URL environment variable")
+			}
+
+			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip", serverUrl), requestBody)
+			proxyRequest.Header.Add("Content-Type", bodyWriter.FormDataContentType())
+			resp, err := client.Do(proxyRequest)
+			if err != nil {
+				if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
+					return err
+				} else {
+					return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
+				}
+			}
+
+			if resp.StatusCode >= 300 {
+				var errorMsg string
+				if resp.StatusCode == http.StatusNotFound {
+					errorMsg = fmt.Sprintf("one of the accelerators or fragments was not found\n")
+				} else {
+					var errorResponse UiErrorResponse
+					body, _ := ioutil.ReadAll(resp.Body)
+					json.Unmarshal(body, &errorResponse)
+					if errorResponse.Detail > "" {
+						errorMsg = fmt.Sprintf("there was an error generating the accelerator, the server response was: \"%s\"\n", errorResponse.Detail)
+					} else {
+						errorMsg = fmt.Sprintf("there was an error generating the accelerator, the server response code was: \"%v\"\n", resp.StatusCode)
+					}
+				}
+				return fmt.Errorf(errorMsg)
+			}
+
+			body, _ := ioutil.ReadAll(resp.Body)
+			zipReader, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+			if err != nil {
+				return err
+			}
+
+			for _, f := range zipReader.File {
+				err = extractFile(f, forceOverwrite)
+				if err != nil {
+					return err
+				}
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "generated project %s\n", projectName)
+			return nil
+		},
+	}
+	localGenerateCommand.Flags().StringVar(&optionsString, "options", "", "options JSON string")
+	localGenerateCommand.Flags().StringVar(&optionsFilename, "options-file", "", "path to file containing options JSON string")
+	localGenerateCommand.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")
+	localGenerateCommand.Flags().StringVar(&acceleratorName, "accelerator-name", "", "name of the registered accelerator to use")
+	localGenerateCommand.Flags().StringSliceVar(&fragmentNames, "fragment-names", []string{}, "names of the registered fragments to use")
+	localGenerateCommand.Flags().VarP(newPairValue(kvPair{}, &localAccelerator), "accelerator-path", "", "key value pair of the name and path to the directory containing the accelerator")
+	localGenerateCommand.Flags().StringToStringVar(&localFragments, "fragment-paths", map[string]string{}, "key value pairs of the name and path to the directory containing each fragment")
+	localGenerateCommand.Flags().BoolVar(&forceOverwrite, "force", false, "force overwrite of existing files and directories")
+	localGenerateCommand.MarkFlagsMutuallyExclusive("options", "options-file")
+	localGenerateCommand.MarkFlagsMutuallyExclusive("accelerator-path", "accelerator-name")
+	accServerUrl = EnvVar("ACC_SERVER_URL", "")
+	return localGenerateCommand
+}
+
+func extractFile(f *zip.File, forceOverwrite bool) error {
+	currentDir, _ := os.Getwd()
+	path := filepath.Join(currentDir, f.Name)
+
+	if forceOverwrite {
+		err := os.RemoveAll(path)
+		if err != nil {
+			return errors.New(fmt.Sprintf("could not overwrite %s", path))
+		}
+	}
+
+	if f.FileInfo().IsDir() {
+		// check if directory exists
+		if _, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) {
+			return errors.New(fmt.Sprintf("directory %s already exists, use --force to overwrite", path))
+		}
+
+		err := os.Mkdir(path, 0755)
+		if err != nil {
+			return errors.New(fmt.Sprintf("could not create directory %s", path))
+		}
+	} else {
+		// create directories to the file
+		os.MkdirAll(filepath.Dir(path), 0755)
+
+		dstFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			return errors.New("error creating subdirectories in generated project")
+		}
+
+		fileInArchive, err := f.Open()
+		if err != nil {
+			return errors.New(fmt.Sprintf("could not open file %s", f.Name))
+		}
+
+		if _, err := io.Copy(dstFile, fileInArchive); err != nil {
+			return errors.New(fmt.Sprintf("could not open file %s", f.Name))
+		}
+
+		dstFile.Close()
+		fileInArchive.Close()
+	}
+	return nil
+}
+
+// tarToWriter takes a source and a writer and walks sourceDir writing each file
+// found to the tar writer
+func tarToWriter(sourceDir string, writer io.Writer) error {
+
+	// ensure the sourceDir actually exists before trying to tar it
+	if _, err := os.Stat(sourceDir); err != nil {
+		return fmt.Errorf("cannot find directory %v", sourceDir)
+	}
+
+	gzw := gzip.NewWriter(writer)
+	defer gzw.Close()
+
+	tw := tar.NewWriter(gzw)
+	defer tw.Close()
+
+	// walk path
+	return filepath.Walk(sourceDir, func(file string, fi os.FileInfo, err error) error {
+
+		// return on any error
+		if err != nil {
+			return err
+		}
+
+		// return on non-regular files
+		if !fi.Mode().IsRegular() {
+			return nil
+		}
+
+		// create a new dir/file header
+		header, err := tar.FileInfoHeader(fi, fi.Name())
+		if err != nil {
+			return err
+		}
+
+		// update the name to correctly reflect the desired destination when untaring
+		header.Name = strings.TrimPrefix(strings.Replace(file, sourceDir, "", -1), string(filepath.Separator))
+
+		// write the header
+		if err := tw.WriteHeader(header); err != nil {
+			return err
+		}
+
+		// open files for taring
+		f, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+
+		// copy file data into tar writer
+		if _, err := io.Copy(tw, f); err != nil {
+			return err
+		}
+
+		// manually close here after each file operation; deferring would cause each file close
+		// to wait until all operations have completed.
+		f.Close()
+
+		return nil
+	})
+}

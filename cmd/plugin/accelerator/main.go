@@ -61,6 +61,7 @@ func main() {
 		commands.PushCmd(ctx, c),
 		commands.ApplyCmd(ctx, c),
 		commands.FragmentCmd(ctx, c),
+		commands.LocalGenerateCmd(),
 	)
 
 	p.Cmd.PersistentFlags().StringVar(&c.KubeConfigFile, "kubeconfig", "", "kubeconfig `file` (default is $HOME/.kube/config)")

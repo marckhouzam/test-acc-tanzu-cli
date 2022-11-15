@@ -9,3 +9,5 @@ cover.out
 e2e/packaging
 
 *.tar.gz
+
+.idea/
