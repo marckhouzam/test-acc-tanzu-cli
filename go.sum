@@ -1168,6 +1168,10 @@ github.com/pivotal/acc-controller v1.1.1-0.20220511121131-a6aefe8cd386 h1:sdzAIT
 github.com/pivotal/acc-controller v1.1.1-0.20220511121131-a6aefe8cd386/go.mod h1:K4wLRbiHVFsxdrYbbeycnaH+/05BZj1knoGAc/Hr5s8=
 github.com/pivotal/acc-controller v1.3.0 h1:QEcJ0hIMN5zWiBSIJvu3BaXAjNx2yH94N9NOORckrSw=
 github.com/pivotal/acc-controller v1.3.0/go.mod h1:AYkofUR7uHpmhOHsKeLoe4hcE6+k2PRto98SXGVvIJQ=
+github.com/pivotal/acc-controller v1.3.1-0.20221116145044-db629e68d5ef h1:aTkCeISBWyJg4Q40d2AyZewN6biZxobuP0WETMdbiks=
+github.com/pivotal/acc-controller v1.3.1-0.20221116145044-db629e68d5ef/go.mod h1:VQX9t275dy/ptTfnA5cYtNtnzOgGbr5B8Bboem7TVOw=
+github.com/pivotal/acc-server v1.3.1-0.20221118153029-ecfffb46f103 h1:Ne1kYutMREHRvlBGg2aeU5Bf6LFwhe326wyT6K0nfMk=
+github.com/pivotal/acc-server v1.3.1-0.20221118153029-ecfffb46f103/go.mod h1:mkb97WEJ+vqgWN/YNYS7Mhqr6oeOfjZgVKDqrMnLj28=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=

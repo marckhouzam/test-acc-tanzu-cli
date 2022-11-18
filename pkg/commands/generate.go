@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os/user"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -146,12 +147,26 @@ environment variable if it is set.
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
-			downloadedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/downloaded?name=%s", serverUrl, args[0]), nil)
-			resp, err = client.Do(downloadedRequest)
+			osuser, _ := user.Current()
+			invokedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/invoked?type=download&name=%s&source=TanzuCLI&username=%s", serverUrl, args[0], osuser.Username), nil)
 			if err != nil {
 				return err
 			}
-
+			resp, err = client.Do(invokedRequest)
+			if err != nil {
+				return err
+			}
+			if resp.StatusCode == http.StatusNotFound {
+				// try the deprecated downloaded endpoint for older servers
+				downloadedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/downloaded?name=%s", serverUrl, args[0]), nil)
+				if err != nil {
+					return err
+				}
+				resp, err = client.Do(downloadedRequest)
+				if err != nil {
+					return err
+				}
+			}
 			if resp.StatusCode == http.StatusNotFound {
 				return nil
 			} else if resp.StatusCode >= 400 {
