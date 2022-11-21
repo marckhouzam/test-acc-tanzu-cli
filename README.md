@@ -4,7 +4,7 @@
 
 Early prototype for Accelerator CLI commands.
 
-To check the plugin documentation go to 
+To check the plugin documentation go to
 
 ## Commands
 
@@ -27,7 +27,7 @@ tar -zxvf tanzu-accelerator-plugin-*.tar.gz
 Install the accelerator plugin:
 
 ```sh
-tanzu plugin install accelerator --local ./artifacts --version v1.4.0-dev
+tanzu plugin install accelerator --local ./artifacts --version v1.4.0-build.1
 ```
 
 ### Build from source
