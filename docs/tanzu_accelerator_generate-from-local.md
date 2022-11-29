@@ -37,12 +37,13 @@ tanzu accelerator generate-from-local --accelerator-path java-rest=workspace/jav
 ```
       --accelerator-name string             name of the registered accelerator to use
       --accelerator-path "key=value" pair   key value pair of the name and path to the directory containing the accelerator
-      --force                               force overwrite of existing files and directories
+  -f, --force                               force clean and rewrite of output-dir
       --fragment-names strings              names of the registered fragments to use
       --fragment-paths stringToString       key value pairs of the name and path to the directory containing each fragment (default [])
   -h, --help                                help for generate-from-local
       --options string                      options JSON string (default "{}")
       --options-file string                 path to file containing options JSON string
+  -o, --output-dir string                   the directory that the project will be created in (defaults to the project name)
       --server-url string                   the URL for the Application Accelerator server
 ```
 

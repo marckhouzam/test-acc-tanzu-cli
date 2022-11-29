@@ -70,6 +70,7 @@ func LocalGenerateCmd() *cobra.Command {
 	var optionsString string
 	var optionsFilename string
 	var acceleratorName string
+	var outputDirectory string
 	var localAccelerator kvPair
 	var fragmentNames []string
 	var localFragments map[string]string
@@ -113,7 +114,13 @@ environment variable if it is set.
 			} else if acceleratorName != "" {
 				projectName = acceleratorName
 				field, err := bodyWriter.CreateFormField("accelerator_name")
-				field.Write([]byte(acceleratorName))
+				if err != nil {
+					return err
+				}
+				_, err = field.Write([]byte(acceleratorName))
+				if err != nil {
+					return err
+				}
 				if err != nil {
 					return err
 				}
@@ -123,7 +130,10 @@ environment variable if it is set.
 
 			for _, fragmentName := range fragmentNames {
 				field, err := bodyWriter.CreateFormField("fragment_names")
-				field.Write([]byte(fragmentName))
+				if err != nil {
+					return err
+				}
+				_, err = field.Write([]byte(fragmentName))
 				if err != nil {
 					return err
 				}
@@ -217,8 +227,26 @@ environment variable if it is set.
 				return err
 			}
 
+			targetDirectory := outputDirectory
+			if outputDirectory == "" {
+				targetDirectory = projectName
+			}
+
+			if forceOverwrite {
+				err := os.RemoveAll(targetDirectory)
+				if err != nil {
+					return errors.New(fmt.Sprintf("could not remove %s", targetDirectory))
+				}
+			} else {
+				if _, err := os.Stat(targetDirectory); !errors.Is(err, os.ErrNotExist) {
+					// directory exists
+					if empty, _ := isEmpty(targetDirectory); !empty {
+						return errors.New(fmt.Sprintf("path %s is not empty, use --force to overwrite", targetDirectory))
+					}
+				}
+			}
 			for _, f := range zipReader.File {
-				err = extractFile(f, forceOverwrite)
+				err = extractFile(f, targetDirectory)
 				if err != nil {
 					return err
 				}
@@ -231,35 +259,24 @@ environment variable if it is set.
 	localGenerateCommand.Flags().StringVar(&optionsString, "options", "{}", "options JSON string")
 	localGenerateCommand.Flags().StringVar(&optionsFilename, "options-file", "", "path to file containing options JSON string")
 	localGenerateCommand.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")
+	localGenerateCommand.Flags().StringVarP(&outputDirectory, "output-dir", "o", "", "the directory that the project will be created in (defaults to the project name)")
 	localGenerateCommand.Flags().StringVar(&acceleratorName, "accelerator-name", "", "name of the registered accelerator to use")
 	localGenerateCommand.Flags().StringSliceVar(&fragmentNames, "fragment-names", []string{}, "names of the registered fragments to use")
-	localGenerateCommand.Flags().VarP(newPairValue(kvPair{}, &localAccelerator), "accelerator-path", "", "key value pair of the name and path to the directory containing the accelerator")
+	localGenerateCommand.Flags().Var(newPairValue(kvPair{}, &localAccelerator), "accelerator-path", "key value pair of the name and path to the directory containing the accelerator")
 	localGenerateCommand.Flags().StringToStringVar(&localFragments, "fragment-paths", map[string]string{}, "key value pairs of the name and path to the directory containing each fragment")
-	localGenerateCommand.Flags().BoolVar(&forceOverwrite, "force", false, "force overwrite of existing files and directories")
+	localGenerateCommand.Flags().BoolVarP(&forceOverwrite, "force", "f", false, "force clean and rewrite of output-dir")
 	localGenerateCommand.MarkFlagsMutuallyExclusive("options", "options-file")
 	localGenerateCommand.MarkFlagsMutuallyExclusive("accelerator-path", "accelerator-name")
 	accServerUrl = EnvVar("ACC_SERVER_URL", "")
 	return localGenerateCommand
 }
 
-func extractFile(f *zip.File, forceOverwrite bool) error {
-	currentDir, _ := os.Getwd()
-	path := filepath.Join(currentDir, f.Name)
-
-	if forceOverwrite {
-		err := os.RemoveAll(path)
-		if err != nil {
-			return errors.New(fmt.Sprintf("could not overwrite %s", path))
-		}
-	}
+func extractFile(f *zip.File, targetDirectory string) error {
+	filePaths := strings.Split(f.Name, "/")[1:]
+	path := filepath.Join(append([]string{targetDirectory}, filePaths...)...)
 
 	if f.FileInfo().IsDir() {
-		// check if directory exists
-		if _, err := os.Stat(path); !errors.Is(err, os.ErrNotExist) {
-			return errors.New(fmt.Sprintf("directory %s already exists, use --force to overwrite", path))
-		}
-
-		err := os.Mkdir(path, 0755)
+		err := os.MkdirAll(path, 0755)
 		if err != nil {
 			return errors.New(fmt.Sprintf("could not create directory %s", path))
 		}
@@ -285,6 +302,20 @@ func extractFile(f *zip.File, forceOverwrite bool) error {
 		fileInArchive.Close()
 	}
 	return nil
+}
+
+func isEmpty(name string) (bool, error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1) // Or f.Readdir(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err // Either not empty or error, suits both cases
 }
 
 // tarToWriter takes a source and a writer and walks sourceDir writing each file

@@ -15,22 +15,6 @@ import (
 )
 
 var _ = Describe("command run", func() {
-	ets500 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		errorResponse := UiErrorResponse{
-			Status: 500,
-			Title:  "MissingOptions",
-			Detail: "Invalid options provided. Expected but not present: [one, second]",
-		}
-		json, _ := json.Marshal(errorResponse)
-		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, string(json))
-	}))
-	ets503 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusServiceUnavailable)
-	}))
-	ets404 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-	}))
 	Context("LocalGenerateCmd()", func() {
 		When("Executes generate-from-local command with accelerator name", func() {
 			It("Should send accelerator name and create project directory", func() {
@@ -40,11 +24,13 @@ var _ = Describe("command run", func() {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
 				generateCmd.SetOut(b)
 				generateCmd.SetErr(b)
 				generateCmd.SetArgs([]string{"--accelerator-name", "acc", "--server-url", ts.URL})
+				defer os.RemoveAll("acc")
 				generateCmd.Execute()
 				out, err := ioutil.ReadAll(b)
 				if err != nil {
@@ -52,7 +38,6 @@ var _ = Describe("command run", func() {
 				}
 
 				Expect(string(out)).Should(Equal("generated project acc\n"))
-				os.RemoveAll("acc")
 			})
 		})
 
@@ -66,11 +51,13 @@ var _ = Describe("command run", func() {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
 				generateCmd.SetOut(b)
 				generateCmd.SetErr(b)
 				generateCmd.SetArgs([]string{"--accelerator-path", "acc=testdata/test-acc", "--server-url", ts.URL})
+				defer os.RemoveAll("acc")
 				generateCmd.Execute()
 				out, err := ioutil.ReadAll(b)
 				if err != nil {
@@ -78,7 +65,6 @@ var _ = Describe("command run", func() {
 				}
 
 				Expect(string(out)).Should(Equal("generated project acc\n"))
-				os.RemoveAll("acc")
 			})
 		})
 
@@ -96,6 +82,7 @@ var _ = Describe("command run", func() {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
 				generateCmd.SetOut(b)
@@ -103,6 +90,7 @@ var _ = Describe("command run", func() {
 				generateCmd.SetArgs([]string{"--accelerator-name", "acc", "--fragment-names", "f1",
 					"--fragment-names", "f2", "--fragment-paths", "f3=testdata/test-acc",
 					"--fragment-paths", "f4=testdata/test-acc", "--server-url", ts.URL})
+				defer os.RemoveAll("acc")
 				generateCmd.Execute()
 				out, err := ioutil.ReadAll(b)
 				if err != nil {
@@ -110,7 +98,66 @@ var _ = Describe("command run", func() {
 				}
 
 				Expect(string(out)).Should(Equal("generated project acc\n"))
-				os.RemoveAll("acc")
+			})
+		})
+
+		When("Executes generate-from-local command with output directory", func() {
+			It("Should send accelerator name and create project directory", func() {
+				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					r.ParseMultipartForm(100 << 20)
+					Expect(r.FormValue("accelerator_name")).Should(Equal("acc"))
+					zipWriter := zip.NewWriter(w)
+					zipWriter.Create("acc/")
+					fileWriter, _ := zipWriter.Create("acc/test")
+					fileWriter.Write([]byte("hello"))
+					zipWriter.Close()
+				}))
+				defer ts.Close()
+				generateCmd := LocalGenerateCmd()
+				b := new(bytes.Buffer)
+				generateCmd.SetOut(b)
+				generateCmd.SetErr(b)
+				generateCmd.SetArgs([]string{"--accelerator-name", "acc", "--output-dir", "output", "--server-url", ts.URL})
+				defer os.RemoveAll("output")
+				generateCmd.Execute()
+				out, err := ioutil.ReadAll(b)
+				if err != nil {
+					Fail("Error testing generate command")
+				}
+
+				Expect(string(out)).Should(Equal("generated project acc\n"))
+				Expect("output/test").Should(BeARegularFile())
+			})
+		})
+
+		When("Executes generate-from-local command with --force", func() {
+			It("Should send accelerator name and overwrite output directory", func() {
+				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					r.ParseMultipartForm(100 << 20)
+					Expect(r.FormValue("accelerator_name")).Should(Equal("acc"))
+					zipWriter := zip.NewWriter(w)
+					zipWriter.Create("acc/")
+					fileWriter, _ := zipWriter.Create("acc/test")
+					fileWriter.Write([]byte("hello"))
+					zipWriter.Close()
+				}))
+				defer ts.Close()
+				os.MkdirAll("existing-dir/subpath", 0755)
+				defer os.RemoveAll("existing-dir")
+				generateCmd := LocalGenerateCmd()
+				b := new(bytes.Buffer)
+				generateCmd.SetOut(b)
+				generateCmd.SetErr(b)
+				generateCmd.SetArgs([]string{"--accelerator-name", "acc", "--output-dir", "existing-dir", "--force", "--server-url", ts.URL})
+				generateCmd.Execute()
+				out, err := ioutil.ReadAll(b)
+				if err != nil {
+					Fail("Error testing generate command")
+				}
+
+				Expect(string(out)).Should(Equal("generated project acc\n"))
+				Expect("existing-dir/subpath").ShouldNot(BeAnExistingFile())
+				Expect("existing-dir/test").Should(BeARegularFile())
 			})
 		})
 
@@ -131,13 +178,14 @@ var _ = Describe("command run", func() {
 					zipWriter.Create("existing-dir/")
 					zipWriter.Close()
 				}))
-				os.Mkdir("existing-dir", 0755)
+				defer ts.Close()
+				os.MkdirAll("existing-dir/subpath", 0755)
+				defer os.RemoveAll("existing-dir")
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "existing-dir", "--server-url", ts.URL})
 				err := generateCmd.Execute()
 				Expect(err).NotTo(BeNil())
-				Expect(err.Error()).Should(ContainSubstring("existing-dir already exists, use --force to overwrite"))
-				os.RemoveAll("existing-dir")
+				Expect(err.Error()).Should(ContainSubstring("path existing-dir is not empty, use --force to overwrite"))
 			})
 		})
 
@@ -153,6 +201,17 @@ var _ = Describe("command run", func() {
 
 		When("Executes generate and response it's a 500", func() {
 			It("Should output error message", func() {
+				ets500 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					errorResponse := UiErrorResponse{
+						Status: 500,
+						Title:  "MissingOptions",
+						Detail: "Invalid options provided. Expected but not present: [one, second]",
+					}
+					json, _ := json.Marshal(errorResponse)
+					w.WriteHeader(http.StatusInternalServerError)
+					io.WriteString(w, string(json))
+				}))
+				defer ets500.Close()
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "test-500", "--server-url", ets500.URL})
 				err := generateCmd.Execute()
@@ -165,6 +224,10 @@ var _ = Describe("command run", func() {
 
 		When("Executes generate and response is a 503", func() {
 			It("Should output error message", func() {
+				ets503 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusServiceUnavailable)
+				}))
+				defer ets503.Close()
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "test-503", "--server-url", ets503.URL})
 				err := generateCmd.Execute()
@@ -176,6 +239,10 @@ var _ = Describe("command run", func() {
 
 		When("Executes generate and response is a 404", func() {
 			It("Should output error message", func() {
+				ets404 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(http.StatusNotFound)
+				}))
+				defer ets404.Close()
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "test-missing", "--server-url", ets404.URL})
 				err := generateCmd.Execute()
