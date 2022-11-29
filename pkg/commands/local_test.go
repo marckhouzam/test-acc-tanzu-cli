@@ -1,8 +1,10 @@
 package commands
 
 import (
+	"archive/tar"
 	"archive/zip"
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -45,9 +47,25 @@ var _ = Describe("command run", func() {
 			It("Should send accelerator bytes and create project directory", func() {
 				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
-					fileAcc, handlerAcc, _ := r.FormFile("accelerator")
+					fileAcc, _, _ := r.FormFile("accelerator")
+
+					gzr, err := gzip.NewReader(fileAcc)
+					if err != nil {
+						panic(err)
+					}
+					defer gzr.Close()
+					tr := tar.NewReader(gzr)
+					var header *tar.Header
+					names := []string{}
+					for header, err = tr.Next(); err == nil; header, err = tr.Next() {
+						if header.Typeflag == tar.TypeReg {
+							names = append(names, header.Name)
+						}
+					}
+
+					Expect(names).Should(ContainElements("accelerator.yaml", "inner/foo.txt"))
+
 					Expect(fileAcc).ShouldNot(BeNil())
-					Expect(handlerAcc.Filename).Should(Equal("test-acc"))
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
@@ -56,7 +74,7 @@ var _ = Describe("command run", func() {
 				b := new(bytes.Buffer)
 				generateCmd.SetOut(b)
 				generateCmd.SetErr(b)
-				generateCmd.SetArgs([]string{"--accelerator-path", "acc=testdata/test-acc", "--server-url", ts.URL})
+				generateCmd.SetArgs([]string{"--accelerator-path", "acc=./testdata/test-acc", "--server-url", ts.URL})
 				defer os.RemoveAll("acc")
 				generateCmd.Execute()
 				out, err := ioutil.ReadAll(b)

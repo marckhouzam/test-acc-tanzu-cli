@@ -16,6 +16,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -101,9 +102,9 @@ environment variable if it is set.
 			requestBody := &bytes.Buffer{}
 			bodyWriter := multipart.NewWriter(requestBody)
 
-			var projectName string
+			var defaultProjectName string
 			if !localAccelerator.isEmpty() {
-				projectName = localAccelerator.key
+				defaultProjectName = localAccelerator.key
 				accFolderName := localAccelerator.value
 				fileWriter, err := bodyWriter.CreateFormFile("accelerator", accFolderName)
 
@@ -112,7 +113,7 @@ environment variable if it is set.
 					return err
 				}
 			} else if acceleratorName != "" {
-				projectName = acceleratorName
+				defaultProjectName = acceleratorName
 				field, err := bodyWriter.CreateFormField("accelerator_name")
 				if err != nil {
 					return err
@@ -168,8 +169,9 @@ environment variable if it is set.
 				return errors.New("invalid options provided, must be valid JSON")
 			}
 			if _, found := options["projectName"]; !found {
-				options["projectName"] = projectName
+				options["projectName"] = defaultProjectName
 			}
+			projectName := options["projectName"].(string)
 
 			client := &http.Client{}
 
@@ -333,6 +335,8 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 	tw := tar.NewWriter(gzw)
 	defer tw.Close()
 
+	cleanSourceDir := path.Clean(sourceDir)
+
 	// walk path
 	return filepath.Walk(sourceDir, func(file string, fi os.FileInfo, err error) error {
 
@@ -347,13 +351,13 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 		}
 
 		// create a new dir/file header
-		header, err := tar.FileInfoHeader(fi, fi.Name())
+		header, err := tar.FileInfoHeader(fi, "")
 		if err != nil {
 			return err
 		}
 
 		// update the name to correctly reflect the desired destination when untaring
-		header.Name = strings.TrimPrefix(strings.Replace(file, sourceDir, "", -1), string(filepath.Separator))
+		header.Name = strings.TrimPrefix(path.Clean(file), cleanSourceDir+string(filepath.Separator))
 
 		// write the header
 		if err := tw.WriteHeader(header); err != nil {
