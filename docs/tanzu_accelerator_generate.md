@@ -37,7 +37,7 @@ tanzu accelerator generate <accelerator-name> --options '{"projectName":"test"}'
 
 ```
   -h, --help                  help for generate
-      --options string        options JSON string
+      --options string        options JSON string (default "{}")
       --options-file string   path to file containing options JSON string
       --output-dir string     directory that the zip file will be written to
       --server-url string     the URL for the Application Accelerator server

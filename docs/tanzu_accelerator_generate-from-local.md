@@ -41,7 +41,7 @@ tanzu accelerator generate-from-local --accelerator-path java-rest=workspace/jav
       --fragment-names strings              names of the registered fragments to use
       --fragment-paths stringToString       key value pairs of the name and path to the directory containing each fragment (default [])
   -h, --help                                help for generate-from-local
-      --options string                      options JSON string
+      --options string                      options JSON string (default "{}")
       --options-file string                 path to file containing options JSON string
       --server-url string                   the URL for the Application Accelerator server
 ```

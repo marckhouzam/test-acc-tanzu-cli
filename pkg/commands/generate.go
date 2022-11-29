@@ -22,10 +22,6 @@ type UiServerBody struct {
 	Options     map[string]interface{} `json:"options"`
 }
 
-type OptionsProjectName struct {
-	ProjectName string `json:"projectName"`
-}
-
 type AcceleratorName struct {
 	Name string `json:"name"`
 }
@@ -73,18 +69,9 @@ environment variable if it is set.
 		ValidArgsFunction: SuggestAcceleratorNamesFromUiServer(context.Background()),
 		Example:           "tanzu accelerator generate <accelerator-name> --options '{\"projectName\":\"test\"}'",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if optionsString == "" {
-				optionsString = "{\"projectName\": \"" + args[0] + "\"}"
-			}
-			if !strings.Contains(optionsString, "projectName") {
-				optionsString = "{\"projectName\": \"" + args[0] + "\"," + optionsString[1:]
-			}
 			if !strings.HasSuffix(outputDir, "/") && outputDir != "" {
 				outputDir += "/"
 			}
-			var projectName OptionsProjectName
-			json.Unmarshal([]byte(optionsString), &projectName)
-			client := &http.Client{}
 			var options map[string]interface{}
 			if filename != "" {
 				fileBytes, err := ioutil.ReadFile(filename)
@@ -96,6 +83,9 @@ environment variable if it is set.
 			err := json.Unmarshal([]byte(optionsString), &options)
 			if err != nil {
 				return err
+			}
+			if _, found := options["projectName"]; !found {
+				options["projectName"] = args[0]
 			}
 			uiServerBody := UiServerBody{
 				Accelerator: args[0],
@@ -114,6 +104,7 @@ environment variable if it is set.
 			}
 			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", serverUrl, args[0]), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
+			client := &http.Client{}
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
 				if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
@@ -141,7 +132,7 @@ environment variable if it is set.
 			}
 
 			body, _ := ioutil.ReadAll(resp.Body)
-			zipfile := outputDir + projectName.ProjectName + ".zip"
+			zipfile := outputDir + options["projectName"].(string) + ".zip"
 			err = ioutil.WriteFile(zipfile, body, 0644)
 			if err != nil {
 				return err
@@ -185,7 +176,7 @@ environment variable if it is set.
 			return nil
 		},
 	}
-	generateCmd.Flags().StringVar(&optionsString, "options", "", "options JSON string")
+	generateCmd.Flags().StringVar(&optionsString, "options", "{}", "options JSON string")
 	generateCmd.Flags().StringVar(&filename, "options-file", "", "path to file containing options JSON string")
 	generateCmd.Flags().StringVar(&outputDir, "output-dir", "", "directory that the zip file will be written to")
 	generateCmd.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")

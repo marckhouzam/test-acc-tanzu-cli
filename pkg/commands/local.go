@@ -137,9 +137,6 @@ environment variable if it is set.
 				}
 			}
 
-			if optionsString == "" {
-				optionsString = "{\"projectName\": \"" + projectName + "\"}"
-			}
 			if optionsFilename != "" {
 				fileBytes, err := ioutil.ReadFile(optionsFilename)
 				if err != nil {
@@ -147,14 +144,30 @@ environment variable if it is set.
 				}
 				optionsString = string(fileBytes)
 			}
-			if !strings.Contains(optionsString, "projectName") {
-				optionsString = "{\"projectName\": \"" + projectName + "\"," + optionsString[1:]
+
+			var options map[string]interface{}
+			if optionsFilename != "" {
+				fileBytes, err := ioutil.ReadFile(optionsFilename)
+				if err != nil {
+					return err
+				}
+				optionsString = string(fileBytes)
+			}
+			err := json.Unmarshal([]byte(optionsString), &options)
+			if err != nil {
+				return errors.New("invalid options provided, must be valid JSON")
+			}
+			if _, found := options["projectName"]; !found {
+				options["projectName"] = projectName
 			}
 
 			client := &http.Client{}
 
 			optionsField, err := bodyWriter.CreateFormField("options")
-			optionsField.Write([]byte(optionsString))
+			if err != nil {
+				return err
+			}
+			err = json.NewEncoder(optionsField).Encode(options)
 			if err != nil {
 				return err
 			}
@@ -215,7 +228,7 @@ environment variable if it is set.
 			return nil
 		},
 	}
-	localGenerateCommand.Flags().StringVar(&optionsString, "options", "", "options JSON string")
+	localGenerateCommand.Flags().StringVar(&optionsString, "options", "{}", "options JSON string")
 	localGenerateCommand.Flags().StringVar(&optionsFilename, "options-file", "", "path to file containing options JSON string")
 	localGenerateCommand.Flags().StringVar(&uiServer, "server-url", "", "the URL for the Application Accelerator server")
 	localGenerateCommand.Flags().StringVar(&acceleratorName, "accelerator-name", "", "name of the registered accelerator to use")
