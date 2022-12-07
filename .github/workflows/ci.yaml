@@ -157,12 +157,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.3.4
-    - uses: pivotal-cf/srp-helper-action/install@release/v1
-    - uses: pivotal-cf/srp-helper-action/init@release/v1
+    - uses: pivotal-cf/srp-helper-action/install@srp-cli-v2
+    - uses: pivotal-cf/srp-helper-action/init@srp-cli-v2
       with:
         client-id: ${{ secrets.SRP_CLIENT_ID }}
         client-secret: ${{ secrets.SRP_CLIENT_SECRET }}
-    - uses: pivotal-cf/srp-helper-action/collect@release/v1
+    - uses: pivotal-cf/srp-helper-action/collect@srp-cli-v2
       with:
         git-repos: .
-    - uses: pivotal-cf/srp-helper-action/submit@release/v1
+    - uses: pivotal-cf/srp-helper-action/submit@srp-cli-v2
