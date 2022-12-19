@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"text/tabwriter"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
@@ -96,11 +95,7 @@ func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer,
 	errorMsg := "accelerator %s not found"
 	Accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
-		if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
-			return err
-		} else {
-			return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", url))
-		}
+		return err
 	}
 	for _, accelerator := range Accelerators {
 		if accelerator.Name == name {

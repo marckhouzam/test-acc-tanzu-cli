@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -70,6 +71,9 @@ type OptionsResponse struct {
 }
 
 func GetAcceleratorsFromApiServer(url string, cmd *cobra.Command) ([]Accelerator, error) {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+		return nil, errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", url))
+	}
 	client := &http.Client{}
 	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators", url))
 	if err != nil {

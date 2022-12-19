@@ -194,16 +194,15 @@ environment variable if it is set.
 			if serverUrl == "" {
 				return errors.New("no server URL provided, you must provide --server-url option or set ACC_SERVER_URL environment variable")
 			}
+			if !strings.HasPrefix(serverUrl, "http://") && !strings.HasPrefix(serverUrl, "https://") {
+				return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
+			}
 
 			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip", serverUrl), requestBody)
 			proxyRequest.Header.Add("Content-Type", bodyWriter.FormDataContentType())
 			resp, err := client.Do(proxyRequest)
 			if err != nil {
-				if strings.HasPrefix(serverUrl, "http://") || strings.HasPrefix(serverUrl, "https://") {
-					return err
-				} else {
-					return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
-				}
+				return err
 			}
 
 			if resp.StatusCode >= 300 {
