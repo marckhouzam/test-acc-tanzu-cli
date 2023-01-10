@@ -9,7 +9,7 @@ on:
 
 env:
   GOPRIVATE: github.com/pivotal,github.com/vmware-tanzu/*
-  TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  TOKEN: ${{ secrets.PAT }}
   USERNAME: ${{ secrets.PAT_USER }}
 jobs:
   unit:
