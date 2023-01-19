@@ -5,6 +5,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,7 @@ import (
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
@@ -87,7 +88,7 @@ func loadResourceFromFile(file string, a *runtime.RawExtension) error {
 			if err == io.EOF {
 				break
 			}
-			return err
+			return errors.New(fmt.Sprintf("%s does not contain valid YAML", file))
 		}
 		if accelerator == nil {
 			continue
@@ -112,10 +113,10 @@ func saveAcceleratorResource(ctx context.Context, c *cli.Config, providedResourc
 	}
 	currentAcc := &acceleratorv1alpha1.Accelerator{}
 	err := c.Get(ctx, client.ObjectKey{Namespace: acceleratorNamespace, Name: acceleratorName}, currentAcc)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !k8serrors.IsNotFound(err) {
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s\n", providedResource.Name)
 		return err
-	} else if err != nil && errors.IsNotFound(err) {
+	} else if err != nil && k8serrors.IsNotFound(err) {
 		err = c.Create(ctx, &providedResource)
 		if err != nil {
 			fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator %s\n", providedResource.Name)
@@ -142,10 +143,10 @@ func saveFragmentResource(ctx context.Context, c *cli.Config, providedResource a
 	}
 	currentAcc := &acceleratorv1alpha1.Fragment{}
 	err := c.Get(ctx, client.ObjectKey{Namespace: fragmentNamespace, Name: fragmentName}, currentAcc)
-	if err != nil && !errors.IsNotFound(err) {
+	if err != nil && !k8serrors.IsNotFound(err) {
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator fragment %s\n", providedResource.Name)
 		return err
-	} else if err != nil && errors.IsNotFound(err) {
+	} else if err != nil && k8serrors.IsNotFound(err) {
 		err = c.Create(ctx, &providedResource)
 		if err != nil {
 			fmt.Fprintf(cmd.OutOrStderr(), "Error creating accelerator fragment %s\n", providedResource.Name)

@@ -24,7 +24,7 @@ func FragmentGetCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 		Long:  "Get accelerator fragment info.",
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
-				return errors.New("you must specify the name of the fragment")
+				return errors.New("you must specify the name of the accelerator fragment")
 			}
 			return nil
 		},

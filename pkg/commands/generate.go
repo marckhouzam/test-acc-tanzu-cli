@@ -67,7 +67,13 @@ an ACC_SERVER_URL environment variable. If you specify the --server-url flag it 
 environment variable if it is set.
 `,
 		ValidArgsFunction: SuggestAcceleratorNamesFromUiServer(context.Background()),
-		Example:           "tanzu accelerator generate <accelerator-name> --options '{\"projectName\":\"test\"}'",
+		Args: func(cmd *cobra.Command, args []string) error {
+			if err := cobra.ExactArgs(1)(cmd, args); err != nil {
+				return errors.New("you must specify the name of the accelerator")
+			}
+			return nil
+		},
+		Example: "tanzu accelerator generate <accelerator-name> --options '{\"projectName\":\"test\"}'",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !strings.HasSuffix(outputDir, "/") && outputDir != "" {
 				outputDir += "/"
@@ -82,7 +88,7 @@ environment variable if it is set.
 			}
 			err := json.Unmarshal([]byte(optionsString), &options)
 			if err != nil {
-				return err
+				return errors.New("invalid options provided, must be valid JSON")
 			}
 			if _, found := options["projectName"]; !found {
 				options["projectName"] = args[0]
