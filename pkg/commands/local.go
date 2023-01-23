@@ -344,6 +344,11 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 			return err
 		}
 
+		// exclude .git directory and its contents
+		if fi.IsDir() && fi.Name() == ".git" {
+			return filepath.SkipDir
+		}
+
 		// return on non-regular files
 		if !fi.Mode().IsRegular() {
 			return nil
