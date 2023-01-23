@@ -1,0 +1,10 @@
+enable: true
+search_depth: 5
+include_bomtools: "go_mod"
+go_mod.path: "/usr/local/bin/go"
+search_exclude_patterns:
+- ".github/"
+- "*_test.go"
+# exlcude for signature scans
+exclude_patterns:
+- vendor
