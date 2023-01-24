@@ -106,7 +106,7 @@ environment variable if it is set.
 			if !localAccelerator.isEmpty() {
 				defaultProjectName = localAccelerator.key
 				accFolderName := localAccelerator.value
-				fileWriter, err := bodyWriter.CreateFormFile("accelerator", accFolderName)
+				fileWriter, err := bodyWriter.CreateFormFile("accelerator", defaultProjectName+".tar.gz")
 
 				err = tarToWriter(accFolderName, fileWriter)
 				if err != nil {
@@ -141,7 +141,7 @@ environment variable if it is set.
 			}
 
 			for fragmentName, fragmentFolderName := range localFragments {
-				fileWriter, err := bodyWriter.CreateFormFile("fragment_"+fragmentName, fragmentFolderName)
+				fileWriter, err := bodyWriter.CreateFormFile("fragment_"+fragmentName, fragmentName+".tar.gz")
 				err = tarToWriter(fragmentFolderName, fileWriter)
 				if err != nil {
 					return err
