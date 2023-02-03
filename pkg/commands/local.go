@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/denormal/go-gitignore"
 	"github.com/spf13/cobra"
 )
 
@@ -336,6 +337,11 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 
 	cleanSourceDir := path.Clean(sourceDir)
 
+	ignore, err := gitignore.NewRepository(cleanSourceDir)
+	if err != nil {
+		return err
+	}
+
 	// walk path
 	return filepath.Walk(sourceDir, func(file string, fi os.FileInfo, err error) error {
 
@@ -347,6 +353,18 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 		// exclude .git directory and its contents
 		if fi.IsDir() && fi.Name() == ".git" {
 			return filepath.SkipDir
+		}
+
+		// exclude directories and files in .gitignore
+		// don't call Ignore for root path (see https://github.com/denormal/go-gitignore/pull/4)
+		if file != sourceDir {
+			if match := ignore.Match(file); match != nil && match.Ignore() {
+				if fi.IsDir() {
+					return filepath.SkipDir
+				} else {
+					return nil
+				}
+			}
 		}
 
 		// return on non-regular files

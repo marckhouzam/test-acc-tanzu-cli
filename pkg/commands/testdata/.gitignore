@@ -1,0 +1,2 @@
+# Ignore the .gitgnore files generated for testing purposes
+/test-acc-gitignore/**/.gitignore

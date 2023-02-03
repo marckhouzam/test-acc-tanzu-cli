@@ -84,6 +84,75 @@ var _ = Describe("command run", func() {
 
 				Expect(string(out)).Should(Equal("generated project acc\n"))
 			})
+
+			It("Should ignore directories and files in .gitignore", func() {
+				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					r.ParseMultipartForm(100 << 20)
+					fileAcc, _, _ := r.FormFile("accelerator")
+
+					gzr, err := gzip.NewReader(fileAcc)
+					if err != nil {
+						panic(err)
+					}
+					defer gzr.Close()
+					tr := tar.NewReader(gzr)
+					var header *tar.Header
+					names := []string{}
+					for header, err = tr.Next(); err == nil; header, err = tr.Next() {
+						if header.Typeflag == tar.TypeReg {
+							names = append(names, header.Name)
+						}
+					}
+
+					Expect(names).Should(ConsistOf(".gitignore", "accelerator.yaml", "included-dir/foo.txt", "partially-excluded-dir/included.txt"))
+
+					Expect(fileAcc).ShouldNot(BeNil())
+					zipWriter := zip.NewWriter(w)
+					zipWriter.Close()
+				}))
+				defer ts.Close()
+				generateCmd := LocalGenerateCmd()
+				b := new(bytes.Buffer)
+				generateCmd.SetOut(b)
+				generateCmd.SetErr(b)
+				generateCmd.SetArgs([]string{"--accelerator-path", "acc=./testdata/test-acc-gitignore", "--server-url", ts.URL})
+				defer os.RemoveAll("acc")
+
+				// Create .gitignore programmatically so that test files get committed
+				gitignore, err := os.Create("./testdata/test-acc-gitignore/.gitignore")
+				if err != nil {
+					panic(err)
+				}
+
+				defer gitignore.Close()
+
+				_, err = gitignore.WriteString(`
+# Exclude a directory
+excluded-dir/
+# Exclude a file
+excluded-file.txt
+# Exclude a file nested in an included directory
+included-dir/nested-excluded.txt
+# Exclude a directory and then negate exclusion for a file
+partially-excluded-dir/*.txt
+!partially-excluded-dir/included.txt
+`,
+				)
+				if err != nil {
+					panic(err)
+				}
+
+				// Remove .gitignore
+				defer os.Remove("./testdata/test-acc-gitignore/.gitignore")
+
+				generateCmd.Execute()
+				out, err := ioutil.ReadAll(b)
+				if err != nil {
+					Fail("Error testing local generate command with .gitignore")
+				}
+
+				Expect(string(out)).Should(Equal("generated project acc\n"))
+			})
 		})
 
 		When("Executes generate-from-local command with a combination of fragments", func() {
