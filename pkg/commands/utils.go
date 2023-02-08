@@ -75,7 +75,8 @@ func GetAcceleratorsFromApiServer(url string, cmd *cobra.Command) ([]Accelerator
 		return nil, errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", url))
 	}
 	client := &http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators", url))
+	apiPrefix := DetermineApiServerPrefix(url)
+	resp, err := client.Get(fmt.Sprintf("%s/%s/accelerators", url, apiPrefix))
 	if err != nil {
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerators from %s, check that --server-url or the ACC_SERVER_URL"+
 			" env variable is set with the correct value, or use the --from-context flag to get the accelerators from your current context\n", url)
@@ -95,7 +96,8 @@ func GetAcceleratorsFromApiServer(url string, cmd *cobra.Command) ([]Accelerator
 
 func GetAcceleratorOptionsFromUiServer(url string, acceleratorName string, cmd *cobra.Command) ([]Option, error) {
 	client := &http.Client{}
-	resp, err := client.Get(fmt.Sprintf("%s/api/accelerators/options?name=%s", url, acceleratorName))
+	apiPrefix := DetermineApiServerPrefix(url)
+	resp, err := client.Get(fmt.Sprintf("%s/%s/accelerators/options?name=%s", url, apiPrefix, acceleratorName))
 	if err != nil {
 		fmt.Fprintf(cmd.OutOrStderr(), "Error getting accelerator %s options from %s\n", acceleratorName, url)
 		return nil, err
@@ -120,7 +122,8 @@ func SuggestAcceleratorNamesFromUiServer(ctx context.Context) func(*cobra.Comman
 			uiServerUrl, _ = cmd.Flags().GetString("server-url")
 		}
 		var response UiAcceleratorList
-		resp, err := http.Get(uiServerUrl + "/api/accelerators")
+		apiPrefix := DetermineApiServerPrefix(uiServerUrl)
+		resp, err := http.Get(fmt.Sprintf("%s/%s/accelerators", uiServerUrl, apiPrefix))
 		if err != nil {
 			return suggestions, cobra.ShellCompDirectiveError
 		}
@@ -202,4 +205,15 @@ func pushSourceImage(ctx context.Context, c *cli.Config, image string, path stri
 		return "", err
 	}
 	return digestedImage, nil
+}
+
+func DetermineApiServerPrefix(url string) string {
+	client := &http.Client{}
+	// check to see if acc-server url api/about can be reached
+	resp, err := client.Get(fmt.Sprintf("%s/api/about", url))
+	if err == nil && resp.StatusCode == 200 {
+		return "api"
+	}
+	// assume it is a tap-gui url
+	return "api/proxy"
 }

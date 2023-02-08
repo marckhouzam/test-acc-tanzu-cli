@@ -199,7 +199,8 @@ environment variable if it is set.
 				return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
 			}
 
-			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip", serverUrl), requestBody)
+			apiPrefix := DetermineApiServerPrefix(serverUrl)
+			proxyRequest, _ := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/zip", serverUrl, apiPrefix), requestBody)
 			proxyRequest.Header.Add("Content-Type", bodyWriter.FormDataContentType())
 			resp, err := client.Do(proxyRequest)
 			if err != nil {

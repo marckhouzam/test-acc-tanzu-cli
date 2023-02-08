@@ -20,12 +20,19 @@ var _ = Describe("command run", func() {
 	Context("LocalGenerateCmd()", func() {
 		When("Executes generate-from-local command with accelerator name", func() {
 			It("Should send accelerator name and create project directory", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					Expect(r.FormValue("accelerator_name")).Should(Equal("acc"))
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
+				// ts := httptest.NewServer(hf)
 				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
@@ -45,7 +52,12 @@ var _ = Describe("command run", func() {
 
 		When("Executes generate-from-local command with local accelerator", func() {
 			It("Should send accelerator bytes and create project directory", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					fileAcc, _, _ := r.FormFile("accelerator")
 
@@ -69,6 +81,7 @@ var _ = Describe("command run", func() {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
@@ -86,7 +99,12 @@ var _ = Describe("command run", func() {
 			})
 
 			It("Should ignore directories and files in .gitignore", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					fileAcc, _, _ := r.FormFile("accelerator")
 
@@ -110,6 +128,7 @@ var _ = Describe("command run", func() {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
@@ -157,7 +176,12 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate-from-local command with a combination of fragments", func() {
 			It("Should send accelerator fragments", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					Expect(r.Form["fragment_names"]).Should(ContainElements("f1", "f2"))
 					f3File, f3Handler, _ := r.FormFile("fragment_f3")
@@ -169,6 +193,7 @@ partially-excluded-dir/*.txt
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
@@ -190,7 +215,12 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate-from-local command with output directory", func() {
 			It("Should send accelerator name and create project directory", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					Expect(r.FormValue("accelerator_name")).Should(Equal("acc"))
 					zipWriter := zip.NewWriter(w)
@@ -199,6 +229,7 @@ partially-excluded-dir/*.txt
 					fileWriter.Write([]byte("hello"))
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				generateCmd := LocalGenerateCmd()
 				b := new(bytes.Buffer)
@@ -219,7 +250,12 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate-from-local command with --force", func() {
 			It("Should send accelerator name and overwrite output directory", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					r.ParseMultipartForm(100 << 20)
 					Expect(r.FormValue("accelerator_name")).Should(Equal("acc"))
 					zipWriter := zip.NewWriter(w)
@@ -228,6 +264,7 @@ partially-excluded-dir/*.txt
 					fileWriter.Write([]byte("hello"))
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				os.MkdirAll("existing-dir/subpath", 0755)
 				defer os.RemoveAll("existing-dir")
@@ -260,11 +297,17 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate-from-local command and project directory already exists", func() {
 			It("Should output error message", func() {
-				ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					zipWriter := zip.NewWriter(w)
 					zipWriter.Create("existing-dir/")
 					zipWriter.Close()
 				}))
+				ts := httptest.NewServer(mux)
 				defer ts.Close()
 				os.MkdirAll("existing-dir/subpath", 0755)
 				defer os.RemoveAll("existing-dir")
@@ -288,7 +331,12 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate and response it's a 500", func() {
 			It("Should output error message", func() {
-				ets500 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					errorResponse := UiErrorResponse{
 						Status: 500,
 						Title:  "MissingOptions",
@@ -298,6 +346,7 @@ partially-excluded-dir/*.txt
 					w.WriteHeader(http.StatusInternalServerError)
 					io.WriteString(w, string(json))
 				}))
+				ets500 := httptest.NewServer(mux)
 				defer ets500.Close()
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "test-500", "--server-url", ets500.URL})
@@ -326,9 +375,15 @@ partially-excluded-dir/*.txt
 
 		When("Executes generate and response is a 404", func() {
 			It("Should output error message", func() {
-				ets404 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				mux := http.NewServeMux()
+				mux.HandleFunc("/api/about", func(w http.ResponseWriter, r *http.Request) {
+					w.WriteHeader(200)
+					w.Write([]byte("{}"))
+				})
+				mux.HandleFunc("/api/accelerators/zip", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusNotFound)
 				}))
+				ets404 := httptest.NewServer(mux)
 				defer ets404.Close()
 				generateCmd := LocalGenerateCmd()
 				generateCmd.SetArgs([]string{"--accelerator-name", "test-missing", "--server-url", ets404.URL})

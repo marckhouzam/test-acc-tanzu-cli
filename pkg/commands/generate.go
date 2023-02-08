@@ -112,7 +112,8 @@ environment variable if it is set.
 				return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
 			}
 
-			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/zip?name=%s", serverUrl, args[0]), bytes.NewReader(JsonProxyBodyBytes))
+			apiPrefix := DetermineApiServerPrefix(serverUrl)
+			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/zip?name=%s", serverUrl, apiPrefix, args[0]), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
 			client := &http.Client{}
 			resp, err := client.Do(proxyRequest)
@@ -145,7 +146,7 @@ environment variable if it is set.
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
 			osuser, _ := user.Current()
-			invokedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/invoked?type=download&name=%s&source=TanzuCLI&username=%s", serverUrl, args[0], osuser.Username), nil)
+			invokedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/invoked?type=download&name=%s&source=TanzuCLI&username=%s", serverUrl, apiPrefix, args[0], osuser.Username), nil)
 			if err != nil {
 				return err
 			}
@@ -155,7 +156,7 @@ environment variable if it is set.
 			}
 			if resp.StatusCode == http.StatusNotFound {
 				// try the deprecated downloaded endpoint for older servers
-				downloadedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/api/accelerators/downloaded?name=%s", serverUrl, args[0]), nil)
+				downloadedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/downloaded?name=%s", serverUrl, apiPrefix, args[0]), nil)
 				if err != nil {
 					return err
 				}
