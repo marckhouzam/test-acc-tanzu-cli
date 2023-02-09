@@ -80,7 +80,7 @@ the Application Accelerator server you want to access.
 			w := new(tabwriter.Writer)
 			w.Init(cmd.OutOrStdout(), 0, 8, 3, ' ', 0)
 			if serverUrl != "" && !opts.FromContext && !context && !kubeconfig {
-				return printAcceleratorFromApiServer(serverUrl, args[0], w, cmd)
+				return printAcceleratorFromApiServer(serverUrl, args[0], w, opts, cmd)
 			} else {
 				return printAcceleratorFromClient(ctx, opts, cmd, args[0], w, c)
 			}
@@ -91,7 +91,7 @@ the Application Accelerator server you want to access.
 	return getCmd
 }
 
-func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer, cmd *cobra.Command) error {
+func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer, opts GetOptions, cmd *cobra.Command) error {
 	errorMsg := "accelerator %s not found"
 	Accelerators, err := GetAcceleratorsFromApiServer(url, cmd)
 	if err != nil {
@@ -108,7 +108,9 @@ func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer,
 			fmt.Fprintf(cmd.OutOrStdout(), "name: %s\n", accelerator.Name)
 			fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Description)
 			fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.DisplayName)
-			fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.IconUrl)
+			if opts.Verbose {
+				fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.IconUrl)
+			}
 			if accelerator.SpecImageRepository != "" {
 				fmt.Fprintf(cmd.OutOrStdout(), "source:\n")
 				fmt.Fprintf(cmd.OutOrStdout(), "  image: %s\n", accelerator.SpecImageRepository)
@@ -150,7 +152,9 @@ func printAcceleratorFromApiServer(url string, name string, w *tabwriter.Writer,
 			fmt.Fprintln(cmd.OutOrStdout(), "artifact:")
 			fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", accelerator.ArchiveMessage)
 			fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", accelerator.ArchiveReady)
-			fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.ArchiveUrl)
+			if opts.Verbose {
+				fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.ArchiveUrl)
+			}
 			return nil
 		}
 	}
@@ -174,7 +178,9 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintf(cmd.OutOrStdout(), "namespace: %s\n", accelerator.Namespace)
 	fmt.Fprintf(cmd.OutOrStdout(), "description: %s\n", accelerator.Status.Description)
 	fmt.Fprintf(cmd.OutOrStdout(), "displayName: %s\n", accelerator.Status.DisplayName)
-	fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
+	if opts.Verbose {
+		fmt.Fprintf(cmd.OutOrStdout(), "iconUrl: %s\n", accelerator.Status.IconUrl)
+	}
 	if accelerator.Spec.Git != nil {
 		fmt.Fprintln(cmd.OutOrStdout(), "git:")
 		if accelerator.Spec.Git.Interval != nil {
@@ -243,8 +249,9 @@ func printAcceleratorFromClient(ctx context.Context, opts GetOptions, cmd *cobra
 	fmt.Fprintln(cmd.OutOrStdout(), "artifact:")
 	fmt.Fprintf(cmd.OutOrStdout(), "  message: %s\n", accelerator.Status.ArtifactInfo.Message)
 	fmt.Fprintf(cmd.OutOrStdout(), "  ready: %t\n", accelerator.Status.ArtifactInfo.Ready)
-	fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Status.ArtifactInfo.URL)
-
+	if opts.Verbose {
+		fmt.Fprintf(cmd.OutOrStdout(), "  url: %s\n", accelerator.Status.ArtifactInfo.URL)
+	}
 	fmt.Fprintln(cmd.OutOrStdout(), "imports:")
 	imports := accelerator.Status.ArtifactInfo.Imports
 	if len(imports) == 0 {

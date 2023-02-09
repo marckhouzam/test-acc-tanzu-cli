@@ -146,6 +146,57 @@ No accelerators found.
 				}),
 			},
 			ExpectOutput: `
+NAME                  TAGS   READY
+another-accelerator   []     unknown
+image-accelerator     []     unknown
+test-accelerator      []     unknown
+`,
+		},
+		{
+			Name: "List accelerators from context with verbose flag",
+			Args: []string{"--from-context", "--verbose"},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      acceleratorName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "another-accelerator",
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "image-accelerator",
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.AcceleratorSpec{
+						Source: &v1alpha1.ImageRepositorySpec{
+							Image: "test-image",
+						},
+					},
+				}),
+			},
+			ExpectOutput: `
 NAME                  TAGS   READY     REPOSITORY
 another-accelerator   []     unknown   https://www.test.com:main
 image-accelerator     []     unknown   source-image: test-image
@@ -155,6 +206,14 @@ test-accelerator      []     unknown   https://www.test.com:main
 		{
 			Name: "List accelerators server-url",
 			Args: []string{"--server-url", ts.URL},
+			ExpectOutput: `
+NAME   TAGS             READY
+mock   [first second]   true
+`,
+		},
+		{
+			Name: "List accelerators server-url with verbose flag",
+			Args: []string{"--server-url", ts.URL, "--verbose"},
 			ExpectOutput: `
 NAME   TAGS             READY   REPOSITORY
 mock   [first second]   true    
@@ -180,8 +239,8 @@ mock   [first second]   true
 				}),
 			},
 			ExpectOutput: `
-NAME               TAGS   READY     REPOSITORY
-test-accelerator   []     unknown   https://www.test.com:main
+NAME               TAGS   READY
+test-accelerator   []     unknown
 `,
 		},
 	}

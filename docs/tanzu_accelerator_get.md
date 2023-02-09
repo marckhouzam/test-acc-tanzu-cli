@@ -29,6 +29,7 @@ tanzu accelerator get <accelerator-name> --from-context
   -h, --help                help for get
   -n, --namespace string    namespace for accelerator system (default "accelerator-system")
       --server-url string   the URL for the Application Accelerator server
+  -v, --verbose             include all fields and show long URLs in the output
 ```
 
 ### Options inherited from parent commands

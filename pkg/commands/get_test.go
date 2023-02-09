@@ -231,6 +231,39 @@ name: test-accelerator
 namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
+git:
+  interval: 2m0s
+  ignore: .ignore
+  url: http://www.test.com
+  ref:
+    branch: main
+    tag: v1.0.0
+tags:
+- first
+- second
+ready: true
+options:
+- defaultValue: ""
+  label: test
+  name: test
+artifact:
+  message: test
+  ready: true
+imports:
+  java-version
+`,
+		},
+		{
+			Name: "Get an accelerator from context with verbose flag",
+			Args: []string{acceleratorName, "--from-context", "--verbose"},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&testAccelerator),
+			},
+			ExpectOutput: `
+name: test-accelerator
+namespace: accelerator-system
+description: Lorem Ipsum
+displayName: Test Accelerator
 iconUrl: http://icon.png
 git:
   interval: 2m0s
@@ -266,7 +299,6 @@ name: test-accelerator
 namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
-iconUrl: http://icon.png
 git:
   ignore: .ignore
   url: http://www.test.com
@@ -279,7 +311,6 @@ options: []
 artifact:
   message: test
   ready: true
-  url: http://www.test.com
 imports:
   None
 `,
@@ -295,7 +326,6 @@ name: test-accelerator
 namespace: accelerator-system
 description: Lorem Ipsum
 displayName: Test Accelerator
-iconUrl: http://icon.png
 source:
   image: test-image
 tags:
@@ -309,7 +339,6 @@ options:
 artifact:
   message: test
   ready: true
-  url: http://www.test.com
 imports:
   None
 `,
@@ -317,6 +346,36 @@ imports:
 		{
 			Name: "Get accelerators from server-url",
 			Args: []string{"mock", "--server-url", ts.URL},
+			ExpectOutput: `
+name: mock
+description: Lorem Ipsum
+displayName: Mock
+sourceUrl: http://www.test.com
+tags:
+- first
+- second
+ready: true
+options:
+- name: test-option
+  defaultValue: test
+  display: true
+  dataType: choices
+  choices:
+  - text: first
+    value: first
+- name: test-option-bool
+  defaultValue: true
+  display: true
+  dataType: boolean
+  choices: []
+artifact:
+  message: Lorem Ipsum archive
+  ready: true
+`,
+		},
+		{
+			Name: "Get accelerators from server-url with verbose flag",
+			Args: []string{"mock", "--server-url", ts.URL, "--verbose"},
 			ExpectOutput: `
 name: mock
 description: Lorem Ipsum
@@ -353,7 +412,6 @@ artifact:
 name: mock-empty-tags
 description: Lorem Ipsum
 displayName: Mock
-iconUrl: http://icon-url.png
 sourceUrl: http://www.test.com
 tags: []
 ready: true
@@ -361,7 +419,6 @@ options: []
 artifact:
   message: Lorem Ipsum archive
   ready: true
-  url: http://archive.tar.gz
 `,
 		},
 	}

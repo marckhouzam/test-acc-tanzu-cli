@@ -165,6 +165,7 @@ type ListOptions struct {
 	Namespace   string
 	ServerUrl   string
 	FromContext bool
+	Verbose     bool
 }
 
 func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
@@ -172,20 +173,24 @@ func (lo *ListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *c
 	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&lo.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&lo.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
+	cmd.Flags().BoolVarP(&lo.Verbose, "verbose", "v", false, "include repository and show long URLs or image digests in the output")
 }
 
 type FragmentListOptions struct {
 	Namespace string
+	Verbose   bool
 }
 
 func (lo *FragmentListOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {
 	cmd.Flags().StringVarP(&lo.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
+	cmd.Flags().BoolVarP(&lo.Verbose, "verbose", "v", false, "include repository and show long URLs or image digests in the output")
 }
 
 type GetOptions struct {
 	Namespace   string
 	ServerUrl   string
 	FromContext bool
+	Verbose     bool
 }
 
 type FragmentGetOptions struct {
@@ -196,6 +201,7 @@ func (gopts *GetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVarP(&gopts.Namespace, "namespace", "n", "accelerator-system", "namespace for accelerator system")
 	cmd.Flags().StringVar(&gopts.ServerUrl, "server-url", "", "the URL for the Application Accelerator server")
 	cmd.Flags().BoolVar(&gopts.FromContext, "from-context", false, "retrieve resources from current context defined in kubeconfig")
+	cmd.Flags().BoolVarP(&gopts.Verbose, "verbose", "v", false, "include all fields and show long URLs in the output")
 }
 
 func (gopts *FragmentGetOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c *cli.Config) {

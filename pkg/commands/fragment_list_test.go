@@ -86,6 +86,45 @@ No accelerator fragments found.
 				}),
 			},
 			ExpectOutput: `
+NAME               READY
+another-fragment   unknown
+test-fragment      unknown
+`,
+		},
+		{
+			Name: "List accelerator fragments from context with verbose flag",
+			Args: []string{"--verbose"},
+			GivenObjects: []clitesting.Factory{
+				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      fragmentName,
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.FragmentSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "another-fragment",
+						Namespace: namespace,
+					},
+					Spec: acceleratorv1alpha1.FragmentSpec{
+						Git: &acceleratorv1alpha1.Git{
+							URL: "https://www.test.com",
+							Reference: &v1beta1.GitRepositoryRef{
+								Branch: "main",
+							},
+						},
+					},
+				}),
+			},
+			ExpectOutput: `
 NAME               READY     REPOSITORY
 another-fragment   unknown   https://www.test.com:main
 test-fragment      unknown   https://www.test.com:main
@@ -111,8 +150,8 @@ test-fragment      unknown   https://www.test.com:main
 				}),
 			},
 			ExpectOutput: `
-NAME            READY     REPOSITORY
-test-fragment   unknown   https://www.test.com:main
+NAME            READY
+test-fragment   unknown
 `,
 		},
 	}

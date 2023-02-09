@@ -77,17 +77,24 @@ func printFragmentListFromClient(ctx context.Context, c *cli.Config, opts Fragme
 		fragList = append(fragList, values)
 	}
 
-	printAcceleratorFragmentList(c, cmd, w, fragList)
+	printAcceleratorFragmentList(c, opts, cmd, w, fragList)
 	return nil
 }
 
-func printAcceleratorFragmentList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, fragments [][]string) {
+func printAcceleratorFragmentList(c *cli.Config, opts FragmentListOptions, cmd *cobra.Command, w *tabwriter.Writer, fragments [][]string) {
 	if len(fragments) == 0 {
 		c.Infof("No accelerator fragments found.\n")
 	} else {
-		fmt.Fprintln(w, "NAME\tREADY\tREPOSITORY")
-		for _, values := range fragments {
-			fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[2], values[1])
+		if opts.Verbose {
+			fmt.Fprintln(w, "NAME\tREADY\tREPOSITORY")
+			for _, values := range fragments {
+				fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[2], values[1])
+			}
+		} else {
+			fmt.Fprintln(w, "NAME\tREADY")
+			for _, values := range fragments {
+				fmt.Fprintf(w, "%s\t%s\n", values[0], values[2])
+			}
 		}
 		w.Flush()
 	}

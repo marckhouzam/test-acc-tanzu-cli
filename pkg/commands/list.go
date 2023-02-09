@@ -91,7 +91,7 @@ func printListFromUiServer(c *cli.Config, url string, opts ListOptions, cmd *cob
 	}
 	w.Flush()
 
-	printAcceleratorList(c, cmd, w, accList)
+	printAcceleratorList(c, opts, cmd, w, accList)
 	return nil
 }
 
@@ -146,7 +146,7 @@ func printListFromClient(ctx context.Context, c *cli.Config, opts ListOptions, c
 		}
 	}
 
-	printAcceleratorList(c, cmd, w, accList)
+	printAcceleratorList(c, opts, cmd, w, accList)
 	return nil
 }
 
@@ -167,13 +167,20 @@ func contains(accTags []string, input []string) bool {
 	return true
 }
 
-func printAcceleratorList(c *cli.Config, cmd *cobra.Command, w *tabwriter.Writer, accelerators [][]string) {
+func printAcceleratorList(c *cli.Config, opts ListOptions, cmd *cobra.Command, w *tabwriter.Writer, accelerators [][]string) {
 	if len(accelerators) == 0 {
 		c.Infof("No accelerators found.\n")
 	} else {
-		fmt.Fprintln(w, "NAME\tTAGS\tREADY\tREPOSITORY")
-		for _, values := range accelerators {
-			fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", values[0], values[1], values[3], values[2])
+		if opts.Verbose {
+			fmt.Fprintln(w, "NAME\tTAGS\tREADY\tREPOSITORY")
+			for _, values := range accelerators {
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", values[0], values[1], values[3], values[2])
+			}
+		} else {
+			fmt.Fprintln(w, "NAME\tTAGS\tREADY")
+			for _, values := range accelerators {
+				fmt.Fprintf(w, "%s\t%s\t%s\n", values[0], values[1], values[3])
+			}
 		}
 		w.Flush()
 	}
