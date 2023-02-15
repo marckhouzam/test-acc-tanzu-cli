@@ -14,6 +14,7 @@ import (
 	"os/user"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -112,8 +113,11 @@ environment variable if it is set.
 				return errors.New(fmt.Sprintf("error creating request for %s, the URL needs to include the protocol (\"http://\" or \"https://\")", serverUrl))
 			}
 
+			osuser, _ := user.Current()
+			provenanceId := uuid.New().String()
+
 			apiPrefix := DetermineApiServerPrefix(serverUrl)
-			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/zip?name=%s", serverUrl, apiPrefix, args[0]), bytes.NewReader(JsonProxyBodyBytes))
+			proxyRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/zip?name=%s&source=TanzuCLI&username=%s&id=%s", serverUrl, apiPrefix, args[0], osuser.Username, provenanceId), bytes.NewReader(JsonProxyBodyBytes))
 			proxyRequest.Header.Add("Content-Type", "application/json")
 			client := &http.Client{}
 			resp, err := client.Do(proxyRequest)
@@ -145,8 +149,7 @@ environment variable if it is set.
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "zip file %s created\n", zipfile)
-			osuser, _ := user.Current()
-			invokedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/invoked?type=download&name=%s&source=TanzuCLI&username=%s", serverUrl, apiPrefix, args[0], osuser.Username), nil)
+			invokedRequest, err := http.NewRequest("POST", fmt.Sprintf("%s/%s/accelerators/invoked?type=download&name=%s&source=TanzuCLI&username=%s&id=%s", serverUrl, apiPrefix, args[0], osuser.Username, provenanceId), nil)
 			if err != nil {
 				return err
 			}
