@@ -29,7 +29,7 @@ func TestCreateCommand(t *testing.T) {
 	acceleratorName := "test-accelerator"
 	gitRepoUrl := "https://www.test.com"
 	imageName := "test-image"
-	noGitBranch := ""
+	noGitBranch := "main"
 	noGitTag := ""
 	gitBranch := "main"
 	gitTag := "v0.0.1"

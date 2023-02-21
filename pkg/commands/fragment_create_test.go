@@ -20,7 +20,7 @@ func TestFragmentCreateCommand(t *testing.T) {
 	fragmentName := "test-fragment"
 	gitRepoUrl := "https://www.test.com"
 	gitRepoSubPath := "test-path"
-	noGitBranch := ""
+	noGitBranch := "main"
 	noGitTag := ""
 	gitBranch := "main"
 	gitTag := "v0.0.1"

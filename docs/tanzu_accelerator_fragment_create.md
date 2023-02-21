@@ -28,7 +28,7 @@ tanzu acceleratorent fragm create <fragment-name> --git-repository <URL> --git-b
 
 ```
       --display-name string   display name for the accelerator fragment
-      --git-branch string     Git repository branch to be used
+      --git-branch string     Git repository branch to be used (default "main")
       --git-repo string       Git repository URL for the accelerator fragment
       --git-sub-path string   Git repository subPath to be used
       --git-tag string        Git repository tag to be used
