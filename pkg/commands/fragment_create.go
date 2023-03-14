@@ -15,6 +15,7 @@ import (
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -104,10 +105,18 @@ the same options specified in the accelerator metadata retrieved from the Git re
 			}
 
 			if opts.SecretRef != "" {
-				ref := meta.LocalObjectReference{
-					Name: opts.SecretRef,
+				if opts.SourceImage != "" {
+					ref := corev1.LocalObjectReference{
+						Name: opts.SecretRef,
+					}
+					frag.Spec.Source.ImagePullSecrets = []corev1.LocalObjectReference{ref}
+				} else {
+					ref := meta.LocalObjectReference{
+						Name: opts.SecretRef,
+					}
+					frag.Spec.Git.SecretRef = &ref
 				}
-				frag.Spec.Git.SecretRef = &ref
+
 			}
 
 			err := c.Create(ctx, frag)
