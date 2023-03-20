@@ -16,7 +16,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -336,7 +335,7 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 	tw := tar.NewWriter(gzw)
 	defer tw.Close()
 
-	cleanSourceDir := path.Clean(sourceDir)
+	cleanSourceDir := filepath.Clean(sourceDir)
 
 	ignore, err := gitignore.NewRepository(cleanSourceDir)
 	if err != nil {
@@ -379,8 +378,10 @@ func tarToWriter(sourceDir string, writer io.Writer) error {
 			return err
 		}
 
-		// update the name to correctly reflect the desired destination when untaring
-		header.Name = strings.TrimPrefix(path.Clean(file), cleanSourceDir+string(filepath.Separator))
+		// update the name to correctly reflect the desired destination when untaring, accounting for Windows paths
+		// which use "\" instead of "/"
+		fileDestination := strings.TrimPrefix(filepath.Clean(file), cleanSourceDir+string(filepath.Separator))
+		header.Name = filepath.ToSlash(fileDestination)
 
 		// write the header
 		if err := tw.WriteHeader(header); err != nil {
