@@ -36,10 +36,10 @@ tanzu accelerator create <accelerator-name> --git-repository <URL> --git-branch 
   -h, --help                  help for create
       --icon-url string       URL for icon to use with the accelerator
       --interval string       interval for checking for updates to Git or image repository
-      --local-path string     path to the directory containing the source for the accelerator
+      --local-path string     (DEPRECATED) path to the directory containing the source for the accelerator
   -n, --namespace string      namespace for accelerator system (default "accelerator-system")
       --secret-ref string     name of secret containing credentials for private Git or image repository
-      --source-image string   name of the source image for the accelerator
+      --source-image string   (DEPRECATED) name of the source image for the accelerator
       --tags strings          tags that can be used to search for accelerators
 ```
 

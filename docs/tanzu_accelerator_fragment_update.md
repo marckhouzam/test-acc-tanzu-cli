@@ -37,7 +37,7 @@ tanzu accelerator update <accelerator-name> --description "Lorem Ipsum"
   -n, --namespace string      namespace for accelerator fragments (default "accelerator-system")
       --reconcile             trigger a reconciliation including the associated GitRepository resource
       --secret-ref string     name of secret containing credentials for private Git repository
-      --source-image string   name of the source image for the accelerator fragment
+      --source-image string   (DEPRECATED) name of the source image for the accelerator fragment
 ```
 
 ### Options inherited from parent commands

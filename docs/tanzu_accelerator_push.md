@@ -1,10 +1,10 @@
 ## tanzu accelerator push
 
-Push local path to source image
+(DEPRECTAED) Push local path to source image
 
 ### Synopsis
 
-Push source code from local path to source image used by an accelerator
+(DEPRECATED) Push source code from local path to source image used by an accelerator
 
 ```
 tanzu accelerator push [flags]

@@ -21,7 +21,9 @@ type CreateOptions struct {
 	GitTag      string
 	GitSubPath  string
 	Interval    string
-	LocalPath   string
+	// Deprecated: LocalPath is deprecated
+	LocalPath string
+	// Deprecated: SourceImage is deprecated
 	SourceImage string
 	SecretRef   string
 	Tags        []string
@@ -35,7 +37,9 @@ type FragmentCreateOptions struct {
 	GitTag      string
 	GitSubPath  string
 	Interval    string
-	LocalPath   string
+	// Deprecated: LocalPath is deprecated
+	LocalPath string
+	// Deprecated: SourceImage is deprecated
 	SourceImage string
 	SecretRef   string
 }
@@ -59,9 +63,9 @@ func (co *CreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().StringVar(&co.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().StringVar(&co.Interval, "interval", "", "interval for checking for updates to Git or image repository")
-	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
+	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "(DEPRECATED) name of the source image for the accelerator")
 	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
-	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator")
+	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "(DEPRECATED) path to the directory containing the source for the accelerator")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
@@ -73,9 +77,9 @@ func (co *FragmentCreateOptions) DefineFlags(ctx context.Context, cmd *cobra.Com
 	cmd.Flags().StringVar(&co.GitTag, "git-tag", "", "Git repository tag to be used")
 	cmd.Flags().StringVar(&co.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().StringVar(&co.Interval, "interval", "", "interval for checking for updates to Git or image repository")
-	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "name of the source image for the accelerator")
+	cmd.Flags().StringVar(&co.SourceImage, "source-image", "", "(DEPRECATED) name of the source image for the accelerator")
 	cmd.Flags().StringVar(&co.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
-	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "path to the directory containing the source for the accelerator fragment")
+	cmd.Flags().StringVar(&co.LocalPath, "local-path", "", "(DEPRECATED) path to the directory containing the source for the accelerator fragment")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
 
@@ -89,6 +93,7 @@ type UpdateOptions struct {
 	GitTag      string
 	GitSubPath  string
 	Interval    string
+	// Deprecated: SourceImage is deprecated
 	SourceImage string
 	SecretRef   string
 	Tags        []string
@@ -107,7 +112,7 @@ func (uo *UpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Command, c 
 	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git or image repository")
-	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator")
+	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "(DEPRECATED) name of the source image for the accelerator")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git or image repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }
@@ -120,6 +125,7 @@ type FragmentUpdateOptions struct {
 	GitTag      string
 	GitSubPath  string
 	Interval    string
+	// Deprecated: SourceImage is deprecated
 	SourceImage string
 	SecretRef   string
 	Reconcile   bool
@@ -134,7 +140,7 @@ func (uo *FragmentUpdateOptions) DefineFlags(ctx context.Context, cmd *cobra.Com
 	cmd.Flags().StringVar(&uo.GitSubPath, "git-sub-path", "", "Git repository subPath to be used")
 	cmd.Flags().BoolVar(&uo.Reconcile, "reconcile", false, "trigger a reconciliation including the associated GitRepository resource")
 	cmd.Flags().StringVar(&uo.Interval, "interval", "", "interval for checking for updates to Git repository")
-	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "name of the source image for the accelerator fragment")
+	cmd.Flags().StringVar(&uo.SourceImage, "source-image", "", "(DEPRECATED) name of the source image for the accelerator fragment")
 	cmd.Flags().StringVar(&uo.SecretRef, "secret-ref", "", "name of secret containing credentials for private Git repository")
 	cmd.Flags().SetNormalizeFunc(normalizeGitRepoRun)
 }

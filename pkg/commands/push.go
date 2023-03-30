@@ -14,8 +14,8 @@ func PushCmd(ctx context.Context, c *cli.Config) *cobra.Command {
 	opts := PushOptions{}
 	cmd := &cobra.Command{
 		Use:     "push",
-		Short:   "Push local path to source image",
-		Long:    "Push source code from local path to source image used by an accelerator",
+		Short:   "(DEPRECTAED) Push local path to source image",
+		Long:    "(DEPRECATED) Push source code from local path to source image used by an accelerator",
 		Example: "tanzu accelerator push --local-path <local path> --source-image <image>",
 		Args: func(cmd *cobra.Command, args []string) error {
 			return nil

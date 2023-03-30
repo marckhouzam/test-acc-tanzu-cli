@@ -20,6 +20,6 @@ Manage accelerators in a Kubernetes cluster
 * [tanzu accelerator generate-from-local](tanzu_accelerator_generate-from-local.md)	 - Generate project from a combination of registered and local artifacts
 * [tanzu accelerator get](tanzu_accelerator_get.md)	 - Get accelerator info
 * [tanzu accelerator list](tanzu_accelerator_list.md)	 - List accelerators
-* [tanzu accelerator push](tanzu_accelerator_push.md)	 - Push local path to source image
+* [tanzu accelerator push](tanzu_accelerator_push.md)	 - (DEPRECTAED) Push local path to source image
 * [tanzu accelerator update](tanzu_accelerator_update.md)	 - Update an accelerator
 

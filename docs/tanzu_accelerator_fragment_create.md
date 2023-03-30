@@ -34,10 +34,10 @@ tanzu acceleratorent fragm create <fragment-name> --git-repository <URL> --git-b
       --git-tag string        Git repository tag to be used
   -h, --help                  help for create
       --interval string       interval for checking for updates to Git or image repository
-      --local-path string     path to the directory containing the source for the accelerator fragment
+      --local-path string     (DEPRECATED) path to the directory containing the source for the accelerator fragment
   -n, --namespace string      namespace for accelerator system (default "accelerator-system")
       --secret-ref string     name of secret containing credentials for private Git or image repository
-      --source-image string   name of the source image for the accelerator
+      --source-image string   (DEPRECATED) name of the source image for the accelerator
 ```
 
 ### Options inherited from parent commands
