@@ -1,56 +1,56 @@
-BUILD_VERSION ?= $$(cat BUILD_VERSION)
-BUILD_SHA ?= $$(git rev-parse --short HEAD)
-BUILD_DATE ?= $$(date -u +"%Y-%m-%d")
+ROOT_DIR_RELATIVE := .
 
-LD_FLAGS = -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildDate=$(BUILD_DATE)' \
-           -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildSHA=$(BUILD_SHA)$(BUILD_DIRTY)' \
-           -X 'github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli.BuildVersion=$(BUILD_VERSION)'
+include $(ROOT_DIR_RELATIVE)/common.mk
+include $(ROOT_DIR_RELATIVE)/plugin-tooling.mk
 
-GO_SOURCES = $(shell find ./cmd ./pkg -type f -name '*.go')
+TOOLS_DIR := tools
+TOOLS_BIN_DIR := $(TOOLS_DIR)/bin
+GOLANGCI_LINT := $(TOOLS_BIN_DIR)/golangci-lint
+GOLANGCI_LINT_VERSION := 1.49.0
 
-build-local:
-	@echo BUILD_VERSION: $(BUILD_VERSION)
-	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin --target local
+.PHONY: lint
+lint: $(GOLANGCI_LINT) ## Lint the plugin
+	$(GOLANGCI_LINT) run -v
 
-build:
-	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin
+.PHONY: gomod
+gomod: ## Update go module dependencies
+	go mod tidy
 
-.PHONY: build-%
-build-%:
-	$(eval ARCH = $(word 2,$(subst -, ,$*)))
-	$(eval OS = $(word 1,$(subst -, ,$*)))
-	tanzu builder cli compile --version $(BUILD_VERSION) --ldflags "$(LD_FLAGS)" --path ./cmd/plugin --artifacts artifacts/${OS}/${ARCH}/cli --target ${OS}_${ARCH}
-
-.PHONY: publish-%
-publish-%:
-	$(eval ARCH = $(word 2,$(subst -, ,$*)))
-	$(eval OS = $(word 1,$(subst -, ,$*)))
-	tanzu builder publish --type local --plugins "accelerator" --version $(BUILD_VERSION) --local-output-discovery-dir standalone/${OS}-${ARCH}/discovery/standalone --local-output-distribution-dir standalone/${OS}-${ARCH}/distribution --input-artifact-dir artifacts --os-arch "${OS}-${ARCH}"
-
+.PHONY: test
 test:
+	go test ./...
+
+.PHONY: cover
+cover:
 	go test -coverprofile cover.out ./...
 
-create-artifact: build-darwin-amd64 build-linux-amd64 build-windows-amd64 publish-darwin-amd64 publish-linux-amd64 publish-windows-amd64
-	tar -C standalone -zcvf tanzu-accelerator-plugin.tar.gz .
+$(TOOLS_BIN_DIR):
+	-mkdir -p $@
 
-docs: $(GO_SOURCES)
-	@rm -rf docs
-	ACC_SERVER_URL="" go run --ldflags "$(LD_FLAGS)" ./cmd/plugin/accelerator docs -d docs
+$(GOLANGCI_LINT): $(TOOLS_BIN_DIR) ## Install golangci-lint
+	curl -L https://github.com/golangci/golangci-lint/releases/download/v$(GOLANGCI_LINT_VERSION)/golangci-lint-$(GOLANGCI_LINT_VERSION)-$(GOHOSTOS)-$(GOHOSTARCH).tar.gz | tar -xz -C /tmp/
+	mv /tmp/golangci-lint-$(GOLANGCI_LINT_VERSION)-$(GOHOSTOS)-$(GOHOSTARCH)/golangci-lint $(@)
 
+.PHONY: create-kind-cluster
 create-kind-cluster:
 	kind delete clusters e2e-acc-cluster
 	kind create cluster --name e2e-acc-cluster --config ./e2e/assets/acc-kind-node.yml
 	kubectl config use-context kind-e2e-acc-cluster
 
+.PHONY: install-prereqs
 install-prereqs:
-	kubectl apply -f https://gist.githubusercontent.com/trisberg/f53bbaa0b8aacba0ec64372a6fb6acdf/raw/45259afd682caa2f6270f4b8c07c995aa8487a12/acc-flux2.yaml	
+	kubectl apply -f ./e2e/assets/fluxcd-flux2-install.yaml
 	kubectl apply -f https://gist.githubusercontent.com/trisberg/0fc3ed74e3673af72c63e867ffcf8972/raw/9d5834bd81fa407665c00a238d6dd0ade135ca10/acc-source.yaml
 
+.PHONY: install-bundle
 install-bundle:
 	kubectl create namespace accelerator-system	
 	./e2e/scripts/deploy-app.sh
 
+.PHONY: add-test-accelerators
 add-test-accelerators:
 	kubectl create -f ./e2e/assets/test-accelerators.yml
+	sleep 10
 
-create-context: create-kind-cluster install-prereqs install-bundle add-test-accelerators	
+.PHONY: create-context
+create-context: create-kind-cluster install-prereqs install-bundle add-test-accelerators

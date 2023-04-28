@@ -4,10 +4,12 @@ import (
 	"testing"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
+	rtesting "github.com/vmware-labs/reconciler-runtime/testing"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestFragmentDeleteCommand(t *testing.T) {
@@ -32,8 +34,8 @@ func TestFragmentDeleteCommand(t *testing.T) {
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("delete", "Fragment"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      fragmentName,
@@ -41,17 +43,17 @@ func TestFragmentDeleteCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
 					},
-				}),
+				},
 			},
-			ExpectDeletes: []clitesting.DeleteRef{
+			ExpectDeletes: []rtesting.DeleteRef{
 				{
 					Group:     "accelerator.apps.tanzu.vmware.com",
-					Resource:  "Fragment",
+					Kind:      "Fragment",
 					Namespace: namespace,
 					Name:      fragmentName,
 				},
@@ -62,8 +64,8 @@ func TestFragmentDeleteCommand(t *testing.T) {
 		{
 			Name: "Error accelerator fragment not found",
 			Args: []string{fragmentNotFound},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      fragmentName,
@@ -71,12 +73,12 @@ func TestFragmentDeleteCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: "accelerator fragment non-existent not found\n",
 			ShouldError:  true,
@@ -84,8 +86,8 @@ func TestFragmentDeleteCommand(t *testing.T) {
 		{
 			Name: "Delete Fragment",
 			Args: []string{fragmentName},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: v1.ObjectMeta{
 						Namespace: namespace,
 						Name:      fragmentName,
@@ -93,17 +95,17 @@ func TestFragmentDeleteCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
 					},
-				}),
+				},
 			},
-			ExpectDeletes: []clitesting.DeleteRef{
+			ExpectDeletes: []rtesting.DeleteRef{
 				{
 					Group:     "accelerator.apps.tanzu.vmware.com",
-					Resource:  "Fragment",
+					Kind:      "Fragment",
 					Namespace: namespace,
 					Name:      fragmentName,
 				},

@@ -1,3 +1,6 @@
+/*
+Copyright 2021-2023 VMware, Inc. All Rights Reserved.
+*/
 package commands
 
 import (
@@ -10,11 +13,14 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
+	"github.com/vmware-tanzu/apps-cli-plugin/pkg/logger"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/source"
+	"github.com/vmware-tanzu/carvel-imgpkg/pkg/imgpkg/registry"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -199,8 +205,22 @@ func (opts PushOptions) PublishLocalSource(ctx context.Context, c *cli.Config) e
 
 func pushSourceImage(ctx context.Context, c *cli.Config, image string, path string) (string, error) {
 	taggedImage := strings.Split(image, "@sha")[0]
+	options := registry.Opts{
+		VerifyCerts:           false,
+		RetryCount:            5,
+		ResponseHeaderTimeout: 30 * time.Second,
+		Insecure:              true,
+	}
+	reg, err := registry.NewSimpleRegistry(options)
+	if err != nil {
+		return "", err
+	}
+
 	c.Infof("publishing accelerator source in %q to %q...\n", path, taggedImage)
-	digestedImage, err := source.ImgpkgPush(ctx, path, taggedImage)
+	ctx = logger.StashSourceImageLogger(ctx, logger.NewNoopLogger())
+
+	digestedImage, err := source.ImgpkgPush(ctx, path, nil, reg, taggedImage)
+
 	if err != nil {
 		return "", err
 	}

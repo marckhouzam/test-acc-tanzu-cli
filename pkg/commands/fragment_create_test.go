@@ -6,7 +6,7 @@ import (
 
 	"github.com/fluxcd/pkg/apis/meta"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -50,7 +50,7 @@ func TestFragmentCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: noGitBranch,
 								Tag:    noGitTag,
 							},
@@ -73,7 +73,7 @@ func TestFragmentCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: noGitBranch,
 								Tag:    noGitTag,
 							},
@@ -102,7 +102,7 @@ func TestFragmentCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 								Tag:    gitTag,
 							},

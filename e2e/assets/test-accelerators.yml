@@ -1,12 +1,12 @@
 apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
-  name: spring-petclinic-e2e
+  name: spring-petclinic
+  namespace: accelerator-system
 spec:
   # Add fields here
   displayName: Spring Petclinic
   description: A sample Spring-based application
-  iconUrl: https://github.com/scothis/spring-petclinic/raw/main/src/main/resources/static/resources/images/pets.png
   tags:
     - java
     - spring
@@ -19,6 +19,7 @@ apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
   name: podinfo
+  namespace: accelerator-system
 spec:
   # Add fields here
   displayName: Podinfo
@@ -36,6 +37,7 @@ apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
   name: new-accelerator-e2e
+  namespace: accelerator-system
 spec:
   git:
     url: https://github.com/simple-starters/e2e-new-accelerator
@@ -46,6 +48,7 @@ apiVersion: accelerator.apps.tanzu.vmware.com/v1alpha1
 kind: Accelerator
 metadata:
   name: engine-features
+  namespace: accelerator-system
 spec:
   git:
     url: https://github.com/simple-starters/e2e-engine-features

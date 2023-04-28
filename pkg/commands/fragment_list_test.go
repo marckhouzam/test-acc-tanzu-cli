@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -33,8 +34,8 @@ No accelerator fragments found.
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("list", "FragmentList"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      fragmentName,
 						Namespace: namespace,
@@ -42,12 +43,12 @@ No accelerator fragments found.
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ShouldError:  true,
 			ExpectOutput: "There was an error listing accelerator fragments\n",
@@ -55,8 +56,8 @@ No accelerator fragments found.
 		{
 			Name: "List accelerator fragments from context",
 			Args: []string{},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      fragmentName,
 						Namespace: namespace,
@@ -64,13 +65,13 @@ No accelerator fragments found.
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+				},
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-fragment",
 						Namespace: namespace,
@@ -78,12 +79,12 @@ No accelerator fragments found.
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME               READY
@@ -94,8 +95,8 @@ test-fragment      unknown
 		{
 			Name: "List accelerator fragments from context with verbose flag",
 			Args: []string{"--verbose"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      fragmentName,
 						Namespace: namespace,
@@ -103,13 +104,13 @@ test-fragment      unknown
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+				},
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-fragment",
 						Namespace: namespace,
@@ -117,12 +118,12 @@ test-fragment      unknown
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME               READY     REPOSITORY
@@ -133,8 +134,8 @@ test-fragment      unknown   https://www.test.com:main
 		{
 			Name: "List accelerator fragments from context",
 			Args: []string{},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      fragmentName,
 						Namespace: namespace,
@@ -142,12 +143,12 @@ test-fragment      unknown   https://www.test.com:main
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME            READY

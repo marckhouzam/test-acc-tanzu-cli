@@ -8,9 +8,8 @@ import (
 
 	"github.com/fluxcd/pkg/apis/meta"
 	ggcrregistry "github.com/google/go-containerregistry/pkg/registry"
-	"github.com/google/go-containerregistry/pkg/v1/remote"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
@@ -59,7 +58,7 @@ func TestCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: noGitBranch,
 								Tag:    noGitTag,
 							},
@@ -82,7 +81,7 @@ func TestCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: noGitBranch,
 								Tag:    noGitTag,
 							},
@@ -136,7 +135,7 @@ func TestCreateCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 								Tag:    gitTag,
 							},
@@ -183,7 +182,7 @@ func TestCreateCommandLocalPath(t *testing.T) {
 		{
 			Config: c,
 			Prepare: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) (context.Context, error) {
-				return source.StashGgcrRemoteOptions(ctx, remote.WithTransport(registry.Client().Transport)), nil
+				return source.StashContainerRemoteTransport(ctx, registry.Client().Transport), nil
 			},
 			Name: "Create Accelerator Image from Local Path",
 			Args: []string{acceleratorName, "--source-image", imageName, "--local-path", localPath},

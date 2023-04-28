@@ -5,10 +5,11 @@ import (
 	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestFragmentGetCommand(t *testing.T) {
@@ -29,7 +30,7 @@ func TestFragmentGetCommand(t *testing.T) {
 			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
-				Reference: &v1beta1.GitRepositoryRef{
+				Reference: &v1beta2.GitRepositoryRef{
 					Branch: "main",
 					Tag:    "v1.0.0",
 				},
@@ -59,7 +60,7 @@ func TestFragmentGetCommand(t *testing.T) {
 			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
-				Reference: &v1beta1.GitRepositoryRef{
+				Reference: &v1beta2.GitRepositoryRef{
 					Branch: "main",
 					Tag:    "v1.0.0",
 				},
@@ -92,8 +93,8 @@ func TestFragmentGetCommand(t *testing.T) {
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("get", "Fragment"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testFragment),
+			GivenObjects: []client.Object{
+				&testFragment,
 			},
 			ShouldError:  true,
 			ExpectOutput: "Error getting accelerator fragment test-fragment\n",
@@ -101,8 +102,8 @@ func TestFragmentGetCommand(t *testing.T) {
 		{
 			Name: "Get a fragment from context",
 			Args: []string{fragmentName},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testFragment),
+			GivenObjects: []client.Object{
+				&testFragment,
 			},
 			ExpectOutput: `
 name: test-fragment
@@ -133,8 +134,8 @@ importedBy:
 		{
 			Name: "Get an fragment with empty values from context",
 			Args: []string{fragmentName},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAcceleratorEmptyValues),
+			GivenObjects: []client.Object{
+				&testAcceleratorEmptyValues,
 			},
 			ExpectOutput: `
 name: test-fragment

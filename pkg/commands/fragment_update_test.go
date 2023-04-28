@@ -6,7 +6,7 @@ import (
 
 	"github.com/fluxcd/pkg/apis/meta"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,8 +43,8 @@ func TestFragmentUpdateCmd(t *testing.T) {
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("update", "Fragment"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -52,12 +52,12 @@ func TestFragmentUpdateCmd(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectUpdates: []client.Object{
 				&acceleratorv1alpha1.Fragment{
@@ -68,7 +68,7 @@ func TestFragmentUpdateCmd(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
@@ -81,8 +81,8 @@ func TestFragmentUpdateCmd(t *testing.T) {
 		{
 			Name: "Updates fragment",
 			Args: []string{acceleratorName, "--interval", interval, "--secret-ref", secretRef},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -90,12 +90,12 @@ func TestFragmentUpdateCmd(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectUpdates: []client.Object{
 				&acceleratorv1alpha1.Fragment{
@@ -106,7 +106,7 @@ func TestFragmentUpdateCmd(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 							SecretRef: &meta.LocalObjectReference{

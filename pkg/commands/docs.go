@@ -1,7 +1,6 @@
 /*
-Copyright 2021 VMware, Inc. All Rights Reserved.
+Copyright 2021-2023 VMware, Inc. All Rights Reserved.
 */
-
 package commands
 
 import (

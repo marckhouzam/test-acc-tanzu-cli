@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -47,7 +47,7 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
@@ -59,8 +59,8 @@ func TestApplyCommand(t *testing.T) {
 		{
 			Name: "Update Accelerator",
 			Args: []string{acceleratorName, "--filename", acceleratorFilename},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: v1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -68,12 +68,12 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "not-main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectUpdates: []client.Object{
 				&acceleratorv1alpha1.Accelerator{
@@ -84,7 +84,7 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
@@ -105,7 +105,7 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},
@@ -117,8 +117,8 @@ func TestApplyCommand(t *testing.T) {
 		{
 			Name: "Update Fragment",
 			Args: []string{fragmentName, "--filename", fragmentFilename},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Fragment{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Fragment{
 					ObjectMeta: v1.ObjectMeta{
 						Name:      fragmentName,
 						Namespace: namespace,
@@ -126,12 +126,12 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "not-main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectUpdates: []client.Object{
 				&acceleratorv1alpha1.Fragment{
@@ -142,7 +142,7 @@ func TestApplyCommand(t *testing.T) {
 					Spec: acceleratorv1alpha1.FragmentSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: gitRepoUrl,
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: gitBranch,
 							},
 						},

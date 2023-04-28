@@ -21,14 +21,24 @@ Download `tanzu-accelerator-plugin-<version>.tar.gz` from the most recent releas
 Extract the archive to a local directory:
 
 ```sh
-tar -zxvf tanzu-accelerator-plugin-*.tar.gz
+mkdir plugin_bundle
+tar -zxvf tanzu-accelerator-plugin-*.tar.gz -C plugin_bundle
 ```
 
 Install the accelerator plugin:
 
-```sh
-tanzu plugin install accelerator --local ./artifacts --version v1.6.0-dev
-```
+- For MacOS:
+    ```sh
+    tanzu plugin install accelerator -t kubernetes --local ./plugin_bundle/darwin/amd64
+    ```
+- For Linux:
+    ```sh
+    tanzu plugin install accelerator -t kubernetes --local ./plugin_bundle/linux/amd64
+    ```
+- For Windows:
+    ```sh
+    tanzu plugin install accelerator -t kubernetes --local ./plugin_bundle/windows/amd64
+    ```
 
 ### Build from source
 

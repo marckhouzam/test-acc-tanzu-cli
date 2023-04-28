@@ -19,7 +19,7 @@ export acc_registry__secret_ref=acc-reg-creds
 export acc_server__service_type=NodePort
 imgpkg pull -b $registry/app-accelerator/acc-install-bundle:$version \
   -o $BUNDLE_PATH
-ytt -f $BUNDLE_PATH/config -f $BUNDLE_PATH/values.yml --data-values-env acc  \
+ytt -f $BUNDLE_PATH/config -f $BUNDLE_PATH/values.yml --data-values-env acc --data-value-yaml samples.include=false  \
 | kbld -f $BUNDLE_PATH/.imgpkg/images.yml -f- \
 | kapp deploy -y -n accelerator-system -a accelerator -f-
 

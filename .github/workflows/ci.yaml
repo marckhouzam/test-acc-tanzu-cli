@@ -3,9 +3,10 @@ name: CI
 on:
   push:
     branches:
-    - '**'
+      - '**'
     tags:
-    - '**'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-build.[0-9]+'
 
 env:
   GOPRIVATE: github.com/pivotal,github.com/vmware-tanzu/*
@@ -19,29 +20,36 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.ACC_CONTROLLER_DEPLOY_KEY }}
     - uses: actions/checkout@v2.3.4
-    - uses: actions/setup-go@v2.1.3
+    - uses: actions/setup-go@v4.0.0
       with:
-        go-version: 1.18.x
+        go-version: 1.19.x
     - name: Setup
       run: |
         git config --global url."https://${USERNAME}:${TOKEN}@github.com".insteadOf "https://github.com"
         kind create cluster
     - name: Install tanzu cli
       run: |
-        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-cli-linux-amd64.tar.gz && \
+        TANZU_VERSION=$(cat TANZU_VERSION)
+        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/${TANZU_VERSION}/tanzu-cli-linux-amd64.tar.gz && \
           mkdir -p tanzu && \
           tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
-        sudo install tanzu/v0.17.0/tanzu-core-linux_amd64 /usr/local/bin/tanzu
-        curl -L -o tanzu-framework-plugins-admin-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.17.0/tanzu-framework-plugins-admin-linux-amd64.tar.gz && \
-          tar xvzf tanzu-framework-plugins-admin-linux-amd64.tar.gz
-        tanzu plugin install builder -l admin-plugins
-        tanzu plugin install test -l admin-plugins
+        sudo install tanzu/${TANZU_VERSION}/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
+        tanzu ceip-participation set false
+        tanzu init
+        tanzu version
+        tanzu plugin install builder --version ${TANZU_VERSION} --target global
+        tanzu plugin install test --version ${TANZU_VERSION} --target global
+        tanzu plugin list
     - name: Test
-      run: make test
-    - name: Create Artifact
-      run: make create-artifact
-    - name: Install
-      run: tanzu plugin install accelerator --local standalone/linux-amd64 --version $(cat BUILD_VERSION)
+      run: | 
+        make test
+    - name: Build plugin and create artifact
+      run: |
+        tanzu version
+        tanzu plugin list
+        make plugin-build
+    - name: Install plugin
+      run: tanzu plugin install accelerator -t kubernetes --local ./artifacts/plugins/linux/amd64 --version $(cat BUILD_VERSION)
     - name: Verify docs
       run: |
         rm -rf docs
@@ -50,7 +58,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: tanzu-accelerator-plugin.tar.gz
-        path: tanzu-accelerator-plugin.tar.gz
+        path: artifacts/plugin_bundle.tar.gz
         retention-days: 1
 
   e2e:
@@ -59,7 +67,7 @@ jobs:
     strategy:
       matrix:
         k8s:
-        - 1.25.6
+        - kind
     env:
       ACC_SERVER_URL: http://localhost:8877
       TANZUNET_ROBOT: ${{ secrets.TANZUNET_ROBOT }}
@@ -75,10 +83,15 @@ jobs:
         name: tanzu-accelerator-plugin.tar.gz
     - name: Install tanzu cli
       run: |
-        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-framework/releases/download/v0.25.4/tanzu-cli-linux-amd64.tar.gz && \
+        TANZU_VERSION=$(cat TANZU_VERSION)
+        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/${TANZU_VERSION}/tanzu-cli-linux-amd64.tar.gz && \
           mkdir -p tanzu && \
           tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
-        sudo install tanzu/v0.25.4/tanzu-core-linux_amd64 /usr/local/bin/tanzu
+        sudo install tanzu/${TANZU_VERSION}/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
+        tanzu ceip-participation set false
+        tanzu init
+        tanzu version
+        tanzu plugin list
     - name: Build Version
       run: echo "BUILD_VERSION=$(cat BUILD_VERSION)" >> $GITHUB_ENV
     - name: Install CLI
@@ -87,9 +100,9 @@ jobs:
         set -o nounset
         set -o pipefail
 
-        mkdir standalone
-        tar -xvzf tanzu-accelerator-plugin.tar.gz -C standalone
-        tanzu plugin install accelerator --local standalone/linux-amd64 --version ${{env.BUILD_VERSION}}
+        mkdir -p artifacts/plugins
+        tar -xvzf plugin_bundle.tar.gz -C artifacts/plugins
+        tanzu plugin install accelerator -t kubernetes --local ./artifacts/plugins/linux/amd64 --version ${{env.BUILD_VERSION}}
     - name: Create Context
       run: |
         make create-context
@@ -105,14 +118,14 @@ jobs:
         echo "##[group]Create Accelerator"
           tanzu accelerator create test-accelerator --git-repository http://www.test.com
         echo "##[endgroup]"
-        echo "##[group]Get Acceletor"
+        echo "##[group]Get Accelerator"
           tanzu accelerator get spring-petclinic
-        echo "##[endgroup]"
-        echo "##[group]Update Accelerator"
-          tanzu accelerator update spring-petclinic --description "Lorem Ipsum"
         echo "##[endgroup]"
         echo "##[group]Generate Accelerator"
           tanzu accelerator generate spring-petclinic
+        echo "##[endgroup]"
+        echo "##[group]Update Accelerator"
+          tanzu accelerator update test-accelerator --description "Lorem Ipsum"
         echo "##[endgroup]"
         echo "##[group]Delete Accelerator"
           tanzu accelerator delete test-accelerator
@@ -148,6 +161,8 @@ jobs:
       uses: actions/download-artifact@v2.0.10
       with:
         name: tanzu-accelerator-plugin.tar.gz
+    - name: Rename artifact
+      run: mv plugin_bundle.tar.gz tanzu-accelerator-plugin.tar.gz
     - name: Upload CLI release
       uses: actions/upload-release-asset@v1.0.2
       env:

@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	ggcrregistry "github.com/google/go-containerregistry/pkg/registry"
-	"github.com/google/go-containerregistry/pkg/v1/remote"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
@@ -52,7 +51,7 @@ func TestPushCmd(t *testing.T) {
 		{
 			Config: c,
 			Prepare: func(t *testing.T, ctx context.Context, config *cli.Config, tc *clitesting.CommandTestCase) (context.Context, error) {
-				return source.StashGgcrRemoteOptions(ctx, remote.WithTransport(registry.Client().Transport)), nil
+				return source.StashContainerRemoteTransport(ctx, registry.Client().Transport), nil
 			},
 			Name:         "Push to source-image",
 			Args:         []string{"--local-path", localPath, "--source-image", imageName},

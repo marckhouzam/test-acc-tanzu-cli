@@ -10,9 +10,10 @@ import (
 
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -82,8 +83,8 @@ No accelerators found.
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("list", "AcceleratorList"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -91,12 +92,12 @@ No accelerators found.
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ShouldError:  true,
 			ExpectOutput: "There was an error listing accelerators\n",
@@ -104,8 +105,8 @@ No accelerators found.
 		{
 			Name: "List accelerators from context",
 			Args: []string{"--from-context"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -113,13 +114,13 @@ No accelerators found.
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+				},
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-accelerator",
 						Namespace: namespace,
@@ -127,13 +128,13 @@ No accelerators found.
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+				},
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "image-accelerator",
 						Namespace: namespace,
@@ -143,7 +144,7 @@ No accelerators found.
 							Image: "test-image",
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME                  TAGS   READY
@@ -155,8 +156,8 @@ test-accelerator      []     unknown
 		{
 			Name: "List accelerators from context with verbose flag",
 			Args: []string{"--from-context", "--verbose"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -164,13 +165,13 @@ test-accelerator      []     unknown
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+				},
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "another-accelerator",
 						Namespace: namespace,
@@ -178,13 +179,13 @@ test-accelerator      []     unknown
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+				},
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "image-accelerator",
 						Namespace: namespace,
@@ -194,7 +195,7 @@ test-accelerator      []     unknown
 							Image: "test-image",
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME                  TAGS   READY     REPOSITORY
@@ -222,8 +223,8 @@ mock   [first second]   true
 		{
 			Name: "List accelerators from context",
 			Args: []string{"--from-context"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&acceleratorv1alpha1.Accelerator{
+			GivenObjects: []client.Object{
+				&acceleratorv1alpha1.Accelerator{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      acceleratorName,
 						Namespace: namespace,
@@ -231,12 +232,12 @@ mock   [first second]   true
 					Spec: acceleratorv1alpha1.AcceleratorSpec{
 						Git: &acceleratorv1alpha1.Git{
 							URL: "https://www.test.com",
-							Reference: &v1beta1.GitRepositoryRef{
+							Reference: &v1beta2.GitRepositoryRef{
 								Branch: "main",
 							},
 						},
 					},
-				}),
+				},
 			},
 			ExpectOutput: `
 NAME               TAGS   READY

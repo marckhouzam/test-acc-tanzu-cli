@@ -1,0 +1,4 @@
+plugins:
+  - name: accelerator
+    target: kubernetesmake plugin-build-install-local
+    isContextScoped: false

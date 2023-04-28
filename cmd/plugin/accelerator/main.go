@@ -1,5 +1,5 @@
 /*
-Copyright 2021 VMware, Inc. All Rights Reserved.
+Copyright 2021-2023 VMware, Inc. All Rights Reserved.
 */
 package main
 
@@ -10,14 +10,14 @@ import (
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
 	"github.com/pivotal/acc-tanzu-cli/pkg/commands"
-	tanzucliv1alpha1 "github.com/vmware-tanzu/tanzu-framework/apis/cli/v1alpha1"
-	"github.com/vmware-tanzu/tanzu-framework/pkg/v1/cli/command/plugin"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/config/types"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/plugin"
+	"github.com/vmware-tanzu/tanzu-plugin-runtime/plugin/buildinfo"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	// load credential helpers
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 )
@@ -32,12 +32,14 @@ func init() {
 
 func main() {
 	ctx := context.Background()
-	p, err := plugin.NewPlugin(&tanzucliv1alpha1.PluginDescriptor{
+	p, err := plugin.NewPlugin(&plugin.PluginDescriptor{
 		Name:           "accelerator",
-		Version:        "v1.6.0-dev",
+		Version:        buildinfo.Version,
 		Description:    "Manage accelerators in a Kubernetes cluster",
-		Group:          tanzucliv1alpha1.BuildCmdGroup,
-		CompletionType: tanzucliv1alpha1.NativePluginCompletion,
+		Target:         types.TargetK8s,
+		BuildSHA:       buildinfo.SHA,
+		Group:          plugin.RunCmdGroup,
+		CompletionType: plugin.NativePluginCompletion,
 		Aliases:        []string{"acc"},
 	})
 	if err != nil {

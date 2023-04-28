@@ -1,5 +1,5 @@
 /*
-Copyright 2021 VMware, Inc. All Rights Reserved.
+Copyright 2022-2023 VMware, Inc. All Rights Reserved.
 */
 package commands
 
@@ -12,7 +12,7 @@ import (
 	"github.com/fluxcd/pkg/apis/meta"
 	"github.com/imdario/mergo"
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	fluxcdv1beta1 "github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"

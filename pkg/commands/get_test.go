@@ -11,12 +11,13 @@ import (
 	"time"
 
 	acceleratorv1alpha1 "github.com/pivotal/acc-controller/api/v1alpha1"
-	"github.com/pivotal/acc-controller/fluxcd/api/v1beta1"
+	"github.com/pivotal/acc-controller/fluxcd/api/v1beta2"
 	"github.com/pivotal/acc-controller/sourcecontroller/api/v1alpha1"
 	cli "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime"
 	clitesting "github.com/vmware-tanzu/apps-cli-plugin/pkg/cli-runtime/testing"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 func TestGetCommand(t *testing.T) {
@@ -105,7 +106,7 @@ func TestGetCommand(t *testing.T) {
 			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
-				Reference: &v1beta1.GitRepositoryRef{
+				Reference: &v1beta2.GitRepositoryRef{
 					Branch: "main",
 					Tag:    "v1.0.0",
 				},
@@ -138,7 +139,7 @@ func TestGetCommand(t *testing.T) {
 			Git: &acceleratorv1alpha1.Git{
 				Ignore: &ignore,
 				URL:    "http://www.test.com",
-				Reference: &v1beta1.GitRepositoryRef{
+				Reference: &v1beta2.GitRepositoryRef{
 					Branch: "main",
 					Tag:    "v1.0.0",
 				},
@@ -214,8 +215,8 @@ func TestGetCommand(t *testing.T) {
 			WithReactors: []clitesting.ReactionFunc{
 				clitesting.InduceFailure("get", "Accelerator"),
 			},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAccelerator),
+			GivenObjects: []client.Object{
+				&testAccelerator,
 			},
 			ShouldError:  true,
 			ExpectOutput: "Error getting accelerator test-accelerator\n",
@@ -223,8 +224,8 @@ func TestGetCommand(t *testing.T) {
 		{
 			Name: "Get an accelerator from context",
 			Args: []string{acceleratorName, "--from-context"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAccelerator),
+			GivenObjects: []client.Object{
+				&testAccelerator,
 			},
 			ExpectOutput: `
 name: test-accelerator
@@ -256,8 +257,8 @@ imports:
 		{
 			Name: "Get an accelerator from context with verbose flag",
 			Args: []string{acceleratorName, "--from-context", "--verbose"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAccelerator),
+			GivenObjects: []client.Object{
+				&testAccelerator,
 			},
 			ExpectOutput: `
 name: test-accelerator
@@ -291,8 +292,8 @@ imports:
 		{
 			Name: "Get an accelerator with empty values from context",
 			Args: []string{acceleratorName, "--from-context"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAcceleratorEmptyValues),
+			GivenObjects: []client.Object{
+				&testAcceleratorEmptyValues,
 			},
 			ExpectOutput: `
 name: test-accelerator
@@ -318,8 +319,8 @@ imports:
 		{
 			Name: "Get an accelerator with image from context",
 			Args: []string{acceleratorName, "--from-context"},
-			GivenObjects: []clitesting.Factory{
-				clitesting.Wrapper(&testAcceleratorImage),
+			GivenObjects: []client.Object{
+				&testAcceleratorImage,
 			},
 			ExpectOutput: `
 name: test-accelerator
