@@ -14,7 +14,6 @@ jobs:
     steps:
     - name: Install tanzu cli
       run: |
-        curl -I https://projects.registry.vmware.com
         curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/v0.90.0-alpha.1/tanzu-cli-linux-amd64.tar.gz && \
           mkdir -p tanzu && \
           tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
@@ -22,5 +21,4 @@ jobs:
         tanzu ceip-participation set false
         tanzu version
         tanzu plugin search
-        tanzu plugin install builder --version v0.90.0-alpha.1 --target global
 
