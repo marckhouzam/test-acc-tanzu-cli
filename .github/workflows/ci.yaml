@@ -18,7 +18,7 @@ jobs:
         sudo apt-get install -y ca-certificates
         echo "deb https://storage.googleapis.com/tanzu-cli-os-packages/apt tanzu-cli-jessie main" | sudo tee /etc/apt/sources.list.d/tanzu.list
         sudo apt update --allow-insecure-repositories
-        sudo apt-get install tanzu-cli
+        sudo apt install -y tanzu-cli --allow-unauthenticated
         tanzu ceip-participation set false
         tanzu version
         tanzu config get
