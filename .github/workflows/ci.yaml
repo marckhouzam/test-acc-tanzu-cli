@@ -12,10 +12,6 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.3.4
-    - uses: actions/setup-go@v4.0.0
-      with:
-        go-version: 1.19.x
     - name: Install tanzu cli
       run: |
         curl -I https://projects.registry.vmware.com
