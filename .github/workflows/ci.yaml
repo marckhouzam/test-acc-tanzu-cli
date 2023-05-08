@@ -14,10 +14,11 @@ jobs:
     steps:
     - name: Install tanzu cli
       run: |
-        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/v0.90.0-alpha.1/tanzu-cli-linux-amd64.tar.gz && \
-          mkdir -p tanzu && \
-          tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
-        sudo install tanzu/v0.90.0-alpha.1/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
+        sudo apt-get update
+        sudo apt-get install -y ca-certificates
+        echo "deb https://storage.googleapis.com/tanzu-cli-os-packages/apt tanzu-cli-jessie main" | sudo tee /etc/apt/sources.list.d/tanzu.list
+        sudo apt update --allow-insecure-repositories
+        sudo apt-get install tanzu-cli
         tanzu ceip-participation set false
         tanzu version
         tanzu config get
