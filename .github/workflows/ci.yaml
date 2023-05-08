@@ -28,3 +28,4 @@ jobs:
         tanzu plugin install builder --version v0.90.0-alpha.1 --target global
         tanzu plugin install test --version v0.90.0-alpha.1 --target global
         tanzu plugin list
+
