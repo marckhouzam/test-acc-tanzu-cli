@@ -20,5 +20,6 @@ jobs:
         sudo install tanzu/v0.90.0-alpha.1/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
         tanzu ceip-participation set false
         tanzu version
+        tanzu config get
         tanzu plugin search
 
