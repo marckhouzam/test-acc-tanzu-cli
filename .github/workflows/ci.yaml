@@ -18,14 +18,13 @@ jobs:
         go-version: 1.19.x
     - name: Install tanzu cli
       run: |
-        TANZU_VERSION=$(cat TANZU_VERSION)
-        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/${TANZU_VERSION}/tanzu-cli-linux-amd64.tar.gz && \
+        curl -L -o tanzu-cli-linux-amd64.tar.gz https://github.com/vmware-tanzu/tanzu-cli/releases/download/v0.90.0-alpha.1/tanzu-cli-linux-amd64.tar.gz && \
           mkdir -p tanzu && \
           tar xvzf tanzu-cli-linux-amd64.tar.gz -C tanzu
-        sudo install tanzu/${TANZU_VERSION}/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
+        sudo install tanzu/v0.90.0-alpha.1/tanzu-cli-linux_amd64 /usr/local/bin/tanzu
         tanzu ceip-participation set false
         tanzu init
         tanzu version
-        tanzu plugin install builder --version ${TANZU_VERSION} --target global
-        tanzu plugin install test --version ${TANZU_VERSION} --target global
+        tanzu plugin install builder --version v0.90.0-alpha.1 --target global
+        tanzu plugin install test --version v0.90.0-alpha.1 --target global
         tanzu plugin list
